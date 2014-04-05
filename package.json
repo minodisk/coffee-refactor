@@ -1,0 +1,14 @@
+{
+  "name": "coffee-refactor",
+  "main": "./lib/coffee-refactor",
+  "version": "0.0.0",
+  "description": "A short description of your package",
+  "activationEvents": ["coffee-refactor:toggle"],
+  "repository": "https://github.com/atom/coffee-refactor",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+  }
+}
