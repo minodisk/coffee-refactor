@@ -1,4 +1,7 @@
 {View} = require 'atom'
+coffee = require 'coffee-script'
+
+console.log coffee
 
 module.exports =
 class CoffeeRefactorView extends View
