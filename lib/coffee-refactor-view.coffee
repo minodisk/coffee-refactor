@@ -10,7 +10,7 @@ class CoffeeRefactorView extends View
       @div "The CoffeeRefactor package is Alive! It's ALIVE!", class: "message"
 
   initialize: (serializeState) ->
-    atom.workspaceView.command "coffee-refactor:toggle", => @toggle()
+    # atom.workspaceView.command "coffee-refactor:toggle", => @toggle()
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->

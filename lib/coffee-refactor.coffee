@@ -1,10 +1,17 @@
-CoffeeRefactorView = require './coffee-refactor-view'
+# { Point, Range } = require 'atom'
+# CoffeeRefactorView = require './coffee-refactor-view'
+# { Point, Range } = require '/Applications/Atom.app/Contents/Resources/app/src/atom'
+{ inspect } = require 'util'
+coffee = require 'coffee-script'
+_ = require 'underscore'
+{ Lexer } = require '../node_modules/coffee-script/lib/coffee-script/lexer'
+# console.log coffee, Lexer
 
 module.exports =
   coffeeRefactorView: null
 
   activate: (state) ->
-    @coffeeRefactorView = new CoffeeRefactorView state.coffeeRefactorViewState
+    # @coffeeRefactorView = new CoffeeRefactorView state.coffeeRefactorViewState
     atom.workspaceView.command "coffee-refactor:toggle", => @refact()
 
   deactivate: ->
@@ -13,9 +20,10 @@ module.exports =
   serialize: ->
     coffeeRefactorViewState: @coffeeRefactorView.serialize()
 
-  refact: ->
+  rename: ->
     editor = atom.workspace.getActiveEditor()
     editor.selectWord()
-    text = editor.getText()
     word = editor.getSelectedText()
-    console.log word, text
+    code = editor.getText()
+    selection = editor.getSelection 0
+    @findRefs selection.initialScreenRange, code
