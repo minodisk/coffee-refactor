@@ -11,6 +11,9 @@
   "engines": {
     "atom": ">0.50.0"
   },
+  "scripts": {
+    "test": "node_modules/.bin/mocha --ui bdd --reporter tap -w --compilers coffee:coffee-script/register tests/test-refactor.coffee"
+  },
   "dependencies": {
     "coffee-script": "~1.7.1",
     "underscore": "~1.6.0"

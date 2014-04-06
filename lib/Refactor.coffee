@@ -39,7 +39,6 @@ class Node
       if founds.indexOf(result) isnt -1
         results.splice i, 1
 
-    console.log '----------'
     console.log 'find:', range.toString()
     for result, i in results
       console.log i, result.range.toString()
