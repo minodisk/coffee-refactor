@@ -64,8 +64,30 @@ describe 'refactor', ->
           end:
             row: 1
             column: 1
-        expect(refs).to.have.length 3
-        # expect(refs[0].range.start.row).to.be 1
-        # expect(refs[0].range.start.column).to.be 4
-        # expect(refs[0].range.end.row).to.be 1
-        # expect(refs[0].range.end.column).to.be 5
+        expect(refs).to.have.length 2
+        expect(refs[0].range.start.row).to.be 0
+        expect(refs[0].range.start.column).to.be 4
+        expect(refs[0].range.end.row).to.be 0
+        expect(refs[0].range.end.column).to.be 5
+        expect(refs[1].range.start.row).to.be 1
+        expect(refs[1].range.start.column).to.be 8
+        expect(refs[1].range.end.row).to.be 1
+        expect(refs[1].range.end.column).to.be 9
+
+      it 'should find references when specified value', ->
+        refs = refactor.find
+          start:
+            row: 1
+            column: 8
+          end:
+            row: 1
+            column: 9
+        expect(refs).to.have.length 2
+        expect(refs[0].range.start.row).to.be 0
+        expect(refs[0].range.start.column).to.be 4
+        expect(refs[0].range.end.row).to.be 0
+        expect(refs[0].range.end.column).to.be 5
+        expect(refs[1].range.start.row).to.be 1
+        expect(refs[1].range.start.column).to.be 0
+        expect(refs[1].range.end.row).to.be 1
+        expect(refs[1].range.end.column).to.be 1

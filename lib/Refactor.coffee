@@ -40,6 +40,7 @@ class Node
         results.splice i, 1
 
     console.log '----------'
+    console.log 'find:', range.toString()
     for result, i in results
       console.log i, result.range.toString()
 
@@ -85,6 +86,7 @@ class Base extends Node
     super
     { value } = data
     @value = value
+    console.log @range.toString(), @value
 
   find: (range) ->
     return @ if range.equals @range
