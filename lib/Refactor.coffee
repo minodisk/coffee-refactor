@@ -5,7 +5,7 @@ _ = require 'underscore'
 module.exports = class Refactor
 
   constructor: (code) ->
-    @node = new Node coffee.nodes code
+    @node = new Expressions coffee.nodes code
     # console.log inspect @node, false, null
 
   find: (range) ->
@@ -13,16 +13,23 @@ module.exports = class Refactor
     @node.find new Range range
 
 
-
-
 class Node
 
-  constructor: ({ locationData, expressions }, @parent) ->
+  constructor: ({ locationData }, @parent) ->
     @range = new Range locationData
     @children = []
-    if expressions?
-      @children = for val in expressions
-        new Expression val, @
+
+    # params, args
+    # if params?
+    #   @children = @children.concat new Param val, @ for val in params
+    # if args?
+    #   @children = @children.concat new Arg val, @ for val in args
+
+class Expressions extends Node
+
+  constructor: ({ expressions }) ->
+    super
+    @children = @children.concat new Expression val, @ for val in expressions
 
   find: (range) ->
     founds = for child in @children
@@ -78,6 +85,32 @@ class Value extends Expression
       @children.push new Value first, @
     if second?
       @children.push new Value second, @
+
+class Param extends Node
+
+  constructor: ({ name }) ->
+    super
+    @children.push new Name name, @
+
+class Arg extends Node
+
+  constructor: ({ base }) ->
+    super
+    @children.push new Base base, @
+
+class Name extends Node
+
+  constructor: (data) ->
+    super
+    { value } = data
+    @value = value
+    console.log @range.toString(), @value
+
+  find: (range) ->
+    return @ if range.equals @range
+
+  search: (value) ->
+    return @ if value is @value
 
 class Base extends Node
 
