@@ -5,25 +5,30 @@ _ = require 'underscore'
 module.exports = class Refactor
 
   constructor: (code) ->
-    @node = new Expressions coffee.nodes code
+    @expressions = new Expressions coffee.nodes code
     # console.log inspect @node, false, null
 
   find: (range) ->
     return unless range?
-    @node.find new Range range
+    @expressions.find new Range range
 
 
 class Node
 
-  constructor: ({ locationData }, @parent) ->
+  constructor: ({ locationData, params, args }, @parent) ->
     @range = new Range locationData
     @children = []
+    if params?
+      @children = @children.concat new Param val, @ for val in params
+    if args?
+      @children = @children.concat new Arg val, @ for val in args
 
-    # params, args
-    # if params?
-    #   @children = @children.concat new Param val, @ for val in params
-    # if args?
-    #   @children = @children.concat new Arg val, @ for val in args
+  getDepth: ->
+    parent = @parent
+    depth = 0
+    while parent? and (parent = parent.parent)?
+      depth++
+    depth
 
 class Expressions extends Node
 
@@ -68,13 +73,16 @@ class Expression extends Node
 
 class Variable extends Node
 
-  constructor: (data) ->
+  type: 'var'
+
+  constructor: ({ base }) ->
     super
-    { base } = data
     if base?
       @children.push new Base base, @
 
 class Value extends Expression
+
+  type: 'val'
 
   constructor: (data) ->
     super
@@ -88,11 +96,15 @@ class Value extends Expression
 
 class Param extends Node
 
+  type: 'prm'
+
   constructor: ({ name }) ->
     super
     @children.push new Name name, @
 
 class Arg extends Node
+
+  type: 'arg'
 
   constructor: ({ base }) ->
     super
@@ -104,7 +116,8 @@ class Name extends Node
     super
     { value } = data
     @value = value
-    console.log @range.toString(), @value
+
+    console.log @toString()
 
   find: (range) ->
     return @ if range.equals @range
@@ -112,19 +125,14 @@ class Name extends Node
   search: (value) ->
     return @ if value is @value
 
-class Base extends Node
+  toString: ->
+    indent = ''
+    depth = @getDepth()
+    while depth--
+      indent += ' '
+    "#{@range.toString()}<#{@parent.type}>#{indent}#{@value}"
 
-  constructor: (data) ->
-    super
-    { value } = data
-    @value = value
-    console.log @range.toString(), @value
-
-  find: (range) ->
-    return @ if range.equals @range
-
-  search: (value) ->
-    return @ if value is @value
+class Base extends Name
 
 
 class Range
