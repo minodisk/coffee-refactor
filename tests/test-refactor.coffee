@@ -1,5 +1,5 @@
 expect = require 'expect.js'
-Refactor = require '../lib/Refactor'
+{ Refactor } = require '../lib/Refactor'
 
 describe 'Refactor', ->
 
@@ -22,7 +22,7 @@ describe 'Refactor', ->
             column: 2
         expect(refs).to.have.length 0
 
-      it 'should find no reference of operator =', ->
+      it 'should find no reference of operator', ->
         refs = refactor.find
           start:
             row: 0
@@ -31,8 +31,6 @@ describe 'Refactor', ->
             row: 0
             column: 3
         expect(refs).to.have.length 0
-
-      it 'should find no reference of operator *', ->
         refs = refactor.find
           start:
             row: 1
@@ -96,7 +94,7 @@ describe 'Refactor', ->
       refactor = new Refactor """
       a = 100
       pow = (a) ->
-        a *= a
+        a * a
       pow a
       """
 
@@ -114,6 +112,6 @@ describe 'Refactor', ->
         expect(refs[0].range.end.row).to.be 2
         expect(refs[0].range.end.column).to.be 3
         expect(refs[1].range.start.row).to.be 2
-        expect(refs[1].range.start.column).to.be 7
+        expect(refs[1].range.start.column).to.be 6
         expect(refs[1].range.end.row).to.be 2
-        expect(refs[1].range.end.column).to.be 8
+        expect(refs[1].range.end.column).to.be 7

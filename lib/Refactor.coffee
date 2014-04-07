@@ -8,14 +8,14 @@ pad = (str, len, pad = ' ') ->
   str
 
 
-module.exports = class Refactor
+exports.Refactor = class Refactor
 
   constructor: (code) ->
     @node = new Node coffee.nodes code
 
   find: (range) ->
     return [] unless range?
-    @node.find new Range range
+    @node.find Range.createWithAtomRange range
 
 class Node
 
@@ -33,8 +33,11 @@ class Node
     name
   }, @parent, @depth = -1, @type = 'body') ->
 
+    unless Refactor.verbose and @parent?
+      console.log pad '', 50, '='
+
     @hasScope = !@parent? or body?
-    @range = new Range locationData
+    @range = Range.createWithLocationData locationData
     @children = []
 
     if @hasScope
@@ -90,9 +93,9 @@ class Node
 class BottomNode extends Node
 
   constructor: ({ locationData, @value }, @parent, @depth, @type) ->
-    @range = new Range locationData
+    @range = Range.createWithLocationData locationData
     if Refactor.verbose
-      console.log @toString()
+      console.log "#{pad @range.toString(), 15}|#{pad @parent.type, 10}|#{@getIndent()}#{@value}"
 
   find: (range) ->
     return @bottomUp @ if range.equals @range
@@ -100,20 +103,19 @@ class BottomNode extends Node
   topDown: (targetNode) ->
     return @ if targetNode isnt @ and targetNode.value is @value
 
-  toString: ->
-    "#{pad @range.toString(), 15}|#{pad @parent.type, 10}|#{@getIndent()}#{@value}"
-
 
 class Range
 
-  constructor: ({ start, end }) ->
-    if start? and end?
-      @start = new Point start.row, start.column
-      @end = new Point end.row, end.column
-    else
-      { first_line, first_column, last_line, last_column } = arguments[0]
-      @start = new Point first_line, first_column
-      @end = new Point last_line, last_column + 1
+  @createWithLocationData: ({ first_line, first_column, last_line, last_column }) ->
+    new Range new Point(first_line, first_column), new Point(last_line, last_column + 1)
+
+  @createWithAtomRange: ({ start, end }) ->
+    new Range new Point(start.row, start.column), new Point(end.row, end.column)
+
+  @createWithNumbers: (startRow, startColumn, endRow, endColumn) ->
+    new Range new Point(startRow, startColumn), new Point(endRow, endColumn)
+
+  constructor: (@start, @end) ->
 
   equals: ({ start, end }) ->
     start.equals(@start) and end.equals(@end)
