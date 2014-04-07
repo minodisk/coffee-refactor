@@ -14,7 +14,7 @@ module.exports = class Refactor
     @node = new Node coffee.nodes code
 
   find: (range) ->
-    return unless range?
+    return [] unless range?
     @node.find new Range range
 
 class Node

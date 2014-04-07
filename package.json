@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "A short description of your package",
   "activationEvents": [
-    "coffee-refactor:toggle"
+    "coffee-refactor:rename"
   ],
   "repository": "https://github.com/atom/coffee-refactor",
   "license": "MIT",
