@@ -12,7 +12,7 @@ module.exports =
 
   activate: (state) ->
     # @coffeeRefactorView = new CoffeeRefactorView state.coffeeRefactorViewState
-    atom.workspaceView.command "coffee-refactor:toggle", => @refact()
+    atom.workspaceView.command "coffee-refactor:rename", => @refact()
 
   deactivate: ->
     @coffeeRefactorView.destroy()

@@ -1,7 +1,7 @@
 # See https://atom.io/docs/latest/creating-a-package#menus for more details
 'context-menu':
   '.overlayer':
-      'Enable coffee-refactor': 'coffee-refactor:toggle'
+      'Enable coffee-refactor': 'coffee-refactor:rename'
 
 'menu': [
   {
@@ -9,7 +9,7 @@
     'submenu': [
       'label': 'coffee-refactor'
       'submenu': [
-        { 'label': 'Toggle', 'command': 'coffee-refactor:toggle' }
+        { 'label': 'Rename', 'command': 'coffee-refactor:rename' }
       ]
     ]
   }

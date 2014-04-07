@@ -12,18 +12,18 @@ describe "CoffeeRefactor", ->
     atom.workspaceView = new WorkspaceView
     activationPromise = atom.packages.activatePackage('coffeeRefactor')
 
-  describe "when the coffee-refactor:toggle event is triggered", ->
+  describe "when the coffee-refactor:rename event is triggered", ->
     it "attaches and then detaches the view", ->
       expect(atom.workspaceView.find('.coffee-refactor')).not.toExist()
 
       # This is an activation event, triggering it will cause the package to be
       # activated.
-      atom.workspaceView.trigger 'coffee-refactor:toggle'
+      atom.workspaceView.trigger 'coffee-refactor:rename'
 
       waitsForPromise ->
         activationPromise
 
       runs ->
         expect(atom.workspaceView.find('.coffee-refactor')).toExist()
-        atom.workspaceView.trigger 'coffee-refactor:toggle'
+        atom.workspaceView.trigger 'coffee-refactor:rename'
         expect(atom.workspaceView.find('.coffee-refactor')).not.toExist()
