@@ -11,7 +11,6 @@ pad = (str, len, pad = ' ') ->
 exports.Refactor = class Refactor
 
   constructor: (code) ->
-    console.log inspect coffee.nodes(code), false, null
     @node = new Node coffee.nodes code
 
   find: (range) ->
@@ -48,8 +47,8 @@ class Node
 
     if @hasScope
       @depth++
-      # if Refactor.verbose
-      #   console.log "#{pad '', 15}|#{pad 'SCOPE', 10}|#{@getIndent()}"
+      if Refactor.verbose
+        console.log "#{pad '', 15}|#{pad 'SCOPE', 10}|#{@getIndent()}-"
 
     if params?
       nodes = (new Node param, @, @depth, 'param' for param in params)
