@@ -1,13 +1,14 @@
 expect = require 'expect.js'
 Refactor = require '../lib/Refactor'
-Range = require '/Applications/Atom.app/Contents/Resources/app/node_modules/text-buffer/lib/range'
+{ Range } = require 'atom'
+
+# Refactor.verbose = true
 
 describe 'Refactor', ->
 
   describe 'find', ->
 
     do ->
-      Refactor.verbose = true
       refactor = new Refactor """
       a = b = 100
       b = a * b / 10
@@ -56,7 +57,6 @@ describe 'Refactor', ->
         expect(refs[1].range.end.column).to.be 1
 
     do ->
-      Refactor.verbose = true
       refactor = new Refactor """
       a = 100
       b = 3
@@ -87,7 +87,6 @@ describe 'Refactor', ->
         expect(refs[1].range.end.column).to.be 13
 
     do ->
-      Refactor.verbose = true
       refactor = new Refactor """
       a = 10
       b = 5
@@ -121,7 +120,6 @@ describe 'Refactor', ->
         expect(refs[1].range.end.column).to.be 14
 
     do ->
-      Refactor.verbose = true
       refactor = new Refactor """
       a = 10
       b = 5
@@ -156,7 +154,6 @@ describe 'Refactor', ->
         expect(refs[1].range.end.column).to.be 7
 
     do ->
-      Refactor.verbose = true
       refactor = new Refactor """
       class A
       class B extends A

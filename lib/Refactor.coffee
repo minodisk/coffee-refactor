@@ -1,17 +1,21 @@
 coffee = require 'coffee-script'
 _ = require 'underscore'
 { inspect } = require 'util'
-console.log require 'atom'
+{ Range } = require 'atom'
 
 
 pad = (str, len, pad = ' ') ->
   while str.length < len
     str += pad
   str
+
 padL = (str, len, pad = ' ') ->
   while str.length < len
     str = pad + str
   str
+
+locationDataToRange = ({ first_line, first_column, last_line, last_column }) ->
+  new Range [first_line, first_column], [last_line, last_column + 1]
 
 
 module.exports = class Refactor
@@ -21,7 +25,7 @@ module.exports = class Refactor
 
   find: (range) ->
     return [] unless range?
-    @node.find Range.createWithAtomRange range
+    @node.find range
 
 class Node
 
@@ -50,7 +54,8 @@ class Node
     name
   }, @parentNode, @depth = 0, @type = 'body') ->
 
-    @range = Range.createWithLocationData locationData
+    @range = locationDataToRange locationData
+    console.log @range
     @children = []
     @params = []
 
@@ -139,42 +144,42 @@ class RootNode extends TopNode
 class BottomNode extends Node
 
   constructor: ({ locationData, @value }, @parentNode, @depth, @type) ->
-    @range = Range.createWithLocationData locationData
+    @range = locationDataToRange locationData
     if Refactor.verbose
-      console.log "#{pad @range.toString(), 15}|#{pad @parentNode.type, 10}|#{@getIndent()}#{@value}"
+      console.log @range + "|#{pad @parentNode.type, 10}|#{@getIndent()}#{@value}"
 
   find: (range) ->
-    return @bottomUp @ if range.equals @range
+    return @bottomUp @ if range.isEqual @range
 
   topDown: (targetNode) ->
     return @ if targetNode isnt @ and targetNode.value is @value
 
 
-class Range
-
-  @createWithLocationData: ({ first_line, first_column, last_line, last_column }) ->
-    new Range new Point(first_line, first_column), new Point(last_line, last_column + 1)
-
-  @createWithAtomRange: ({ start, end }) ->
-    new Range new Point(start.row, start.column), new Point(end.row, end.column)
-
-  @createWithNumbers: (startRow, startColumn, endRow, endColumn) ->
-    new Range new Point(startRow, startColumn), new Point(endRow, endColumn)
-
-  constructor: (@start, @end) ->
-
-  equals: ({ start, end }) ->
-    start.equals(@start) and end.equals(@end)
-
-  toString: ->
-    "#{@start.toString()}-#{@end.toString()}"
-
-class Point
-
-  constructor: (@row, @column) ->
-
-  equals: ({ row, column }) ->
-    row is @row and column is @column
-
-  toString: ->
-    "[#{padL @row, 2}:#{padL @column, 2}]"
+# class Range
+#
+#   @createWithLocationData: ({ first_line, first_column, last_line, last_column }) ->
+#     new Range new Point(first_line, first_column), new Point(last_line, last_column + 1)
+#
+#   @createWithAtomRange: ({ start, end }) ->
+#     new Range new Point(start.row, start.column), new Point(end.row, end.column)
+#
+#   @createWithNumbers: (startRow, startColumn, endRow, endColumn) ->
+#     new Range new Point(startRow, startColumn), new Point(endRow, endColumn)
+#
+#   constructor: (@start, @end) ->
+#
+#   equals: ({ start, end }) ->
+#     start.equals(@start) and end.equals(@end)
+#
+#   toString: ->
+#     "#{@start.toString()}-#{@end.toString()}"
+#
+# class Point
+#
+#   constructor: (@row, @column) ->
+#
+#   equals: ({ row, column }) ->
+#     row is @row and column is @column
+#
+#   toString: ->
+#     "[#{padL @row, 2}:#{padL @column, 2}]"
