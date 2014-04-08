@@ -1,16 +1,15 @@
 # See https://atom.io/docs/latest/creating-a-package#menus for more details
 'context-menu':
   '.overlayer':
-      'Rename coffee-refactor': 'coffee-refactor:rename'
+      'Rename Coffee Refactor': 'coffee-refactor:rename'
 
 'menu': [
-  {
-    'label': 'Packages'
+  'label': 'Packages'
+  'submenu': [
+    'label': 'Coffee Refactor'
     'submenu': [
-      'label': 'coffee-refactor'
-      'submenu': [
-        { 'label': 'Rename', 'command': 'coffee-refactor:rename' }
-      ]
+      'label': 'Rename'
+      'command': 'coffee-refactor:rename'
     ]
-  }
+  ]
 ]
