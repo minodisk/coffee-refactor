@@ -1,6 +1,8 @@
 coffee = require 'coffee-script'
 _ = require 'underscore'
 { inspect } = require 'util'
+console.log require 'atom'
+
 
 pad = (str, len, pad = ' ') ->
   while str.length < len
@@ -12,7 +14,7 @@ padL = (str, len, pad = ' ') ->
   str
 
 
-exports.Refactor = class Refactor
+module.exports = class Refactor
 
   constructor: (code) ->
     @node = Node.create coffee.nodes code
@@ -148,7 +150,7 @@ class BottomNode extends Node
     return @ if targetNode isnt @ and targetNode.value is @value
 
 
-exports.Range = class Range
+class Range
 
   @createWithLocationData: ({ first_line, first_column, last_line, last_column }) ->
     new Range new Point(first_line, first_column), new Point(last_line, last_column + 1)

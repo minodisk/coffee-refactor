@@ -1,6 +1,6 @@
 expect = require 'expect.js'
-{ Refactor, Range } = require '../lib/Refactor'
-# Range = require '/Applications/Atom.app/Contents/Resources/app/node_modules/text-buffer/lib/range'
+Refactor = require '../lib/Refactor'
+Range = require '/Applications/Atom.app/Contents/Resources/app/node_modules/text-buffer/lib/range'
 
 describe 'Refactor', ->
 
@@ -14,17 +14,17 @@ describe 'Refactor', ->
       """
 
       it 'should find no reference of whitespace', ->
-        refs = refactor.find Range.createWithNumbers 0, 1, 0, 2
+        refs = refactor.find new Range [0, 1], [0, 2]
         expect(refs).to.have.length 0
 
       it 'should find no reference of operator', ->
-        refs = refactor.find Range.createWithNumbers 0, 2, 0, 3
+        refs = refactor.find new Range [0, 2], [0, 3]
         expect(refs).to.have.length 0
-        refs = refactor.find Range.createWithNumbers 1, 6, 1, 7
+        refs = refactor.find new Range [1, 6], [1, 7]
         expect(refs).to.have.length 0
 
       it 'should find a reference of variable', ->
-        refs = refactor.find Range.createWithNumbers 0, 0, 0, 1
+        refs = refactor.find new Range [0, 0], [0, 1]
         expect(refs).to.have.length 1
         expect(refs[0].range.start.row).to.be 1
         expect(refs[0].range.start.column).to.be 4
@@ -32,7 +32,7 @@ describe 'Refactor', ->
         expect(refs[0].range.end.column).to.be 5
 
       it 'should find references of variable', ->
-        refs = refactor.find Range.createWithNumbers 1, 0, 1, 1
+        refs = refactor.find new Range [1, 0], [1, 1]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 0
         expect(refs[0].range.start.column).to.be 4
@@ -44,7 +44,7 @@ describe 'Refactor', ->
         expect(refs[1].range.end.column).to.be 9
 
       it 'should find references of value', ->
-        refs = refactor.find Range.createWithNumbers 1, 8, 1, 9
+        refs = refactor.find new Range [1, 8], [1, 9]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 0
         expect(refs[0].range.start.column).to.be 4
@@ -67,7 +67,7 @@ describe 'Refactor', ->
       """
 
       it 'should find function scoped refs', ->
-        refs = refactor.find Range.createWithNumbers 2, 8, 2, 9
+        refs = refactor.find new Range [2, 8], [2, 9]
         expect(refs).to.have.length 1
         expect(refs[0].range.start.row).to.be 3
         expect(refs[0].range.start.column).to.be 2
@@ -75,7 +75,7 @@ describe 'Refactor', ->
         expect(refs[0].range.end.column).to.be 3
 
       it 'should find function external scoped refs', ->
-        refs = refactor.find Range.createWithNumbers 3, 6, 3, 7
+        refs = refactor.find new Range [3, 6], [3, 7]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 1
         expect(refs[0].range.start.column).to.be 0
@@ -97,7 +97,7 @@ describe 'Refactor', ->
       """
 
       it 'should find ref from outer of object', ->
-        refs = refactor.find Range.createWithNumbers 0, 0, 0, 1
+        refs = refactor.find new Range [0, 0], [0, 1]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 3
         expect(refs[0].range.start.column).to.be 7
@@ -109,7 +109,7 @@ describe 'Refactor', ->
         expect(refs[1].range.end.column).to.be 10
 
       it 'should find ref from inner of object', ->
-        refs = refactor.find Range.createWithNumbers 3, 11, 3, 12
+        refs = refactor.find new Range [3, 11], [3, 12]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 1
         expect(refs[0].range.start.column).to.be 0
@@ -132,7 +132,7 @@ describe 'Refactor', ->
       """
 
       it 'should find ref from outer of array', ->
-        refs = refactor.find Range.createWithNumbers 0, 0, 0, 1
+        refs = refactor.find new Range [0, 0], [0, 1]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 3
         expect(refs[0].range.start.column).to.be 2
@@ -144,7 +144,7 @@ describe 'Refactor', ->
         expect(refs[1].range.end.column).to.be 3
 
       it 'should find ref from inner of array', ->
-        refs = refactor.find Range.createWithNumbers 3, 6, 3, 7
+        refs = refactor.find new Range [3, 6], [3, 7]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 1
         expect(refs[0].range.start.column).to.be 0
@@ -164,7 +164,7 @@ describe 'Refactor', ->
       """
 
       it 'should find ref of child class', ->
-        refs = refactor.find Range.createWithNumbers 0, 6, 0, 7
+        refs = refactor.find new Range [0, 6], [0, 7]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 1
         expect(refs[0].range.start.column).to.be 16
@@ -176,7 +176,7 @@ describe 'Refactor', ->
         expect(refs[1].range.end.column).to.be 17
 
       it 'should find ref of extends class', ->
-        refs = refactor.find Range.createWithNumbers 1, 16, 1, 17
+        refs = refactor.find new Range [1, 16], [1, 17]
         expect(refs).to.have.length 2
         expect(refs[0].range.start.row).to.be 0
         expect(refs[0].range.start.column).to.be 6

@@ -16,6 +16,7 @@ module.exports =
 
   rename: ->
     editor = atom.workspace.getActiveEditor()
+    return unless editor?
     editor.selectWord()
     selection = editor.getSelection 0
 
