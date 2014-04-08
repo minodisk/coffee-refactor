@@ -2,7 +2,7 @@
   "name": "coffee-refactor",
   "main": "./lib/coffee-refactor",
   "version": "0.0.0",
-  "description": "A short description of your package",
+  "description": "CoffeeScript refactoring procedures: rename",
   "activationEvents": [
     "coffee-refactor:rename"
   ],
