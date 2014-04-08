@@ -6,18 +6,30 @@ pad = (str, len, pad = ' ') ->
   while str.length < len
     str += pad
   str
+padL = (str, len, pad = ' ') ->
+  while str.length < len
+    str = pad + str
+  str
 
 
 exports.Refactor = class Refactor
 
   constructor: (code) ->
-    @node = new Node coffee.nodes code
+    @node = Node.create coffee.nodes code
 
   find: (range) ->
     return [] unless range?
     @node.find Range.createWithAtomRange range
 
 class Node
+
+  @create: (data, parentNode, depth, type) ->
+    unless depth?
+      new RootNode data
+    else if data.body?
+      new TopNode data, parentNode, depth, type
+    else
+      new Node data, parentNode, depth, type
 
   constructor: ({
     locationData
@@ -36,52 +48,42 @@ class Node
     name
   }, @parentNode, @depth = 0, @type = 'body') ->
 
-    @isRoot = !@parentNode?
-    @hasScope = @isRoot or body?
     @range = Range.createWithLocationData locationData
     @children = []
     @params = []
 
-    if Refactor.verbose and @isRoot
-      console.log pad '', 50, '='
-
-    if @hasScope
-      # @depth++
-      if Refactor.verbose
-        console.log "#{pad '', 15}|#{pad 'SCOPE', 10}|#{@getIndent()}-"
-
     if params?
-      nodes = (new Node param, @, @depth + 1, 'param' for param in params)
+      nodes = (Node.create param, @, @depth + 1, 'param' for param in params)
       @children = @children.concat nodes
       @params = @params.concat nodes
 
     if variable?
-      @children.push new Node variable, @, @depth, 'variable'
+      @children.push Node.create variable, @, @depth, 'variable'
     if expressions?
-      @children = @children.concat new Node expression, @, @depth, 'expression' for expression in expressions
+      @children = @children.concat Node.create expression, @, @depth, 'expression' for expression in expressions
     if args?
-      @children = @children.concat new Node arg, @, @depth, 'arg' for arg in args
+      @children = @children.concat Node.create arg, @, @depth, 'arg' for arg in args
     # if properties?
-    #   @children = @children.concat new Node property, @, @depth, 'property' for property in properties
+    #   @children = @children.concat Node.create property, @, @depth, 'property' for property in properties
     if objects?
-      @children = @children.concat new Node object, @, @depth, 'object' for object in objects
+      @children = @children.concat Node.create object, @, @depth, 'object' for object in objects
     if value?
-      @children.push new Node value, @, @depth, 'value'
+      @children.push Node.create value, @, @depth, 'value'
     if first?
-      @children.push new Node first, @, @depth, 'first'
+      @children.push Node.create first, @, @depth, 'first'
     if second?
-      @children.push new Node second, @, @depth, 'second'
+      @children.push Node.create second, @, @depth, 'second'
     if base?
       if base.value?
         @children.push new BottomNode base, @, @depth, 'base'
       else
-        @children.push new Node base, @, @depth, 'base'
+        @children.push Node.create base, @, @depth, 'base'
     if name?
       @children.push new BottomNode name, @, @depth, 'name'
     if parent?
-      @parentNode.children.push new Node parent, @, @depth, 'parent'
+      @parentNode.children.push Node.create parent, @, @depth, 'parent'
     if body?
-      @children.push new Node body, @, @depth + 1, 'body'
+      @children.push Node.create body, @, @depth + 1, 'body'
 
   find: (range) ->
     for child, i in @children
@@ -91,12 +93,6 @@ class Node
     []
 
   bottomUp: (targetNode) ->
-    if @isRoot
-      return @topDown targetNode
-    if @hasScope
-      for param, i in @params
-        if param.hasSameValue targetNode
-          return @topDown targetNode
     @parentNode.bottomUp targetNode
 
   topDown: (targetNode) ->
@@ -114,6 +110,29 @@ class Node
     for child in @children
       return true if child.value is node.value
     false
+
+class TopNode extends Node
+
+  constructor: ->
+    if Refactor.verbose
+      console.log "#{pad '', 15}|#{pad 'SCOPE', 10}|#{@getIndent()}-"
+    super
+
+  bottomUp: (targetNode) ->
+    for param, i in @params
+      if param.hasSameValue targetNode
+        return @topDown targetNode
+    super
+
+class RootNode extends TopNode
+
+  constructor: ->
+    if Refactor.verbose
+      console.log pad '', 50, '='
+    super
+
+  bottomUp: (targetNode) ->
+    @topDown targetNode
 
 class BottomNode extends Node
 
@@ -156,4 +175,4 @@ class Point
     row is @row and column is @column
 
   toString: ->
-    "[#{@row}:#{@column}]"
+    "[#{padL @row, 2}:#{padL @column, 2}]"
