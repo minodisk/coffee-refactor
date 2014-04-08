@@ -55,7 +55,6 @@ class Node
   }, @parentNode, @depth = 0, @type = 'body') ->
 
     @range = locationDataToRange locationData
-    console.log @range
     @children = []
     @params = []
 
