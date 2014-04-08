@@ -6,8 +6,12 @@
   "activationEvents": [
     "coffee-refactor:rename"
   ],
-  "repository": "https://github.com/atom/coffee-refactor",
+  "repository": "https://github.com/minodisk/coffee-refactor",
   "license": "MIT",
+  "auther": {
+    "name": "Daisuke Mino",
+    "url": "http://dsk.mn"
+  },
   "engines": {
     "atom": ">0.50.0"
   },
