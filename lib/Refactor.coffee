@@ -34,7 +34,7 @@ class Node
     second
     base
     name
-  }, @parentNode, @depth = -1, @type = 'body') ->
+  }, @parentNode, @depth = 0, @type = 'body') ->
 
     @isRoot = !@parentNode?
     @hasScope = @isRoot or body?
@@ -46,12 +46,12 @@ class Node
       console.log pad '', 50, '='
 
     if @hasScope
-      @depth++
+      # @depth++
       if Refactor.verbose
         console.log "#{pad '', 15}|#{pad 'SCOPE', 10}|#{@getIndent()}-"
 
     if params?
-      nodes = (new Node param, @, @depth, 'param' for param in params)
+      nodes = (new Node param, @, @depth + 1, 'param' for param in params)
       @children = @children.concat nodes
       @params = @params.concat nodes
 
@@ -79,9 +79,9 @@ class Node
     if name?
       @children.push new BottomNode name, @, @depth, 'name'
     if parent?
-      @parentNode.children.push new Node parent, @, @depth - 1, 'parent'
+      @parentNode.children.push new Node parent, @, @depth, 'parent'
     if body?
-      @children.push new Node body, @, @depth, 'body'
+      @children.push new Node body, @, @depth + 1, 'body'
 
   find: (range) ->
     for child, i in @children
