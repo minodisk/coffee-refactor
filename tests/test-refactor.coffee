@@ -1,5 +1,6 @@
 expect = require 'expect.js'
 { Refactor, Range } = require '../lib/Refactor'
+# Range = require '/Applications/Atom.app/Contents/Resources/app/node_modules/text-buffer/lib/range'
 
 describe 'Refactor', ->
 
