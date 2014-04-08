@@ -11,6 +11,7 @@ pad = (str, len, pad = ' ') ->
 exports.Refactor = class Refactor
 
   constructor: (code) ->
+    console.log inspect coffee.nodes(code), false, null
     @node = new Node coffee.nodes code
 
   find: (range) ->
@@ -21,6 +22,7 @@ class Node
 
   constructor: ({
     locationData
+    parent
     body
     expressions
     params
@@ -33,9 +35,9 @@ class Node
     second
     base
     name
-  }, @parent, @depth = -1, @type = 'body') ->
+  }, @parentNode, @depth = -1, @type = 'body') ->
 
-    @isRoot = !@parent?
+    @isRoot = !@parentNode?
     @hasScope = @isRoot or body?
     @range = Range.createWithLocationData locationData
     @children = []
@@ -77,6 +79,8 @@ class Node
         @children.push new Node base, @, @depth, 'base'
     if name?
       @children.push new BottomNode name, @, @depth, 'name'
+    if parent?
+      @parentNode.children.push new Node parent, @, @depth - 1, 'parent'
     if body?
       @children.push new Node body, @, @depth, 'body'
 
@@ -94,7 +98,7 @@ class Node
       for param, i in @params
         if param.hasSameValue targetNode
           return @topDown targetNode
-    @parent.bottomUp targetNode
+    @parentNode.bottomUp targetNode
 
   topDown: (targetNode) ->
     for child in @children
@@ -114,10 +118,10 @@ class Node
 
 class BottomNode extends Node
 
-  constructor: ({ locationData, @value }, @parent, @depth, @type) ->
+  constructor: ({ locationData, @value }, @parentNode, @depth, @type) ->
     @range = Range.createWithLocationData locationData
     if Refactor.verbose
-      console.log "#{pad @range.toString(), 15}|#{pad @parent.type, 10}|#{@getIndent()}#{@value}"
+      console.log "#{pad @range.toString(), 15}|#{pad @parentNode.type, 10}|#{@getIndent()}#{@value}"
 
   find: (range) ->
     return @bottomUp @ if range.equals @range

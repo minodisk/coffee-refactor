@@ -153,3 +153,35 @@ describe 'Refactor', ->
         expect(refs[1].range.start.column).to.be 6
         expect(refs[1].range.end.row).to.be 4
         expect(refs[1].range.end.column).to.be 7
+
+    do ->
+      Refactor.verbose = true
+      refactor = new Refactor """
+      class A
+      class B extends A
+      class C extends A
+      """
+
+      it 'should find ref of child class', ->
+        refs = refactor.find Range.createWithNumbers 0, 6, 0, 7
+        expect(refs).to.have.length 2
+        expect(refs[0].range.start.row).to.be 1
+        expect(refs[0].range.start.column).to.be 16
+        expect(refs[0].range.end.row).to.be 1
+        expect(refs[0].range.end.column).to.be 17
+        expect(refs[1].range.start.row).to.be 2
+        expect(refs[1].range.start.column).to.be 16
+        expect(refs[1].range.end.row).to.be 2
+        expect(refs[1].range.end.column).to.be 17
+
+      it 'should find ref of extends class', ->
+        refs = refactor.find Range.createWithNumbers 1, 16, 1, 17
+        expect(refs).to.have.length 2
+        expect(refs[0].range.start.row).to.be 0
+        expect(refs[0].range.start.column).to.be 6
+        expect(refs[0].range.end.row).to.be 0
+        expect(refs[0].range.end.column).to.be 7
+        expect(refs[1].range.start.row).to.be 2
+        expect(refs[1].range.start.column).to.be 16
+        expect(refs[1].range.end.row).to.be 2
+        expect(refs[1].range.end.column).to.be 17
