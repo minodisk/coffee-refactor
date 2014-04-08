@@ -23,7 +23,7 @@
     "underscore": "~1.6.0"
   },
   "devDependencies": {
-    "mocha": "~1.18.2",
-    "expect.js": "~0.3.1"
+    "grunt-este-watch": "~0.1.15",
+    "grunt": "~0.4.4"
   }
 }
