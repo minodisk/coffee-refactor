@@ -21,9 +21,7 @@ module.exports =
 
     @refresh editor.getText()
     nodes = @refactor.find selection.initialScreenRange
-    console.log nodes
     for { range }, i in nodes
-      console.log i, range
       editor.addSelectionForBufferRange range
 
   refresh: (code) ->

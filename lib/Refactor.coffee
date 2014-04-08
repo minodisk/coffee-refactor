@@ -25,6 +25,8 @@ class Node
     expressions
     params
     args
+    properties
+    objects
     variable
     value
     first
@@ -33,26 +35,35 @@ class Node
     name
   }, @parent, @depth = -1, @type = 'body') ->
 
-    unless Refactor.verbose and @parent?
-      console.log pad '', 50, '='
-
-    @hasScope = !@parent? or body?
+    @isRoot = !@parent?
+    @hasScope = @isRoot or body?
     @range = Range.createWithLocationData locationData
     @children = []
+    @params = []
+
+    if Refactor.verbose and @isRoot
+      console.log pad '', 50, '='
 
     if @hasScope
       @depth++
       # if Refactor.verbose
       #   console.log "#{pad '', 15}|#{pad 'SCOPE', 10}|#{@getIndent()}"
 
+    if params?
+      nodes = (new Node param, @, @depth, 'param' for param in params)
+      @children = @children.concat nodes
+      @params = @params.concat nodes
+
     if variable?
       @children.push new Node variable, @, @depth, 'variable'
     if expressions?
       @children = @children.concat new Node expression, @, @depth, 'expression' for expression in expressions
-    if params?
-      @children = @children.concat new Node param, @, @depth, 'param' for param in params
     if args?
       @children = @children.concat new Node arg, @, @depth, 'arg' for arg in args
+    # if properties?
+    #   @children = @children.concat new Node property, @, @depth, 'property' for property in properties
+    if objects?
+      @children = @children.concat new Node object, @, @depth, 'object' for object in objects
     if value?
       @children.push new Node value, @, @depth, 'value'
     if first?
@@ -60,7 +71,10 @@ class Node
     if second?
       @children.push new Node second, @, @depth, 'second'
     if base?
-      @children.push new BottomNode base, @, @depth, 'base'
+      if base.value?
+        @children.push new BottomNode base, @, @depth, 'base'
+      else
+        @children.push new Node base, @, @depth, 'base'
     if name?
       @children.push new BottomNode name, @, @depth, 'name'
     if body?
@@ -74,10 +88,13 @@ class Node
     []
 
   bottomUp: (targetNode) ->
+    if @isRoot
+      return @topDown targetNode
     if @hasScope
-      @topDown targetNode
-    else
-      @parent.bottomUp targetNode
+      for param, i in @params
+        if param.hasSameValue targetNode
+          return @topDown targetNode
+    @parent.bottomUp targetNode
 
   topDown: (targetNode) ->
     for child in @children
@@ -89,6 +106,11 @@ class Node
     while depth--
       indent += '.'
     indent
+
+  hasSameValue: (node) ->
+    for child in @children
+      return true if child.value is node.value
+    false
 
 class BottomNode extends Node
 
@@ -104,7 +126,7 @@ class BottomNode extends Node
     return @ if targetNode isnt @ and targetNode.value is @value
 
 
-class Range
+exports.Range = class Range
 
   @createWithLocationData: ({ first_line, first_column, last_line, last_column }) ->
     new Range new Point(first_line, first_column), new Point(last_line, last_column + 1)
