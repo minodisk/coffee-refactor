@@ -1,5 +1,5 @@
 # CoffeeRefactorView = require './coffee-refactor-view'
-{ Refactor } = require './Refactor'
+Refactor = require './Refactor'
 
 module.exports =
   coffeeRefactorView: null
