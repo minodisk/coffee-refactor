@@ -69,8 +69,6 @@ class Node
       @children = @children.concat Node.create expression, @, @depth, 'expression' for expression in expressions
     if args?
       @children = @children.concat Node.create arg, @, @depth, 'arg' for arg in args
-    # if properties?
-    #   @children = @children.concat Node.create property, @, @depth, 'property' for property in properties
     if objects?
       @children = @children.concat Node.create object, @, @depth, 'object' for object in objects
     if value?
@@ -152,33 +150,3 @@ class BottomNode extends Node
 
   topDown: (targetNode) ->
     return @ if targetNode isnt @ and targetNode.value is @value
-
-
-# class Range
-#
-#   @createWithLocationData: ({ first_line, first_column, last_line, last_column }) ->
-#     new Range new Point(first_line, first_column), new Point(last_line, last_column + 1)
-#
-#   @createWithAtomRange: ({ start, end }) ->
-#     new Range new Point(start.row, start.column), new Point(end.row, end.column)
-#
-#   @createWithNumbers: (startRow, startColumn, endRow, endColumn) ->
-#     new Range new Point(startRow, startColumn), new Point(endRow, endColumn)
-#
-#   constructor: (@start, @end) ->
-#
-#   equals: ({ start, end }) ->
-#     start.equals(@start) and end.equals(@end)
-#
-#   toString: ->
-#     "#{@start.toString()}-#{@end.toString()}"
-#
-# class Point
-#
-#   constructor: (@row, @column) ->
-#
-#   equals: ({ row, column }) ->
-#     row is @row and column is @column
-#
-#   toString: ->
-#     "[#{padL @row, 2}:#{padL @column, 2}]"
