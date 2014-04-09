@@ -12,7 +12,11 @@ module.exports = (grunt) ->
     esteWatch:
       options:
         dirs: [
-          '**/*'
+          'keymaps/**/*'
+          'lib/**/*'
+          'menus/**/*'
+          'spec/**/*'
+          'stylesheets/**/*'
         ]
         livereload:
           enabled: false

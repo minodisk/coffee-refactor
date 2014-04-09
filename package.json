@@ -2,7 +2,7 @@
   "name": "coffee-refactor",
   "main": "./lib/coffee-refactor",
   "version": "0.1.0",
-  "description": "CoffeeScript refactoring procedures: rename",
+  "description": "CoffeeScript refactoring procedures.",
   "activationEvents": [
     "coffee-refactor:rename"
   ],
@@ -16,7 +16,7 @@
     "atom": ">0.50.0"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha --ui bdd --reporter tap -w --compilers coffee:coffee-script/register tests/test-refactor.coffee"
+    "test": "apm test"
   },
   "dependencies": {
     "coffee-script": "~1.7.1",
