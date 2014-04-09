@@ -7,5 +7,7 @@
 
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
-'.editor':
+'.editor:not(.mini)':
   'ctrl-r': 'coffee-refactor:rename'
+  'escape': 'coffee-refactor:done'
+  'enter': 'coffee-refactor:done'

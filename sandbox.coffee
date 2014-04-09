@@ -16,7 +16,7 @@ c = sum: a + b
 
 class A
 
-  constructor: (@name) ->
+  constructor: (@code) ->
 
 class B extends A
 
@@ -26,3 +26,11 @@ class B extends A
 
 b = new B name: a + b
 b.name = 'override!!'
+
+obj =
+  a: 'foo'
+obj.a
+isObjA = obj.a?
+
+if code is 'abc'
+  code = new A code
