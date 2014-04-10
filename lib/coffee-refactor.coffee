@@ -1,12 +1,11 @@
 # CoffeeRefactorView = require './coffee-refactor-view'
 Refactor = require './Refactor'
-{ Point } = require 'atom'
+
 module.exports = new class CoffeeRefactor
 
   # coffeeRefactorView: null
 
   activate: (state) ->
-    console.log 'activate'
     # @coffeeRefactorView = new CoffeeRefactorView state.coffeeRefactorViewState
     atom.workspaceView.command "coffee-refactor:rename", @rename
     atom.workspaceView.command "coffee-refactor:done", @done
@@ -18,8 +17,6 @@ module.exports = new class CoffeeRefactor
     # coffeeRefactorViewState: @coffeeRefactorView.serialize()
 
   rename: =>
-    console.log 'try rename'
-
     editor = atom.workspace.getActiveEditor()
     return unless editor?
 
@@ -34,17 +31,15 @@ module.exports = new class CoffeeRefactor
     nodes = @refactor.find selection.getBufferRange()
     return if nodes.length is 0
 
-    console.log 'rename'
-
     @target =
       editor: editor
       selection: selection
-    for { range } in nodes
-      editor.addSelectionForBufferRange range
+
+    for { locationData } in nodes
+      range = Refactor.locationDataToRange locationData
+      editor.addSelectionForBufferRange Refactor.locationDataToRange locationData
 
   done: (e) =>
-    console.log 'done'
-
     return e.abortKeyBinding() unless @target?
 
     @target.editor.setCursorBufferPosition @target.selection.getBufferRange().start

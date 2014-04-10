@@ -1,7 +1,9 @@
 coffee = require 'coffee-script'
-_ = require 'underscore'
-{ inspect } = require 'util'
+{ Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
+
+# _ = require 'underscore'
+# { inspect } = require 'util'
 
 
 pad = (str, len, pad = ' ') ->
@@ -14,139 +16,37 @@ padL = (str, len, pad = ' ') ->
     str = pad + str
   str
 
-locationDataToRange = ({ first_line, first_column, last_line, last_column }) ->
-  new Range [first_line, first_column], [last_line, last_column + 1]
-
 
 module.exports = class Refactor
 
+  @locationDataToRange: ({ first_line, first_column, last_line, last_column }) ->
+    new Range [ first_line, first_column ], [ last_line, last_column + 1 ]
+
+  @rangeToLocationData: ({ start, end }) ->
+    first_line  : start.row
+    first_column: start.column
+    last_line   : end.row
+    last_column : end.column - 1
+
+  @isEqualLocationData: (a, b) ->
+    a.first_line   is b.first_line   and \
+    a.first_column is b.first_column and \
+    a.last_line    is b.last_line    and \
+    a.last_column  is b.last_column
+
+
   constructor: (code) ->
-    @node = Node.create coffee.nodes code
+    @block = coffee.nodes code
 
   find: (range) ->
-    return [] unless range?
-    @node.find range
+    targetLocationData = Refactor.rangeToLocationData range
+    target = @block.contains (node) ->
+      node instanceof Literal and Refactor.isEqualLocationData node.locationData, targetLocationData
 
-class Node
+    return [] unless target?
 
-  @create: (data, parentNode, depth, type) ->
-    unless depth?
-      new RootNode data
-    else if data.body?
-      new TopNode data, parentNode, depth, type
-    else
-      new Node data, parentNode, depth, type
-
-  constructor: ({
-    locationData
-    parent
-    body
-    expressions
-    params
-    args
-    properties
-    objects
-    variable
-    value
-    first
-    second
-    base
-    name
-  }, @parentNode, @depth = 0, @type = 'body') ->
-
-    @range = locationDataToRange locationData
-    @children = []
-    @params = []
-
-    if params?
-      nodes = (Node.create param, @, @depth + 1, 'param' for param in params)
-      @children = @children.concat nodes
-      @params = @params.concat nodes
-
-    if variable?
-      @children.push Node.create variable, @, @depth, 'variable'
-    if expressions?
-      @children = @children.concat Node.create expression, @, @depth, 'expression' for expression in expressions
-    if args?
-      @children = @children.concat Node.create arg, @, @depth, 'arg' for arg in args
-    if objects?
-      @children = @children.concat Node.create object, @, @depth, 'object' for object in objects
-    if value?
-      @children.push Node.create value, @, @depth, 'value'
-    if first?
-      @children.push Node.create first, @, @depth, 'first'
-    if second?
-      @children.push Node.create second, @, @depth, 'second'
-    if base?
-      if base.value?
-        @children.push new BottomNode base, @, @depth, 'base'
-      else
-        @children.push Node.create base, @, @depth, 'base'
-    if name?
-      @children.push new BottomNode name, @, @depth, 'name'
-    if parent?
-      @parentNode.children.push Node.create parent, @, @depth, 'parent'
-    if body?
-      @children.push Node.create body, @, @depth + 1, 'body'
-
-  find: (range) ->
-    for child, i in @children
-      nodes = child.find range
-      if nodes?.length isnt 0
-        return _.compact _.flatten nodes
-    []
-
-  bottomUp: (targetNode) ->
-    @parentNode.bottomUp targetNode
-
-  topDown: (targetNode) ->
-    for child in @children
-      child.topDown targetNode
-
-  getIndent: ->
-    indent = ''
-    depth = @depth
-    while depth--
-      indent += '.'
-    indent
-
-  hasSameValue: (node) ->
-    for child in @children
-      return true if child.value is node.value
-    false
-
-class TopNode extends Node
-
-  constructor: ->
-    if Refactor.verbose
-      console.log "#{pad '', 15}|#{pad 'SCOPE', 10}|#{@getIndent()}-"
-    super
-
-  bottomUp: (targetNode) ->
-    for param, i in @params
-      if param.hasSameValue targetNode
-        return @topDown targetNode
-    super
-
-class RootNode extends TopNode
-
-  constructor: ->
-    if Refactor.verbose
-      console.log pad '', 50, '='
-    super
-
-  bottomUp: (targetNode) ->
-    @topDown targetNode
-
-class BottomNode extends Node
-
-  constructor: ({ locationData, @value }, @parentNode, @depth, @type) ->
-    @range = locationDataToRange locationData
-    if Refactor.verbose
-      console.log @range + "|#{pad @parentNode.type, 10}|#{@getIndent()}#{@value}"
-
-  find: (range) ->
-    return @bottomUp @ if range.isEqual @range
-
-  topDown: (targetNode) ->
-    return @ if targetNode isnt @ and targetNode.value is @value
+    refs = []
+    @block.traverseChildren no, (node) ->
+      if node instanceof Literal and node isnt target and node.value is target.value
+        refs.push node
+    refs

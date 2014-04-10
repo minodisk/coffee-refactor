@@ -1,7 +1,4 @@
 {View} = require 'atom'
-coffee = require 'coffee-script'
-
-console.log coffee
 
 module.exports =
 class CoffeeRefactorView extends View
@@ -20,7 +17,6 @@ class CoffeeRefactorView extends View
     @detach()
 
   rename: ->
-    console.log "CoffeeRefactorView was renamed!"
     if @hasParent()
       @detach()
     else

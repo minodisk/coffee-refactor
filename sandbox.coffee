@@ -1,3 +1,8 @@
+a = b = 100
+b = a * b / 10
+sum = ->
+  a + b
+
 a = ->
   'bobobo'
 
@@ -34,3 +39,8 @@ isObjA = obj.a?
 
 if code is 'abc'
   code = new A code
+if code
+  code = new B code
+
+if a
+  a = a / a
