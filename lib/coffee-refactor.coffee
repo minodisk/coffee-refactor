@@ -1,20 +1,14 @@
-# CoffeeRefactorView = require './coffee-refactor-view'
 Refactor = require './Refactor'
 
 module.exports = new class CoffeeRefactor
 
-  # coffeeRefactorView: null
-
   activate: (state) ->
-    # @coffeeRefactorView = new CoffeeRefactorView state.coffeeRefactorViewState
     atom.workspaceView.command "coffee-refactor:rename", @rename
     atom.workspaceView.command "coffee-refactor:done", @done
 
   deactivate: ->
-    # @coffeeRefactorView.destroy()
 
   serialize: ->
-    # coffeeRefactorViewState: @coffeeRefactorView.serialize()
 
   rename: =>
     editor = atom.workspace.getActiveEditor()
