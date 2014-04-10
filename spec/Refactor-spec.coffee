@@ -9,12 +9,25 @@ expectEqualRefs = (parser, range, ranges...) ->
     expect node.locationData
     .toEqual Parser.rangeToLocationData ranges[i]
 
+
 describe 'Parser', ->
+
+  parser = new Parser
+
+  describe 'parse', ->
+
+    it "shouldn't parse syntax error code", ->
+      expect ->
+        parser.parse """
+        a /// b
+        """
+      .not.toThrow()
+      expect(parser.nodes).toBeNull()
 
   describe 'find', ->
 
     it 'should find no reference in WHITESPACE, OPERATOR', ->
-      parser = new Parser """
+      parser.parse """
       b = a * b / 10
       """
       expectEqualRefs parser, new Range([0, 1], [0, 2])
@@ -22,7 +35,7 @@ describe 'Parser', ->
       expectEqualRefs parser, new Range([1, 6], [1, 7])
 
     it 'should find references in FUNCTION', ->
-      parser = new Parser """
+      parser.parse """
       a = 100
       b = 3
       calc = (a) ->
@@ -37,7 +50,7 @@ describe 'Parser', ->
         new Range([5, 12], [5, 13])
 
     it 'should find references in OBJECT', ->
-      parser = new Parser """
+      parser.parse """
       a = 10
       b = 5
       c =
@@ -52,7 +65,7 @@ describe 'Parser', ->
         new Range([4, 13], [4, 14])
 
     it 'should find ref from outer in ARRAY', ->
-      parser = new Parser """
+      parser.parse """
       a = 10
       b = 5
       c = [
@@ -68,7 +81,7 @@ describe 'Parser', ->
         new Range([4, 6], [4, 7])
 
     it 'should find references in EXTENDS', ->
-      parser = new Parser """
+      parser.parse """
       class A
       class B extends A
       class C extends A
@@ -81,7 +94,7 @@ describe 'Parser', ->
         new Range([2, 16], [2, 17])
 
     it 'should find references in IF', ->
-      parser = new Parser """
+      parser.parse """
       if a
         a = a / a
       """

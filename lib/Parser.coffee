@@ -1,4 +1,4 @@
-coffee = require 'coffee-script'
+{ tokens, nodes, helpers: { isCoffee } } = require 'coffee-script'
 { Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 
@@ -35,18 +35,25 @@ module.exports = class Parser
     a.last_column  is b.last_column
 
 
-  constructor: (code) ->
-    @block = coffee.nodes code
+  nodes: null
+
+  constructor: ->
+
+  parse: (code) ->
+    try
+      @nodes = nodes code
+    catch err
+      @nodes = null
 
   find: (range) ->
     targetLocationData = Parser.rangeToLocationData range
-    target = @block.contains (node) ->
+    target = @nodes.contains (node) ->
       node instanceof Literal and Parser.isEqualLocationData node.locationData, targetLocationData
 
     return [] unless target?
 
     refs = []
-    @block.traverseChildren no, (node) ->
+    @nodes.traverseChildren no, (node) ->
       if node instanceof Literal and node isnt target and node.value is target.value
         refs.push node
     refs
