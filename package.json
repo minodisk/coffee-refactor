@@ -4,7 +4,8 @@
   "version": "0.1.1",
   "description": "CoffeeScript refactoring procedures.",
   "activationEvents": [
-    "coffee-refactor:rename"
+    "coffee-refactor:rename",
+    "coffee-refactor:done"
   ],
   "repository": "https://github.com/minodisk/coffee-refactor",
   "license": "MIT",
