@@ -1,4 +1,4 @@
-Refactor = require '../lib/Refactor'
+Refactor = require '../lib/Parser'
 { Range } = require 'atom'
 
 expectEqualRefs = (refactor, range, ranges...) ->

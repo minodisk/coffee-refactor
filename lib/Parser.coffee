@@ -17,7 +17,7 @@ padL = (str, len, pad = ' ') ->
   str
 
 
-module.exports = class Refactor
+module.exports = class Parser
 
   @locationDataToRange: ({ first_line, first_column, last_line, last_column }) ->
     new Range [ first_line, first_column ], [ last_line, last_column + 1 ]
@@ -39,9 +39,9 @@ module.exports = class Refactor
     @block = coffee.nodes code
 
   find: (range) ->
-    targetLocationData = Refactor.rangeToLocationData range
+    targetLocationData = Parser.rangeToLocationData range
     target = @block.contains (node) ->
-      node instanceof Literal and Refactor.isEqualLocationData node.locationData, targetLocationData
+      node instanceof Literal and Parser.isEqualLocationData node.locationData, targetLocationData
 
     return [] unless target?
 

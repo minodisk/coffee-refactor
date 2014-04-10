@@ -1,4 +1,4 @@
-Refactor = require './Refactor'
+Parser = require './Parser'
 
 module.exports = new class CoffeeRefactor
 
@@ -18,7 +18,7 @@ module.exports = new class CoffeeRefactor
 
   modified: (editor) =>
     console.log 'modified'
-    refactor = new Refactor editor.buffer.cachedText
+    refactor = new Parser editor.buffer.cachedText
 
   rename: =>
     editor = atom.workspace.getActiveEditor()
@@ -30,7 +30,7 @@ module.exports = new class CoffeeRefactor
     code = editor.getText()
     if code isnt @code
       @code = code
-      @refactor = new Refactor code
+      @refactor = new Parser code
 
     nodes = @refactor.find selection.getBufferRange()
     return if nodes.length is 0
