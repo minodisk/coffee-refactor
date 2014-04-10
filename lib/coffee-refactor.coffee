@@ -3,12 +3,9 @@ Parser = require './Parser'
 module.exports = new class CoffeeRefactor
 
   activate: (state) ->
-    console.log 'activate'
-    atom.workspace.eachEditor (editor) =>
-      editor.on 'contents-modified', =>
-        @modified editor
     atom.workspaceView.command 'coffee-refactor:rename', @rename
     atom.workspaceView.command 'coffee-refactor:done', @done
+    atom.workspace.eachEditor @onEditorCreated
 
   deactivate: ->
     console.log 'deactivate'
@@ -16,32 +13,32 @@ module.exports = new class CoffeeRefactor
   serialize: ->
     console.log 'serialize'
 
-  modified: (editor) =>
-    console.log 'modified'
-    refactor = new Parser editor.buffer.cachedText
+  onEditorCreated: (editor) =>
+    editor.parser = new Parser
+    editor.on 'contents-modified', =>
+      @modified editor
+    @modified editor
 
-  rename: =>
+  modified: (editor) =>
+    editor.parser.parse editor.buffer.cachedText
+
+  rename: (e) =>
     editor = atom.workspace.getActiveEditor()
-    return unless editor?
+    return e.abortKeyBinding() unless editor?
 
     editor.selectWord()
     selection = editor.getSelection 0
-
     code = editor.getText()
-    if code isnt @code
-      @code = code
-      @refactor = new Parser code
-
-    nodes = @refactor.find selection.getBufferRange()
-    return if nodes.length is 0
+    nodes = editor.parser.find selection.getBufferRange()
+    return e.abortKeyBinding() if nodes.length is 0
 
     @target =
       editor: editor
       selection: selection
 
     for { locationData } in nodes
-      range = Refactor.locationDataToRange locationData
-      editor.addSelectionForBufferRange Refactor.locationDataToRange locationData
+      range = Parser.locationDataToRange locationData
+      editor.addSelectionForBufferRange Parser.locationDataToRange locationData
 
   done: (e) =>
     return e.abortKeyBinding() unless @target?
