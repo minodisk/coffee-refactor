@@ -3,12 +3,22 @@ Refactor = require './Refactor'
 module.exports = new class CoffeeRefactor
 
   activate: (state) ->
-    atom.workspaceView.command "coffee-refactor:rename", @rename
-    atom.workspaceView.command "coffee-refactor:done", @done
+    console.log 'activate'
+    atom.workspace.eachEditor (editor) =>
+      editor.on 'contents-modified', =>
+        @modified editor
+    atom.workspaceView.command 'coffee-refactor:rename', @rename
+    atom.workspaceView.command 'coffee-refactor:done', @done
 
   deactivate: ->
+    console.log 'deactivate'
 
   serialize: ->
+    console.log 'serialize'
+
+  modified: (editor) =>
+    console.log 'modified'
+    refactor = new Refactor editor.buffer.cachedText
 
   rename: =>
     editor = atom.workspace.getActiveEditor()
