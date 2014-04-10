@@ -16,13 +16,14 @@ describe 'Parser', ->
 
   describe 'parse', ->
 
-    it "shouldn't parse syntax error code", ->
+    it "shouldn't parse code with syntax error", ->
       expect ->
         parser.parse """
         a /// b
         """
       .not.toThrow()
       expect(parser.nodes).toBeNull()
+      expectEqualRefs parser, new Range([0, 0], [0, 1])
 
   describe 'find', ->
 

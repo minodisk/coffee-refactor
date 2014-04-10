@@ -46,6 +46,8 @@ module.exports = class Parser
       @nodes = null
 
   find: (range) ->
+    return [] unless @nodes?
+
     targetLocationData = Parser.rangeToLocationData range
     target = @nodes.contains (node) ->
       node instanceof Literal and Parser.isEqualLocationData node.locationData, targetLocationData
