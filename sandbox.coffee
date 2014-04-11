@@ -1,3 +1,17 @@
+
+fibs =
+  0: 0
+  1: 1
+fib = (n) ->
+  return fibs[n] if fibs[n]?
+  fibs[n] = fib(n - 1) + fib(n - 2)
+for i in [0..10]
+  console.log i, fib i
+
+
+
+
+
 a = b = 100
 b = a * b / 10
 sum = ->

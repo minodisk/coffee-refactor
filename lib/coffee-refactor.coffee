@@ -28,7 +28,6 @@ module.exports = new class CoffeeRefactor
 
     editor.selectWord()
     selection = editor.getSelection 0
-    code = editor.getText()
     nodes = editor.parser.find selection.getBufferRange()
     return e.abortKeyBinding() if nodes.length is 0
 
