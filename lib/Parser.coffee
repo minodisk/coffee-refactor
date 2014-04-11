@@ -52,22 +52,31 @@ module.exports = class Parser
     target
 
   @traverseScope: (node, target) ->
-    dests = null
+    dests = []
+
+    isBreak = false
     node.traverseChildren true, (child) ->
-      return true unless child instanceof Code
-      return true unless Parser.hasDeclarations child, target
-      dests = Parser.findSameLiterals child, target
-      false
-    unless dests?
-      dests = Parser.findSameLiterals node, target
+      return false if isBreak
+
+      unless child instanceof Code
+        if Parser.isSameLiteral child, target
+          dests.push child
+        return true
+
+      if Parser.hasDeclarations child, target
+        if Parser.isContains child, target
+          dests = Parser.findSameLiterals child, target
+          isBreak = true
+        return false
+      else
+        return true
+
     dests
 
   @findSameLiterals: (node, target) ->
     dests = []
     node.traverseChildren true, (child) ->
-      if child instanceof Literal and \
-         child isnt target and \
-         child.value is target.value
+      if Parser.isSameLiteral child, target
         dests.push child
     dests
 
@@ -75,6 +84,19 @@ module.exports = class Parser
     node.compileNode node
     return true for variable in node.scope.variables when variable.name is target.value
     false
+
+  @isContains: (node, target) ->
+    isContains = false
+    node.traverseChildren true, (child) ->
+      isContains or= child is target
+      !isContains
+    isContains
+
+  @isSameLiteral: (a, b) ->
+    a instanceof Literal and \
+    b instanceof Literal and \
+    a isnt b and \
+    a.value is b.value
 
 
   nodes: null
