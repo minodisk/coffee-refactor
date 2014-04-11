@@ -1,4 +1,4 @@
-{ tokens, nodes, helpers: { isCoffee } } = require 'coffee-script'
+{ tokens, nodes } = require 'coffee-script'
 { Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 
