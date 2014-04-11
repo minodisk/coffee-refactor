@@ -1,5 +1,5 @@
 { tokens, nodes } = require 'coffee-script'
-{ Code, Param, Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Code, Block, Param, Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Scope } = require '../node_modules/coffee-script/lib/coffee-script/scope'
 { Range } = require 'atom'
 
@@ -46,6 +46,8 @@ module.exports = class Parser
     node.traverseChildren true, (child) ->
       # return false if node.classBody
       if child instanceof Literal
+        unless child.locationData?
+          console.log child
         if Parser.isEqualLocationData child.locationData, targetLocationData
           target = child
           return false
@@ -80,9 +82,10 @@ module.exports = class Parser
         dests.push child
     dests
 
-  @hasDeclarations: (node, target) ->
-    node.compileNode node
-    return true for variable in node.scope.variables when variable.name is target.value
+  @hasDeclarations: (code, target) ->
+    code = new Code code.params, new Block(code.body), code.tag
+    code.compileNode code
+    return true for variable in code.scope.variables when variable.name is target.value
     false
 
   @isContains: (node, target) ->
