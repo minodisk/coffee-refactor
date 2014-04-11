@@ -40,19 +40,23 @@ describe 'Parser', ->
       a = b = 100
       calc = (a) ->
         a * b
-      a / = b
+      a /= b
       """
+      expectEqualRefs parser, new Range([0, 0], [0, 1]),
+        new Range([3, 0], [3, 1])
       expectEqualRefs parser, new Range([1, 8], [1, 9]),
         new Range([2, 2], [2, 3])
       expectEqualRefs parser, new Range([2, 2], [2, 3]),
         new Range([1, 8], [1, 9])
+      expectEqualRefs parser, new Range([3, 0], [3, 1]),
+        new Range([0, 0], [0, 1])
       expectEqualRefs parser, new Range([0, 4], [0, 5]),
         new Range([2, 6], [2, 7]),
-        new Range([3, 6], [3, 7])
+        new Range([3, 5], [3, 6])
       expectEqualRefs parser, new Range([2, 6], [2, 7]),
         new Range([0, 4], [0, 5]),
-        new Range([3, 6], [3, 7])
-      expectEqualRefs parser, new Range([3, 6], [3, 7]),
+        new Range([3, 5], [3, 6])
+      expectEqualRefs parser, new Range([3, 5], [3, 6]),
         new Range([0, 4], [0, 5]),
         new Range([2, 6], [2, 7])
 

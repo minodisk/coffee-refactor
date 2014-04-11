@@ -1,9 +1,10 @@
 { tokens, nodes } = require 'coffee-script'
-{ Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Code, Param, Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Scope } = require '../node_modules/coffee-script/lib/coffee-script/scope'
 { Range } = require 'atom'
 
 # _ = require 'underscore'
-# { inspect } = require 'util'
+{ inspect } = require 'util'
 
 
 pad = (str, len, pad = ' ') ->
@@ -34,8 +35,50 @@ module.exports = class Parser
     a.last_line    is b.last_line    and \
     a.last_column  is b.last_column
 
+  @findDeclaredNodes: (node, targetLocationData) ->
+    target = @searchAtLocationData node, targetLocationData
+    return [] unless target?
+
+    @traverseScope node, target
+
+  @searchAtLocationData: (node, targetLocationData) ->
+    target = null
+    node.traverseChildren true, (child) ->
+      # return false if node.classBody
+      if child instanceof Literal
+        if Parser.isEqualLocationData child.locationData, targetLocationData
+          target = child
+          return false
+    target
+
+  @traverseScope: (node, target) ->
+    dests = null
+    node.traverseChildren true, (child) ->
+      return true unless child instanceof Code
+      return true unless Parser.hasDeclarations child, target
+      dests = Parser.findSameLiterals child, target
+      false
+    unless dests?
+      dests = Parser.findSameLiterals node, target
+    dests
+
+  @findSameLiterals: (node, target) ->
+    dests = []
+    node.traverseChildren true, (child) ->
+      if child instanceof Literal and \
+         child isnt target and \
+         child.value is target.value
+        dests.push child
+    dests
+
+  @hasDeclarations: (node, target) ->
+    node.compileNode node
+    return true for variable in node.scope.variables when variable.name is target.value
+    false
+
 
   nodes: null
+
 
   constructor: ->
 
@@ -49,13 +92,4 @@ module.exports = class Parser
     return [] unless @nodes?
 
     targetLocationData = Parser.rangeToLocationData range
-    target = @nodes.contains (node) ->
-      node instanceof Literal and Parser.isEqualLocationData node.locationData, targetLocationData
-
-    return [] unless target?
-
-    refs = []
-    @nodes.traverseChildren no, (node) ->
-      if node instanceof Literal and node isnt target and node.value is target.value
-        refs.push node
-    refs
+    Parser.findDeclaredNodes @nodes, targetLocationData
