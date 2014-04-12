@@ -10,9 +10,9 @@ Rename all references in the code.
 
 ### Operation
 1. Set cursor to symbol.
-2. [ctrl]+[r] (in default)
+2. `ctrl+r` (in default)
 3. Type new name
-4. [enter] or [esc]
+4. `enter` or `esc`
 
 ### Support
 * Rename variable
