@@ -4,6 +4,7 @@ module.exports = new class CoffeeRefactor
 
   activate: (state) ->
     atom.workspaceView.command 'coffee-refactor:rename', @rename
+    atom.workspaceView.command 'coffee-refactor:cancel', @cancel
     atom.workspaceView.command 'coffee-refactor:done', @done
     atom.workspace.eachEditor @onEditorCreated
 
@@ -38,6 +39,9 @@ module.exports = new class CoffeeRefactor
     for { locationData } in nodes
       range = Parser.locationDataToRange locationData
       editor.addSelectionForBufferRange Parser.locationDataToRange locationData
+
+  cancel: (e) =>
+    console.log 'cancel'
 
   done: (e) =>
     return e.abortKeyBinding() unless @target?
