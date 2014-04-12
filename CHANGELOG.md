@@ -1,3 +1,8 @@
+# v0.1.6 on 2014/04/12
+
+* Add capture to README.
+* Add descriptions about operation and support to README.
+
 # v0.1.5 on 2014/04/11
 
 * Support renaming over lexical scope.

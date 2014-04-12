@@ -1,6 +1,26 @@
 # Coffee Refactor package
 
-CoffeeScript refactoring procedures.
-Such as rename variables, parameters, or class names.
+CoffeeScript refactoring package for [Atom](https://atom.io/).
 
-![A screenshot of your spankin' package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+## Rename
+
+Rename all references in the code.
+
+![capture](https://cloud.githubusercontent.com/assets/514164/2685785/baded014-c1d5-11e3-88d6-fe494ce36e0e.gif)
+
+### Operation
+1. Set cursor to symbol.
+2. [ctrl]+[r] (in default)
+3. Type new name
+4. [enter] or [esc]
+
+### Support
+* Rename variable
+* Rename function
+* Rename parameter
+* Rename class
+
+## Links
+
+* [change log](CHANGELOG.md)
+* [license](LICENSE.md)
