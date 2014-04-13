@@ -1,11 +1,14 @@
 Parser = require './Parser'
 
-module.exports = new class CoffeeRefactor
+module.exports =
+new class CoffeeRefactor
 
   activate: (state) ->
+    console.log 'activate'
     atom.workspaceView.command 'coffee-refactor:rename', @rename
     atom.workspaceView.command 'coffee-refactor:cancel', @cancel
     atom.workspaceView.command 'coffee-refactor:done', @done
+    atom.workspaceView.command 'cursor:moved', @hilight
     atom.workspace.eachEditor @onEditorCreated
 
   deactivate: ->
@@ -23,6 +26,9 @@ module.exports = new class CoffeeRefactor
   modified: (editor) =>
     editor.parser.parse editor.buffer.cachedText
 
+  hilight: (e) =>
+    console.log 'hilight'
+
   rename: (e) =>
     editor = atom.workspace.getActiveEditor()
     return e.abortKeyBinding() unless editor?
@@ -35,13 +41,15 @@ module.exports = new class CoffeeRefactor
     @target =
       editor: editor
       selection: selection
+      cachedText: editor.buffer.cachedText
 
     for { locationData } in nodes
       range = Parser.locationDataToRange locationData
       editor.addSelectionForBufferRange Parser.locationDataToRange locationData
 
   cancel: (e) =>
-    console.log 'cancel'
+    @target.editor.setText @target.cachedText
+    @done e
 
   done: (e) =>
     return e.abortKeyBinding() unless @target?

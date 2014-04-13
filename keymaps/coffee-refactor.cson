@@ -9,5 +9,5 @@
 # https://atom.io/docs/latest/advanced/keymaps
 '.editor:not(.mini)':
   'ctrl-r': 'coffee-refactor:rename'
-  'escape': 'coffee-refactor:cancel'
+  'shift-enter': 'coffee-refactor:cancel'
   'enter': 'coffee-refactor:done'

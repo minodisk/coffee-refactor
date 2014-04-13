@@ -1,3 +1,7 @@
+# v0.1.6 on 2014/04/
+
+* Support cancel renaming
+
 # v0.1.6 on 2014/04/12
 
 * Add capture to README.
