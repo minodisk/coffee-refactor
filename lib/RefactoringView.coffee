@@ -10,6 +10,7 @@ class RefactoringingView extends View
 
   constructor: (@editorView) ->
     super()
+    @markerViews = []
     @refactoring = new Refactoring @editorView.getEditor()
     @editorView.underlayer.append @
     @editorView.on 'cursor:moved', @onCursorMoved
@@ -31,7 +32,11 @@ class RefactoringingView extends View
     @highlight @refactoring.getReferenceRanges()
 
   highlight: (ranges) ->
-    console.log 'highlight:', ranges
+    for markerView in @markerViews
+      markerView.destruct()
+    @markerViews = []
     @empty()
     for range in ranges
-      @append new MarkerView @editorView, range
+      markerView = new MarkerView @editorView, range
+      @markerViews.push markerView
+      @append markerView

@@ -9,12 +9,14 @@ class RefactoringingView extends View
   constructor: (editorView, { start, end }) ->
     super()
 
-    tl = editorView.pixelPositionForBufferPosition start
-    tr = editorView.pixelPositionForBufferPosition end
+    rowSpan = end.row - start.row
+    start = editorView.pixelPositionForBufferPosition start
+    end = editorView.pixelPositionForBufferPosition end
+
     @css
-      left: tl.left
-      top: tl.top
-      width: tr.left - tl.left
-      height: editorView.lineHeight * (end.row - start.row + 1)
+      left: start.left
+      top: start.top
+      width: end.left - start.left
+      height: editorView.lineHeight * (rowSpan + 1)
 
   destruct: ->
