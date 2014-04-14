@@ -1,5 +1,6 @@
 { View } = require 'atom'
 Refactoring = require './Refactoring'
+MarkerView = require './MarkerView'
 
 module.exports =
 class RefactoringingView extends View
@@ -8,6 +9,7 @@ class RefactoringingView extends View
     @div class: 'coffee-refactor'
 
   constructor: (@editorView) ->
+    super()
     @refactoring = new Refactoring @editorView.getEditor()
     @editorView.underlayer.append @
     @editorView.on 'cursor:moved', @onCursorMoved
@@ -26,9 +28,10 @@ class RefactoringingView extends View
 
 
   onCursorMoved: =>
-    console.log 'onCursorMoved'
     @highlight @refactoring.getReferenceRanges()
-
 
   highlight: (ranges) ->
     console.log 'highlight:', ranges
+    @empty()
+    for range in ranges
+      @append new MarkerView @editorView, range

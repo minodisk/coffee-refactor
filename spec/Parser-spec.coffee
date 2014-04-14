@@ -1,13 +1,13 @@
 Parser = require '../lib/Parser'
 { Range } = require 'atom'
 
-expectEqualRefs = (parser, range, ranges...) ->
-  nodes = parser.find range
-  expect nodes
-  .toHaveLength ranges.length
-  for node, i in nodes
-    expect node.locationData
-    .toEqual Parser.rangeToLocationData ranges[i]
+expectEqualRefs = (parser, searchedRange, expectedRanges...) ->
+  ranges = parser.find searchedRange
+  expect ranges
+  .toHaveLength expectedRanges.length
+  for range, i in ranges
+    expect range
+    .toEqual expectedRanges[i]
 
 
 describe 'Parser', ->

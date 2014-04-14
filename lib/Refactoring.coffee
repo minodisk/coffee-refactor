@@ -53,14 +53,13 @@ class Refactoring
     console.log 'rename'
 
     @editor.selectWord()
-    selection = @editor.getSelection 0
-    nodes = @parser.find selection.getBufferRange()
-    return false if nodes.length is 0
+    selection = @editor.getLastSelection()
+    ranges = @parser.find selection.getBufferRange()
+    return false if ranges.length is 0
 
     @selection = selection
-    for { locationData } in nodes
-      range = Parser.locationDataToRange locationData
-      @editor.addSelectionForBufferRange Parser.locationDataToRange locationData
+    for range in ranges
+      @editor.addSelectionForBufferRange range
     true
 
   done: ->
@@ -73,7 +72,7 @@ class Refactoring
     true
 
   getReferenceRanges: ->
-    
+    @parser.find @editor.getLastSelection().getBufferRange()
 
   ###
   Private methods
@@ -81,5 +80,4 @@ class Refactoring
 
   parse: =>
     console.log 'parse'
-
-    @editor.selectWord()
+    @parser.parse @editor.getText()

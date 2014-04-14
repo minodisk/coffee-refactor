@@ -18,7 +18,7 @@ padL = (str, len, pad = ' ') ->
   str
 
 
-module.exports = class CoffeeParser
+module.exports = class Parser
 
   @locationDataToRange: ({ first_line, first_column, last_line, last_column }) ->
     new Range [ first_line, first_column ], [ last_line, last_column + 1 ]
@@ -35,6 +35,10 @@ module.exports = class CoffeeParser
     a.last_line    is b.last_line    and \
     a.last_column  is b.last_column
 
+  @isContainsLocationData: (a, b) ->
+    (a.first_line < b.first_line or a.first_line is b.first_line and a.first_column <= b.first_column) and \
+    (b.last_line < a.last_line or b.last_line is a.last_line and b.last_column <= a.last_column)
+
   @findDeclaredNodes: (node, targetLocationData) ->
     target = @searchAtLocationData node, targetLocationData
     return [] unless target?
@@ -48,7 +52,7 @@ module.exports = class CoffeeParser
       if child instanceof Literal
         unless child.locationData?
           console.log child
-        if CoffeeParser.isEqualLocationData child.locationData, targetLocationData
+        if Parser.isContainsLocationData child.locationData, targetLocationData
           target = child
           return false
     target
@@ -61,13 +65,13 @@ module.exports = class CoffeeParser
       return false if isBreak
 
       unless child instanceof Code
-        if CoffeeParser.isSameLiteral child, target
+        if Parser.isSameLiteral child, target
           dests.push child
         return true
 
-      if CoffeeParser.hasDeclarations child, target
-        if CoffeeParser.isContains child, target
-          dests = CoffeeParser.findSameLiterals child, target
+      if Parser.hasDeclarations child, target
+        if Parser.isContains child, target
+          dests = Parser.findSameLiterals child, target
           isBreak = true
         return false
       else
@@ -78,7 +82,7 @@ module.exports = class CoffeeParser
   @findSameLiterals: (node, target) ->
     dests = []
     node.traverseChildren true, (child) ->
-      if CoffeeParser.isSameLiteral child, target
+      if Parser.isSameLiteral child, target
         dests.push child
     dests
 
@@ -116,5 +120,6 @@ module.exports = class CoffeeParser
   find: (range) ->
     return [] unless @nodes?
 
-    targetLocationData = CoffeeParser.rangeToLocationData range
-    CoffeeParser.findDeclaredNodes @nodes, targetLocationData
+    targetLocationData = Parser.rangeToLocationData range
+    for { locationData }, i in Parser.findDeclaredNodes @nodes, targetLocationData
+      Parser.locationDataToRange locationData
