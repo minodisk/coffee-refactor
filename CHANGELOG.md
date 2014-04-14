@@ -1,6 +1,6 @@
 # v0.1.6 on 2014/04/
 
-* Support cancel renaming
+* Highlight reference at cursor.
 
 # v0.1.6 on 2014/04/12
 

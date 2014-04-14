@@ -1,8 +1,10 @@
 Parser = require './Parser'
+console.log require 'atom'
+{ EventEmitter } = require 'events'
 
 
 module.exports =
-class Refactoring
+class Refactoring extends EventEmitter
 
 
   isCoffee: false
@@ -50,8 +52,6 @@ class Refactoring
     editor is @editor
 
   rename: ->
-    console.log 'rename'
-
     @editor.selectWord()
     selection = @editor.getLastSelection()
     ranges = @parser.find selection.getBufferRange()
@@ -63,10 +63,7 @@ class Refactoring
     true
 
   done: ->
-    console.log 'done'
-
     return false unless @selection?
-
     @editor.setCursorBufferPosition @selection.getBufferRange().start
     delete @selection
     true
@@ -81,3 +78,4 @@ class Refactoring
   parse: =>
     console.log 'parse'
     @parser.parse @editor.getText()
+    @emit 'parse'

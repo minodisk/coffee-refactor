@@ -12,8 +12,9 @@ class RefactoringingView extends View
     super()
     @markerViews = []
     @refactoring = new Refactoring @editorView.getEditor()
+    @refactoring.on 'parse', @updateHighlight
     @editorView.underlayer.append @
-    @editorView.on 'cursor:moved', @onCursorMoved
+    @editorView.on 'cursor:moved', @updateHighlight
 
   isSameEditor: (editor) ->
     @refactoring.isSameEditor editor
@@ -28,10 +29,11 @@ class RefactoringingView extends View
     @refactoring.done()
 
 
-  onCursorMoved: =>
+  updateHighlight: =>
     @highlight @refactoring.getReferenceRanges()
 
   highlight: (ranges) ->
+    console.log 'highlight'
     for markerView in @markerViews
       markerView.destruct()
     @markerViews = []
