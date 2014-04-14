@@ -1,8 +1,8 @@
-CoffeeParser = require './CoffeeParser'
+Parser = require './Parser'
 
 
 module.exports =
-class CoffeeRefactor
+class Refactor
 
 
   isCoffee: false
@@ -13,7 +13,7 @@ class CoffeeRefactor
   ###
 
   constructor: (@editor) ->
-    @coffeeParser = new CoffeeParser
+    @coffeeParser = new Parser
 
     @editor.on 'destroyed', @destruct
     @editor.on 'grammar-changed', @checkGrammar

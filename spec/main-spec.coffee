@@ -1,4 +1,4 @@
-CoffeeRefactor = require '../lib/coffee-refactor'
+CoffeeRefactor = require '../lib/main'
 { WorkspaceView } = require 'atom'
 
 # Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
