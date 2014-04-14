@@ -1,13 +1,23 @@
 Parser = require '../lib/Parser'
 { Range } = require 'atom'
+{ inspect } = require 'util'
 
-expectEqualRefs = (parser, searchedRange, expectedRanges...) ->
-  ranges = parser.find searchedRange
-  expect ranges
-  .toHaveLength expectedRanges.length
-  for range, i in ranges
-    expect range
-    .toEqual expectedRanges[i]
+expectNoRefs = (parser, range) ->
+  resultRanges = parser.find range
+  expect resultRanges
+  .toHaveLength 0
+
+expectEqualRefs = (parser, ranges...) ->
+  resultRanges = parser.find ranges[0]
+  ranges.sort (a, b) ->
+    return delta if (delta = a.start.row - b.start.row) isnt 0
+    a.start.column - b.start.column
+
+  expect resultRanges
+  .toHaveLength ranges.length
+  for resultRange, i in resultRanges
+    expect resultRange
+    .toEqual ranges[i]
 
 
 describe 'Parser', ->
@@ -23,7 +33,7 @@ describe 'Parser', ->
         """
       .not.toThrow()
       expect(parser.nodes).toBeNull()
-      expectEqualRefs parser, new Range([0, 0], [0, 1])
+      expectNoRefs parser, new Range([0, 0], [0, 1])
 
   describe 'find', ->
 
@@ -31,9 +41,9 @@ describe 'Parser', ->
       parser.parse """
       b = a * b / 10
       """
-      expectEqualRefs parser, new Range([0, 1], [0, 2])
-      expectEqualRefs parser, new Range([0, 2], [0, 3])
-      expectEqualRefs parser, new Range([1, 6], [1, 7])
+      expectNoRefs parser, new Range([0, 1], [0, 2])
+      expectNoRefs parser, new Range([0, 2], [0, 3])
+      expectNoRefs parser, new Range([1, 6], [1, 7])
 
     it 'should find references in FUNCTION', ->
       parser.parse """
