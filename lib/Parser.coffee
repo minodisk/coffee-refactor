@@ -102,7 +102,7 @@ module.exports = class Parser
   @isSameLiteral: (a, b) ->
     a instanceof Literal and \
     b instanceof Literal and \
-    a isnt b and \
+    # a isnt b and \
     a.value is b.value
 
 
