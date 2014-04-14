@@ -1,59 +1,44 @@
-Parser = require './Parser'
+CoffeeEditor = require './CoffeeEditor'
 
 module.exports =
 new class CoffeeRefactor
 
   activate: (state) ->
-    console.log 'activate'
+    @coffeeEditors = []
+    atom.workspace.eachEditor (editor) =>
+      @coffeeEditors.push new CoffeeEditor editor
+
     atom.workspaceView.command 'coffee-refactor:rename', @rename
     atom.workspaceView.command 'coffee-refactor:cancel', @cancel
     atom.workspaceView.command 'coffee-refactor:done', @done
-    atom.workspaceView.command 'cursor:moved', @hilight
-    atom.workspace.eachEditor @onEditorCreated
+    # atom.workspaceView.command 'cursor:moved', @hilight
 
   deactivate: ->
-    console.log 'deactivate'
+    for coffeeEditor in @coffeeEditors
+      coffeeEditor.destruct()
 
   serialize: ->
     console.log 'serialize'
 
-  onEditorCreated: (editor) =>
-    editor.parser = new Parser
-    editor.on 'contents-modified', =>
-      @modified editor
-    @modified editor
 
-  modified: (editor) =>
-    editor.parser.parse editor.buffer.cachedText
+  # hilight: (editor) =>
+  #   console.log 'highlight'
 
-  hilight: (e) =>
-    console.log 'hilight'
 
   rename: (e) =>
-    editor = atom.workspace.getActiveEditor()
-    return e.abortKeyBinding() unless editor?
-
-    editor.selectWord()
-    selection = editor.getSelection 0
-    nodes = editor.parser.find selection.getBufferRange()
-    return e.abortKeyBinding() if nodes.length is 0
-
-    @target =
-      editor: editor
-      selection: selection
-      cachedText: editor.buffer.cachedText
-
-    for { locationData } in nodes
-      range = Parser.locationDataToRange locationData
-      editor.addSelectionForBufferRange Parser.locationDataToRange locationData
+    @callActiveCoffeeEditor 'rename', e
 
   cancel: (e) =>
-    @target.editor.setText @target.cachedText
-    @done e
+    @callActiveCoffeeEditor 'cancel', e
 
   done: (e) =>
-    return e.abortKeyBinding() unless @target?
+    @callActiveCoffeeEditor 'done', e
 
-    @target.editor.setCursorBufferPosition @target.selection.getBufferRange().start
-
-    delete @target
+  callActiveCoffeeEditor: (methodName, e) ->
+    activePaneItem = atom.workspaceView.getActivePaneItem()
+    isCalled = false
+    for controller in @coffeeEditors
+      if controller.isSameEditor activePaneItem
+        isCalled or= controller[methodName]()
+    unless isCalled
+      e.abortKeyBinding()
