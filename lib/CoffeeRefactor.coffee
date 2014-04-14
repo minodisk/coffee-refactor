@@ -1,7 +1,8 @@
-Parser = require './Parser'
+CoffeeParser = require './CoffeeParser'
+
 
 module.exports =
-class CoffeeEditor
+class CoffeeRefactor
 
 
   isCoffee: false
@@ -12,7 +13,7 @@ class CoffeeEditor
   ###
 
   constructor: (@editor) ->
-    @parser = new Parser
+    @coffeeParser = new CoffeeParser
 
     @editor.on 'destroyed', @destruct
     @editor.on 'grammar-changed', @checkGrammar
@@ -24,7 +25,7 @@ class CoffeeEditor
     @editor.off 'grammar-changed', @checkGrammar
     @editor.off 'contents-modified', @parse
     delete @editor
-    delete @parser
+    delete @coffeeParser
 
 
   ###
@@ -53,7 +54,7 @@ class CoffeeEditor
 
     @editor.selectWord()
     selection = @editor.getSelection 0
-    nodes = @parser.find selection.getBufferRange()
+    nodes = @coffeeParser.find selection.getBufferRange()
     return false if nodes.length is 0
 
     @selection = selection
@@ -77,4 +78,4 @@ class CoffeeEditor
 
   parse: =>
     console.log 'parse'
-    @parser.parse @editor.buffer.cachedText
+    @coffeeParser.parse @editor.buffer.cachedText

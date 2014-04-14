@@ -1,6 +1,6 @@
 {
   "name": "coffee-refactor",
-  "main": "./lib/coffee-refactor",
+  "main": "./lib/main",
   "version": "0.1.6",
   "description": "CoffeeScript refactoring procedures.",
   "activationEvents": [
