@@ -1,4 +1,4 @@
-RefactorView = require './RefactorView'
+RefactoringView = require './RefactoringView'
 
 
 module.exports =
@@ -6,7 +6,7 @@ module.exports =
   activate: (state) ->
     @views = []
     atom.workspaceView.eachEditorView (editorView) =>
-      @views.push new RefactorView editorView
+      @views.push new RefactoringView editorView
 
     atom.workspaceView.command 'coffee-refactor:rename', (e) =>
       @callActiveCoffeeEditor 'rename', e

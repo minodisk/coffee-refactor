@@ -2,7 +2,7 @@ Parser = require './Parser'
 
 
 module.exports =
-class Refactor
+class Refactoring
 
 
   isCoffee: false
@@ -13,7 +13,7 @@ class Refactor
   ###
 
   constructor: (@editor) ->
-    @coffeeParser = new Parser
+    @parser = new Parser
 
     @editor.on 'destroyed', @destruct
     @editor.on 'grammar-changed', @checkGrammar
@@ -25,7 +25,7 @@ class Refactor
     @editor.off 'grammar-changed', @checkGrammar
     @editor.off 'contents-modified', @parse
     delete @editor
-    delete @coffeeParser
+    delete @parser
 
 
   ###
@@ -54,7 +54,7 @@ class Refactor
 
     @editor.selectWord()
     selection = @editor.getSelection 0
-    nodes = @coffeeParser.find selection.getBufferRange()
+    nodes = @parser.find selection.getBufferRange()
     return false if nodes.length is 0
 
     @selection = selection
@@ -72,10 +72,14 @@ class Refactor
     delete @selection
     true
 
+  getReferenceRanges: ->
+    
+
   ###
   Private methods
   ###
 
   parse: =>
     console.log 'parse'
-    @coffeeParser.parse @editor.buffer.cachedText
+
+    @editor.selectWord()
