@@ -1,6 +1,6 @@
 Parser = require '../lib/Parser'
 { Range } = require 'atom'
-{ inspect } = require 'util'
+# { inspect } = require 'util'
 
 expectNoRefs = (parser, range) ->
   resultRanges = parser.find range
@@ -45,7 +45,7 @@ describe 'Parser', ->
       expectNoRefs parser, new Range([0, 2], [0, 3])
       expectNoRefs parser, new Range([1, 6], [1, 7])
 
-    it 'should find references in FUNCTION', ->
+    it 'should support FUNCTION statement', ->
       parser.parse """
       a = b = 100
       calc = (a) ->
@@ -70,7 +70,7 @@ describe 'Parser', ->
         new Range([0, 4], [0, 5]),
         new Range([2, 6], [2, 7])
 
-    it 'should find references in OBJECT', ->
+    it 'should support OBJECT statement', ->
       parser.parse """
       a = 10
       b = 5
@@ -101,7 +101,7 @@ describe 'Parser', ->
         new Range([1, 0], [1, 1]),
         new Range([4, 6], [4, 7])
 
-    it 'should find references in EXTENDS', ->
+    it 'should support EXTENDS statement', ->
       parser.parse """
       class A
       class B extends A
@@ -114,7 +114,7 @@ describe 'Parser', ->
         new Range([0, 6], [0, 7]),
         new Range([2, 16], [2, 17])
 
-    it 'should find references in IF', ->
+    it 'should support IF statement', ->
       parser.parse """
       if a
         a = a / a
@@ -128,9 +128,9 @@ describe 'Parser', ->
         new Range([1, 2], [1, 3]),
         new Range([1, 6], [1, 7])
 
-    it 'should find references in FOR-IN', ->
+    it 'should support FOR-IN statement', ->
       parser.parse """
-      for elem, i in elems
+      for elem, i in arr
         console.log i, elem
       """
       expectEqualRefs parser, new Range([0, 4], [0, 8]),
@@ -141,3 +141,17 @@ describe 'Parser', ->
         new Range([0, 4], [0, 8])
       expectEqualRefs parser, new Range([1, 14], [1, 15]),
         new Range([0, 10], [0, 11])
+
+    it 'should support FOR-OF statement', ->
+      parser.parse """
+      for key, val of obj
+        console.log key, val
+      """
+      expectEqualRefs parser, new Range([0, 4], [0, 7]),
+        new Range([1, 14], [1, 17])
+      expectEqualRefs parser, new Range([0, 9], [0, 12]),
+        new Range([1, 19], [1, 22])
+      expectEqualRefs parser, new Range([1, 14], [1, 17]),
+        new Range([0, 4], [0, 7])
+      expectEqualRefs parser, new Range([1, 19], [1, 22]),
+        new Range([0, 9], [0, 12])
