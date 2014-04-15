@@ -127,3 +127,17 @@ describe 'Parser', ->
         new Range([0, 3], [0, 4]),
         new Range([1, 2], [1, 3]),
         new Range([1, 6], [1, 7])
+
+    it 'should find references in FOR-IN', ->
+      parser.parse """
+      for elem, i in elems
+        console.log i, elem
+      """
+      expectEqualRefs parser, new Range([0, 4], [0, 8]),
+        new Range([1, 17], [1, 21])
+      expectEqualRefs parser, new Range([0, 10], [0, 11]),
+        new Range([1, 14], [1, 15])
+      expectEqualRefs parser, new Range([1, 17], [1, 21]),
+        new Range([0, 4], [0, 8])
+      expectEqualRefs parser, new Range([1, 14], [1, 15]),
+        new Range([0, 10], [0, 11])
