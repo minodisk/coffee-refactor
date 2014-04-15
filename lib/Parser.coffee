@@ -1,6 +1,6 @@
-{ tokens, nodes } = require 'coffee-script'
-{ Code, Block, Param, Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
-{ Scope } = require '../node_modules/coffee-script/lib/coffee-script/scope'
+{ nodes } = require 'coffee-script'
+{ Code, Block, Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+# { Scope } = require '../node_modules/coffee-script/lib/coffee-script/scope'
 { Range } = require 'atom'
 
 # _ = require 'underscore'
@@ -110,6 +110,9 @@ module.exports = class Parser
 
 
   constructor: ->
+
+  destruct: ->
+    delete @nodes
 
   parse: (code) ->
     try

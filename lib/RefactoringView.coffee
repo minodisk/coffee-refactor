@@ -10,11 +10,26 @@ class RefactoringingView extends View
 
   constructor: (@editorView) ->
     super()
+
     @isHighlight = false
+
     @refactoring = new Refactoring @editorView.getEditor()
     @refactoring.on 'parsed', @updateHighlight
+
     @editorView.underlayer.append @
     @editorView.on 'cursor:moved', @updateHighlight
+
+  destruct: =>
+    @remove()
+
+    @refactoring.destruct()
+
+    @editorView.off 'cursor:moved', @updateHighlight
+
+    delete @isHighlight
+    delete @refactoring
+    delete @editorView
+
 
   isSameEditor: (editor) ->
     @refactoring.isSameEditor editor

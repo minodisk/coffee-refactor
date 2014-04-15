@@ -14,17 +14,22 @@ class Refactoring extends EventEmitter
   ###
 
   constructor: (@editor) ->
+    super()
+
     @parser = new Parser
 
-    @editor.on 'destroyed', @destruct
     @editor.on 'grammar-changed', @checkGrammar
 
     @checkGrammar()
 
   destruct: =>
-    @editor.off 'destroyed', @destruct
+    @removeAllListeners()
+
+    @parser.destruct()
+
     @editor.off 'grammar-changed', @checkGrammar
     @editor.off 'contents-modified', @parse
+
     delete @editor
     delete @parser
 

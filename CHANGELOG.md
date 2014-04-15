@@ -1,3 +1,7 @@
+# v0.1.9 on 2014/04/15
+
+* Fix error thrown when toggle highlight after closing editor.
+
 # v0.1.7-v0.1.8 on 2014/04/15
 
 * Highlight references of a symbol at the cursor.

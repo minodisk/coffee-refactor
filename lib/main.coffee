@@ -2,15 +2,13 @@ RefactoringView = require './RefactoringView'
 
 
 module.exports =
+new class Main
 
   activate: (state) ->
     @isHighlight = false
 
-    @views = []
-    atom.workspaceView.eachEditorView (editorView) =>
-      view = new RefactoringView editorView
-      view.highlight @isHighlight
-      @views.push view
+    @refactoringViews = []
+    atom.workspaceView.eachEditorView @onEditorViewCreated
 
     atom.workspaceView.command 'coffee-refactor:toggle-highlight', (e) =>
       @isHighlight = !@isHighlight
@@ -21,7 +19,7 @@ module.exports =
       @callActiveViews e, 'done'
 
   deactivate: ->
-    for view in @views
+    for view in @refactoringViews
       view.destruct()
 
   serialize: ->
@@ -30,7 +28,7 @@ module.exports =
 
   callViews: (e, methodName, args...) ->
     # isCalled = false
-    for view, i in @views
+    for view, i in @refactoringViews
       view[methodName].apply view, args
 
     # unless isCalled
@@ -39,9 +37,23 @@ module.exports =
   callActiveViews: (e, methodName, args...) ->
     activePaneItem = atom.workspaceView.getActivePaneItem()
     isCalled = false
-    for view in @views
+    for view in @refactoringViews
       if view.isSameEditor activePaneItem
         isCalled or= view[methodName].apply view, args
 
     unless isCalled
       e.abortKeyBinding()
+
+
+  onEditorViewCreated: (editorView) =>
+    refactoringView = new RefactoringView editorView
+    editorView.getEditor().on 'destroyed', =>
+      @onEditorViewDestroyed refactoringView
+    refactoringView.highlight @isHighlight
+    @refactoringViews.push refactoringView
+
+  onEditorViewDestroyed: (refactoringView) ->
+    refactoringView.destruct()
+    index = @refactoringViews.indexOf refactoringView
+    return if index is -1
+    @refactoringViews.splice index, 1
