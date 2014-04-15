@@ -60,6 +60,9 @@ if code is 'abc'
   code = new A code
 if code
   code = new B code
+codes = []
+for code, i in codes
+  console.log i, code
 
 if a
   a = a / a
