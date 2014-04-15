@@ -1,22 +1,25 @@
 { View } = require 'atom'
+RegionView = require './RegionView'
 
 module.exports =
-class RefactoringingView extends View
+class MarkerView extends View
 
   @content: ->
-    @div class: 'region'
+    @div class: 'marker'
 
-  constructor: (editorView, { start, end }) ->
+  constructor: (editorView, refactoring, { start, end }) ->
     super()
+    for row in [start.row..end.row] by 1
+      console.log row
+      rowRange = refactoring.rangeForRow row
+      tl = editorView.pixelPositionForBufferPosition if row is start.row then start else rowRange.start
+      br = editorView.pixelPositionForBufferPosition if row is end.row then end else rowRange.end
+      br.top += editorView.lineHeight
+      @append new RegionView tl, br
 
-    rowSpan = end.row - start.row
-    start = editorView.pixelPositionForBufferPosition start
-    end = editorView.pixelPositionForBufferPosition end
-
-    @css
-      left: start.left
-      top: start.top
-      width: end.left - start.left
-      height: editorView.lineHeight * (rowSpan + 1)
+  remove: ->
+    @destruct()
+    super
 
   destruct: ->
+    console.log 'MarkerView::destruct'

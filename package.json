@@ -4,6 +4,7 @@
   "version": "0.1.6",
   "description": "CoffeeScript refactoring procedures.",
   "activationEvents": [
+    "coffee-refactor:toggle-highlight",
     "coffee-refactor:rename",
     "coffee-refactor:done"
   ],

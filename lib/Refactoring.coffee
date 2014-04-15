@@ -1,5 +1,4 @@
 Parser = require './Parser'
-console.log require 'atom'
 { EventEmitter } = require 'events'
 
 
@@ -51,6 +50,9 @@ class Refactoring extends EventEmitter
   isSameEditor: (editor) ->
     editor is @editor
 
+  rangeForRow: ->
+    @editor.buffer.rangeForRow.apply @editor.buffer, arguments
+
   rename: ->
     @editor.selectWord()
     selection = @editor.getLastSelection()
@@ -76,6 +78,6 @@ class Refactoring extends EventEmitter
   ###
 
   parse: =>
-    console.log 'parse'
+    console.log 'parsed'
     @parser.parse @editor.getText()
-    @emit 'parse'
+    @emit 'parsed'
