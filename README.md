@@ -9,7 +9,7 @@ Refactor CoffeeScript for [Atom](https://atom.io/).
 Rename all references of a symbol under the cursor.
 
 1. Set cursor to symbol
-2. Start renaming with `ctrl+r`
+2. Start renaming with `ctrl-r`
 3. Type new name
 4. Finish renaming with `enter`
 
@@ -17,7 +17,7 @@ Rename all references of a symbol under the cursor.
 
 Highlight all references of a symbol under the cursor.
 
-Toggle with `ctrl+alt+r`.
+Toggle with `ctrl-alt-r`.
 
 ### Supported Symbols
 
