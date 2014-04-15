@@ -16,9 +16,9 @@ module.exports =
       @isHighlight = !@isHighlight
       @callViews e, 'highlight', @isHighlight
     atom.workspaceView.command 'coffee-refactor:rename', (e) =>
-      @callViews e, 'rename'
+      @callActiveViews e, 'rename'
     atom.workspaceView.command 'coffee-refactor:done', (e) =>
-      @callViews e, 'done'
+      @callActiveViews e, 'done'
 
   deactivate: ->
     for view in @views
@@ -29,6 +29,14 @@ module.exports =
 
 
   callViews: (e, methodName, args...) ->
+    # isCalled = false
+    for view, i in @views
+      view[methodName].apply view, args
+
+    # unless isCalled
+    #   e.abortKeyBinding()
+
+  callActiveViews: (e, methodName, args...) ->
     activePaneItem = atom.workspaceView.getActivePaneItem()
     isCalled = false
     for view in @views

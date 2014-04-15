@@ -4,7 +4,7 @@ module.exports =
 class RegionView extends View
 
   @content: ->
-    @div class: 'region'
+    @div class: 'region highlight-info'
 
   constructor: (tl, br) ->
     super()

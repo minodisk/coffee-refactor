@@ -1,10 +1,10 @@
 
-fibs =
+tmp =
   0: 0
   1: 1
-fib = (n) ->
-  return fibs[n] if fibs[n]?
-  fibs[n] = fib(n - 1) + fib(n - 2)
+fib = (i) ->
+  return tmp[i] if tmp[i]?
+  tmp[i] = fib(i - 1) + fib(i - 2)
 for i in [0..10]
   console.log i, fib i
 

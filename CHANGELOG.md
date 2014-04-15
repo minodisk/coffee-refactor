@@ -1,6 +1,6 @@
-# v0.1.6 on 2014/04/
+# v0.1.7 on 2014/04/15
 
-* Highlight reference at cursor.
+* Highlight references of a symbol at the cursor.
 
 # v0.1.6 on 2014/04/12
 

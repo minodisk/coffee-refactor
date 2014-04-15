@@ -78,6 +78,5 @@ class Refactoring extends EventEmitter
   ###
 
   parse: =>
-    console.log 'parsed'
     @parser.parse @editor.getText()
     @emit 'parsed'

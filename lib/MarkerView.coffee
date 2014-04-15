@@ -10,7 +10,6 @@ class MarkerView extends View
   constructor: (editorView, refactoring, { start, end }) ->
     super()
     for row in [start.row..end.row] by 1
-      console.log row
       rowRange = refactoring.rangeForRow row
       tl = editorView.pixelPositionForBufferPosition if row is start.row then start else rowRange.start
       br = editorView.pixelPositionForBufferPosition if row is end.row then end else rowRange.end

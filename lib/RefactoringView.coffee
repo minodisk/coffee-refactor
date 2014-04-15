@@ -31,6 +31,7 @@ class RefactoringingView extends View
 
   highlight: (@isHighlight) ->
     @updateHighlight()
+    true
 
   updateHighlight: =>
     @empty()
