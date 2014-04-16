@@ -45,6 +45,43 @@ describe 'Parser', ->
       expectNoRefs parser, new Range([0, 2], [0, 3])
       expectNoRefs parser, new Range([1, 6], [1, 7])
 
+    it 'should find no referecene in STRING', ->
+      parser.parse """
+      'foo'
+      "bar"
+      '''baz'''
+      """
+      expectNoRefs parser, new Range([0, 0], [0, 1])
+      expectNoRefs parser, new Range([0, 1], [0, 2])
+      expectNoRefs parser, new Range([1, 0], [1, 1])
+      expectNoRefs parser, new Range([1, 1], [1, 2])
+      expectNoRefs parser, new Range([2, 0], [2, 1])
+      expectNoRefs parser, new Range([2, 3], [2, 4])
+
+    it 'should find no referecene in NUMBER', ->
+      parser.parse """
+      100
+      0xff
+      """
+      expectNoRefs parser, new Range([0, 0], [0, 1])
+      expectNoRefs parser, new Range([0, 2], [0, 3])
+      expectNoRefs parser, new Range([1, 0], [1, 1])
+      expectNoRefs parser, new Range([1, 3], [1, 4])
+
+    it 'should find no referecene in Regex', ->
+      parser.parse """
+      /foo\s+bar/
+      ///
+      foo
+      \s+
+      bar
+      ///
+      """
+      expectNoRefs parser, new Range([0, 0], [0, 1])
+      expectNoRefs parser, new Range([0, 5], [0, 6])
+      expectNoRefs parser, new Range([1, 0], [1, 1])
+      expectNoRefs parser, new Range([3, 1], [3, 2])
+
     it 'should support FUNCTION statement', ->
       parser.parse """
       a = b = 100

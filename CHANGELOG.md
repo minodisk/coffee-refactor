@@ -1,3 +1,8 @@
+# v0.1.11 on 2014/04/16
+
+* Fixed an issue causing the highlighting to be wrong when focusing at primitive symbols.
+* Add class using when highlighting multi-lines.
+
 # v0.1.10 on 2014/04/16
 
 * Support FOR-IN and FOR-OF statement

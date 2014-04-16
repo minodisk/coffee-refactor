@@ -1,10 +1,14 @@
 { nodes } = require 'coffee-script'
-{ Code, Block, Literal, For } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Block, Literal, For } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 # { Scope } = require '../node_modules/coffee-script/lib/coffee-script/scope'
 { Range } = require 'atom'
 
 # _ = require 'underscore'
 { inspect } = require 'util'
+
+
+HEXNUM = /^[+-]?0x[\da-f]+/i
+Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 
 
 pad = (str, len, pad = ' ') ->
@@ -49,6 +53,12 @@ module.exports = class Parser
     target = null
     node.traverseChildren true, (child) ->
       # return false if node.classBody
+
+      return false if child.isString?() or \
+                      child.isSimpleNumber?() or \
+                      child.isHexNumber?() or \
+                      child.isRegex?()
+
       if child instanceof For
         unless child.name?
           console.log inspect child

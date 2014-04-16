@@ -8,10 +8,10 @@ Refactor CoffeeScript for [Atom](https://atom.io/).
 
 Rename all references of a symbol under the cursor.
 
-1. Set cursor to symbol
-2. Start renaming with `ctrl-r`
-3. Type new name
-4. Finish renaming with `enter`
+1. Set cursor to symbol.
+2. Start renaming with `ctrl-r`.
+3. Type new name.
+4. Finish renaming with `enter`.
 
 ### Highlight references
 
@@ -25,8 +25,10 @@ Toggle with `ctrl-alt-r`.
 * function
 * parameter
 * class
+* for-in name and index
+* for-of key and val
 
-### See
+## See
 
 * [ChangeLog](CHANGELOG.md)
 * [MITLicense](LICENSE.md)
