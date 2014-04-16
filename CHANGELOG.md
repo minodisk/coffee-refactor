@@ -1,10 +1,11 @@
 # v0.1.9 on 2014/04/15
 
 * Fix error thrown when toggle highlight after closing editor.
+* Replace capture in README.
 
 # v0.1.7-v0.1.8 on 2014/04/15
 
-* Highlight references of a symbol at the cursor.
+* Support highlighting.
 
 # v0.1.6 on 2014/04/12
 
@@ -17,7 +18,7 @@
 
 # v0.1.3-v0.1.4 on 2014/04/10
 
-* Refactor based on `Literal` in coffee-script package.
+* Implement finding references with `Literal` class.
 
 # v0.1.2 on 2014/04/10
 
