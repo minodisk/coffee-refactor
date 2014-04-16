@@ -1,3 +1,7 @@
+# v0.1.10 on 2014/04/16
+
+* Support FOR-IN and FOR-OF statement
+
 # v0.1.9 on 2014/04/15
 
 * Fix error thrown when toggle highlight after closing editor.

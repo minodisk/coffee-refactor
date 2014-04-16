@@ -1,5 +1,5 @@
 { nodes } = require 'coffee-script'
-{ Code, Block, Literal } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Code, Block, Literal, For } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 # { Scope } = require '../node_modules/coffee-script/lib/coffee-script/scope'
 { Range } = require 'atom'
 
@@ -49,6 +49,15 @@ module.exports = class Parser
     target = null
     node.traverseChildren true, (child) ->
       # return false if node.classBody
+      if child instanceof For
+        unless child.name?
+          console.log inspect child
+        if child.name? and Parser.isContainsLocationData child.name.locationData, targetLocationData
+          target = child.name
+          return false
+        if child.index? and Parser.isContainsLocationData child.index.locationData, targetLocationData
+          target = child.index
+          return false
       if child instanceof Literal
         unless child.locationData?
           console.log child
@@ -59,12 +68,16 @@ module.exports = class Parser
 
   @traverseScope: (node, target) ->
     dests = []
-
     isBreak = false
     node.traverseChildren true, (child) ->
       return false if isBreak
 
       unless child instanceof Code
+        if child instanceof For
+          if Parser.isSameLiteral child.name, target
+            dests.push child.name
+          if Parser.isSameLiteral child.index, target
+            dests.push child.index
         if Parser.isSameLiteral child, target
           dests.push child
         return true
@@ -86,12 +99,27 @@ module.exports = class Parser
         dests.push child
     dests
 
+  ###
+  Check the target `Literal` is declared in the `Code`
+  @param {Code} code A `Code`
+  @param {Literal} target A `Literal`
+  @returns {Boolean} Has declarations in the `Code`
+  ###
   @hasDeclarations: (code, target) ->
+    # 1. clone Code instance
+    # 2. compile Code
+    # 3. check declared variable in lexical scope of the block
     code = new Code code.params, new Block(code.body), code.tag
     code.compileNode code
     return true for variable in code.scope.variables when variable.name is target.value
     false
 
+  ###
+  Check the target `Node` exsits in the `Node`.
+  @param {Node} node A `Node`
+  @param {Node} target The finding target `Node`.
+  @returns {Boolean} Exists.
+  ###
   @isContains: (node, target) ->
     isContains = false
     node.traverseChildren true, (child) ->
@@ -99,6 +127,12 @@ module.exports = class Parser
       !isContains
     isContains
 
+  ###
+  Check `Literal`s has same value
+  @param {Literal} a A `Literal`
+  @param {Literal} b Another `Literal`
+  @returns {Boolean} Has same value
+  ###
   @isSameLiteral: (a, b) ->
     a instanceof Literal and \
     b instanceof Literal and \
