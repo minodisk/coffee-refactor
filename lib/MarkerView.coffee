@@ -14,7 +14,7 @@ class MarkerView extends View
       tl = editorView.pixelPositionForBufferPosition if row is start.row then start else rowRange.start
       br = editorView.pixelPositionForBufferPosition if row is end.row then end else rowRange.end
       br.top += editorView.lineHeight
-      @append new RegionView tl, br
+      @append new RegionView tl, br, row is start.row, row is end.row
 
   remove: ->
     @destruct()
