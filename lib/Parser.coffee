@@ -94,7 +94,7 @@ module.exports = class Parser
 
       if Parser.hasDeclarations child, target
         if Parser.isContains child, target
-          dests = Parser.findSameLiterals child, target
+          dests = Parser.traverseCode child, target
           isBreak = true
         return false
       else
@@ -102,12 +102,31 @@ module.exports = class Parser
 
     dests
 
-  @findSameLiterals: (node, target) ->
-    dests = []
-    node.traverseChildren true, (child) ->
+  @traverseCode: (code, target, dests = []) ->
+    isBreaking = false
+    code.traverseChildren true, (child) ->
+      return false if isBreaking
+      if child instanceof Code
+        isContains = Parser.isContains child, target
+        isDeclared = Parser.hasDeclarations child, target
+        if isContains
+          foundNodes = Parser.traverseCode child, target
+          if isDeclared
+            dests = foundNodes
+            isBreaking = true
+          else
+            dests.concat foundNodes
+        return false
       if Parser.isSameLiteral child, target
         dests.push child
     dests
+
+  # @findSameLiterals: (node, target) ->
+  #   dests = []
+  #   node.traverseChildren true, (child) ->
+  #     if Parser.isSameLiteral child, target
+  #       dests.push child
+  #   dests
 
   ###
   Check the target `Literal` is declared in the `Code`

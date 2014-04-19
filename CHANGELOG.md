@@ -1,3 +1,7 @@
+# v0.1.12 on 2014/04/20
+
+* Fixed an issue causing finding references to be wrong when multi scoped symbol.
+
 # v0.1.11 on 2014/04/16
 
 * Fixed an issue causing the highlighting to be wrong when focusing at primitive symbols.
