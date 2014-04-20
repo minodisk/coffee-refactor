@@ -1,10 +1,7 @@
 { nodes } = require 'coffee-script'
 { Value, Code, Block, Literal, For } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
-# { Scope } = require '../node_modules/coffee-script/lib/coffee-script/scope'
 { Range } = require 'atom'
-
-# _ = require 'underscore'
-{ inspect } = require 'util'
+# { inspect } = require 'util'
 
 
 HEXNUM = /^[+-]?0x[\da-f]+/i
@@ -40,28 +37,33 @@ module.exports = class Parser
     a.last_column  is b.last_column
 
   @isContainsLocationData: (a, b) ->
-    (a.first_line < b.first_line or a.first_line is b.first_line and a.first_column <= b.first_column) and \
-    (b.last_line < a.last_line or b.last_line is a.last_line and b.last_column <= a.last_column)
+    (
+      a.first_line < b.first_line or \
+      a.first_line is b.first_line and a.first_column <= b.first_column
+    ) and \
+    (
+      b.last_line < a.last_line or \
+      b.last_line is a.last_line and b.last_column <= a.last_column
+    )
 
-  @findDeclaredNodes: (node, targetLocationData) ->
-    target = @searchAtLocationData node, targetLocationData
+  @findReferences: (node, targetLocationData) ->
+    target = @findSymbol node, targetLocationData
     return [] unless target?
+    @traverseCode node, target
 
-    @traverseScope node, target
-
-  @searchAtLocationData: (node, targetLocationData) ->
+  @findSymbol: (node, targetLocationData) ->
     target = null
-    node.traverseChildren true, (child) ->
-      # return false if node.classBody
 
+    node.traverseChildren true, (child) ->
+      return false if target?
+
+      # Skip primitive node
       return false if child.isString?() or \
                       child.isSimpleNumber?() or \
                       child.isHexNumber?() or \
                       child.isRegex?()
 
       if child instanceof For
-        unless child.name?
-          console.log inspect child
         if child.name? and Parser.isContainsLocationData child.name.locationData, targetLocationData
           target = child.name
           return false
@@ -69,64 +71,40 @@ module.exports = class Parser
           target = child.index
           return false
       if child instanceof Literal
-        unless child.locationData?
-          console.log child
         if Parser.isContainsLocationData child.locationData, targetLocationData
           target = child
           return false
+
     target
 
-  @traverseScope: (node, target) ->
+  @traverseCode: (code, target) ->
     dests = []
-    isBreak = false
-    node.traverseChildren true, (child) ->
-      return false if isBreak
+    isFixed = false
 
-      unless child instanceof Code
-        if child instanceof For
-          if Parser.isSameLiteral child.name, target
-            dests.push child.name
-          if Parser.isSameLiteral child.index, target
-            dests.push child.index
-        if Parser.isSameLiteral child, target
-          dests.push child
-        return true
-
-      if Parser.hasDeclarations child, target
-        if Parser.isContains child, target
-          dests = Parser.traverseCode child, target
-          isBreak = true
-        return false
-      else
-        return true
-
-    dests
-
-  @traverseCode: (code, target, dests = []) ->
-    isBreaking = false
     code.traverseChildren true, (child) ->
-      return false if isBreaking
+      return false if isFixed
+
       if child instanceof Code
         isContains = Parser.isContains child, target
-        isDeclared = Parser.hasDeclarations child, target
+        isDeclared = Parser.isDeclared child, target
         if isContains
           foundNodes = Parser.traverseCode child, target
           if isDeclared
             dests = foundNodes
-            isBreaking = true
+            isFixed = true
           else
             dests.concat foundNodes
-        return false
+        return false if isDeclared
+
+      if child instanceof For
+        if Parser.isSameLiteral child.name, target
+          dests.push child.name
+        if Parser.isSameLiteral child.index, target
+          dests.push child.index
       if Parser.isSameLiteral child, target
         dests.push child
-    dests
 
-  # @findSameLiterals: (node, target) ->
-  #   dests = []
-  #   node.traverseChildren true, (child) ->
-  #     if Parser.isSameLiteral child, target
-  #       dests.push child
-  #   dests
+    dests
 
   ###
   Check the target `Literal` is declared in the `Code`
@@ -134,7 +112,7 @@ module.exports = class Parser
   @param {Literal} target A `Literal`
   @returns {Boolean} Has declarations in the `Code`
   ###
-  @hasDeclarations: (code, target) ->
+  @isDeclared: (code, target) ->
     # 1. clone Code instance
     # 2. compile Code
     # 3. check declared variable in lexical scope of the block
@@ -171,9 +149,6 @@ module.exports = class Parser
 
   nodes: null
 
-
-  constructor: ->
-
   destruct: ->
     delete @nodes
 
@@ -187,5 +162,5 @@ module.exports = class Parser
     return [] unless @nodes?
 
     targetLocationData = Parser.rangeToLocationData range
-    for { locationData }, i in Parser.findDeclaredNodes @nodes, targetLocationData
+    for { locationData }, i in Parser.findReferences @nodes, targetLocationData
       Parser.locationDataToRange locationData
