@@ -131,18 +131,18 @@ describe 'Parser', ->
     it 'should support OBJECT literal', ->
       parser.parse """
       x = 1
-      point = x: x
+      point = x: x * x
       point.x = 2
       """
       expectEqualRefs parser, new Range([0, 0], [0, 1]),
         new Range([1, 11], [1, 12]),
-        new Range([2, 6], [2, 7])
+        new Range([1, 15], [1, 16])
       expectEqualRefs parser, new Range([1, 11], [1, 12]),
         new Range([0, 0], [0, 1]),
-        new Range([2, 6], [2, 7])
-      expectEqualRefs parser, new Range([2, 6], [2, 7]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 11], [1, 12])
+        new Range([1, 15], [1, 16])
+      expectEqualRefs parser, new Range([1, 11], [1, 12]),
+        new Range([1, 15], [1, 16]),
+        new Range([0, 0], [0, 1])
 
     it 'should find ref from outer in ARRAY', ->
       parser.parse """
