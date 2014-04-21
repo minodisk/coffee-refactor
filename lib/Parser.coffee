@@ -1,5 +1,5 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Block, Literal, For, Obj, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Block, Literal, For, Obj, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 { inspect } = require 'util'
 
@@ -77,15 +77,15 @@ module.exports = class Parser
 
     target
 
-  @traverseCode: (code, target, dests = [], depth = 0) ->
+  @traverseCode: (parent, target, dests = []) ->
     isFixed = false
 
-    code.eachChild (child) ->
+    parent.eachChild (child) ->
       if child instanceof Code
         isContains = Parser.isContains child, target
         isDeclared = Parser.isDeclared child, target
         if isContains
-          [ childDests, isChildFixed ] = Parser.traverseCode child, target, null, depth++
+          [ childDests, isChildFixed ] = Parser.traverseCode child, target, null
           if isDeclared or isChildFixed
             dests = childDests
             isFixed = true
@@ -95,6 +95,8 @@ module.exports = class Parser
         else if isDeclared
           return false
 
+      return true if child instanceof Value and parent.context is 'object' and parent instanceof Assign
+
       if child instanceof For
         if Parser.isSameLiteral child.name, target
           dests.push child.name
@@ -103,7 +105,7 @@ module.exports = class Parser
       if Parser.isSameLiteral child, target
         dests.push child
 
-      [ childDests, isChildFixed ] = Parser.traverseCode child, target, dests, depth++
+      [ childDests, isChildFixed ] = Parser.traverseCode child, target, dests
       if isChildFixed
         dests = childDests
         isFixed = true
