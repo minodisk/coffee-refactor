@@ -1,7 +1,7 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Block, Literal, For } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Block, Literal, For, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
-# { inspect } = require 'util'
+{ inspect } = require 'util'
 
 
 HEXNUM = /^[+-]?0x[\da-f]+/i
@@ -96,6 +96,8 @@ module.exports = class Parser
             dests.concat foundNodes
         return false if isDeclared
 
+      if child instanceof Access
+        console.log child
       if child instanceof For
         if Parser.isSameLiteral child.name, target
           dests.push child.name
