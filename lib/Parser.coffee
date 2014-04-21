@@ -49,7 +49,7 @@ module.exports = class Parser
   @findReferences: (node, targetLocationData) ->
     target = @findSymbol node, targetLocationData
     return [] unless target?
-    @traverseCode node, target
+    @traverseCode(node, target)[0]
 
   @findSymbol: (node, targetLocationData) ->
     target = null
@@ -77,7 +77,7 @@ module.exports = class Parser
 
     target
 
-  @traverseCode: (code, target, dests = []) ->
+  @traverseCode: (code, target, dests = [], depth = 0) ->
     isFixed = false
 
     code.eachChild (child) ->
@@ -85,12 +85,15 @@ module.exports = class Parser
         isContains = Parser.isContains child, target
         isDeclared = Parser.isDeclared child, target
         if isContains
-          foundNodes = Parser.traverseCode child, target
-          if isDeclared
-            dests = foundNodes
+          [ childDests, isChildFixed ] = Parser.traverseCode child, target, null, depth++
+          if isDeclared or isChildFixed
+            dests = childDests
+            isFixed = true
+            return false
           else
-            dests.concat foundNodes
-        return false if isDeclared
+            dests.concat childDests
+        else if isDeclared
+          return false
 
       if child instanceof For
         if Parser.isSameLiteral child.name, target
@@ -100,32 +103,15 @@ module.exports = class Parser
       if Parser.isSameLiteral child, target
         dests.push child
 
-      dests.concat Parser.traverseCode child, target, dests
+      [ childDests, isChildFixed ] = Parser.traverseCode child, target, dests, depth++
+      if isChildFixed
+        dests = childDests
+        isFixed = true
+        return false
+      else
+        dests.concat nodes
 
-    # code.traverseChildren true, (child) ->
-    #   return false if isFixed
-    #
-    #   if child instanceof Code
-    #     isContains = Parser.isContains child, target
-    #     isDeclared = Parser.isDeclared child, target
-    #     if isContains
-    #       foundNodes = Parser.traverseCode child, target
-    #       if isDeclared
-    #         dests = foundNodes
-    #         isFixed = true
-    #       else
-    #         dests.concat foundNodes
-    #     return false if isDeclared
-    #
-    #   if child instanceof For
-    #     if Parser.isSameLiteral child.name, target
-    #       dests.push child.name
-    #     if Parser.isSameLiteral child.index, target
-    #       dests.push child.index
-    #   if Parser.isSameLiteral child, target
-    #     dests.push child
-
-    dests
+    [ dests, isFixed ]
 
   @hasChild: (parent, child) ->
     for key, val of parent when parent.hasOwnProperty key
@@ -169,7 +155,6 @@ module.exports = class Parser
   @isSameLiteral: (a, b) ->
     a instanceof Literal and \
     b instanceof Literal and \
-    # a isnt b and \
     a.value is b.value
 
 
