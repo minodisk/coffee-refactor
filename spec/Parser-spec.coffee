@@ -128,20 +128,21 @@ describe 'Parser', ->
         new Range([1, 13], [1, 14]),
         new Range([2, 4], [2, 5])
 
-    it 'should support OBJECT statement', ->
+    it 'should support OBJECT literal', ->
       parser.parse """
-      a = 10
-      b = 5
-      c =
-        sum: a + b
-        delta: a - b
+      x = 1
+      point = x: x
+      point.x = 2
       """
       expectEqualRefs parser, new Range([0, 0], [0, 1]),
-        new Range([3, 7], [3, 8]),
-        new Range([4, 9], [4, 10])
-      expectEqualRefs parser, new Range([3, 11], [3, 12]),
-        new Range([1, 0], [1, 1]),
-        new Range([4, 13], [4, 14])
+        new Range([1, 11], [1, 12]),
+        new Range([2, 6], [2, 7])
+      expectEqualRefs parser, new Range([1, 11], [1, 12]),
+        new Range([0, 0], [0, 1]),
+        new Range([2, 6], [2, 7])
+      expectEqualRefs parser, new Range([2, 6], [2, 7]),
+        new Range([0, 0], [0, 1]),
+        new Range([1, 11], [1, 12])
 
     it 'should find ref from outer in ARRAY', ->
       parser.parse """

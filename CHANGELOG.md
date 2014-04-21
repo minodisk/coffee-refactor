@@ -1,3 +1,8 @@
+# v0.1.13 on 2014/04/
+
+* Refactoring code.
+*
+
 # v0.1.12 on 2014/04/20
 
 * Fixed an issue causing finding references to be wrong when multi scoped symbol.
