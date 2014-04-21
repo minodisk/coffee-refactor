@@ -1,5 +1,5 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Block, Literal, For, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Block, Literal, For, Obj, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 { inspect } = require 'util'
 
@@ -77,13 +77,10 @@ module.exports = class Parser
 
     target
 
-  @traverseCode: (code, target) ->
-    dests = []
+  @traverseCode: (code, target, dests = []) ->
     isFixed = false
 
-    code.traverseChildren true, (child) ->
-      return false if isFixed
-
+    code.eachChild (child) ->
       if child instanceof Code
         isContains = Parser.isContains child, target
         isDeclared = Parser.isDeclared child, target
@@ -91,13 +88,10 @@ module.exports = class Parser
           foundNodes = Parser.traverseCode child, target
           if isDeclared
             dests = foundNodes
-            isFixed = true
           else
             dests.concat foundNodes
         return false if isDeclared
 
-      if child instanceof Access
-        console.log child
       if child instanceof For
         if Parser.isSameLiteral child.name, target
           dests.push child.name
@@ -106,7 +100,37 @@ module.exports = class Parser
       if Parser.isSameLiteral child, target
         dests.push child
 
+      dests.concat Parser.traverseCode child, target, dests
+
+    # code.traverseChildren true, (child) ->
+    #   return false if isFixed
+    #
+    #   if child instanceof Code
+    #     isContains = Parser.isContains child, target
+    #     isDeclared = Parser.isDeclared child, target
+    #     if isContains
+    #       foundNodes = Parser.traverseCode child, target
+    #       if isDeclared
+    #         dests = foundNodes
+    #         isFixed = true
+    #       else
+    #         dests.concat foundNodes
+    #     return false if isDeclared
+    #
+    #   if child instanceof For
+    #     if Parser.isSameLiteral child.name, target
+    #       dests.push child.name
+    #     if Parser.isSameLiteral child.index, target
+    #       dests.push child.index
+    #   if Parser.isSameLiteral child, target
+    #     dests.push child
+
     dests
+
+  @hasChild: (parent, child) ->
+    for key, val of parent when parent.hasOwnProperty key
+      return true if child is val
+    false
 
   ###
   Check the target `Literal` is declared in the `Code`

@@ -26,7 +26,7 @@ describe 'Parser', ->
 
   describe 'parse', ->
 
-    # it "shouldn't parse code with syntax error", ->
+  #   it "shouldn't parse code with syntax error", ->
   #     expect ->
   #       parser.parse """
   #       a /// b
@@ -81,62 +81,62 @@ describe 'Parser', ->
   #     expectNoRefs parser, new Range([0, 5], [0, 6])
   #     expectNoRefs parser, new Range([1, 0], [1, 1])
   #     expectNoRefs parser, new Range([3, 1], [3, 2])
-  #
-  #   it 'should support FUNCTION statement', ->
-  #     parser.parse """
-  #     a = b = 100
-  #     calc = (a) ->
-  #       a * b
-  #     a /= b
-  #     """
-  #     expectEqualRefs parser, new Range([0, 0], [0, 1]),
-  #       new Range([3, 0], [3, 1])
-  #     expectEqualRefs parser, new Range([1, 8], [1, 9]),
-  #       new Range([2, 2], [2, 3])
-  #     expectEqualRefs parser, new Range([2, 2], [2, 3]),
-  #       new Range([1, 8], [1, 9])
-  #     expectEqualRefs parser, new Range([3, 0], [3, 1]),
-  #       new Range([0, 0], [0, 1])
-  #     expectEqualRefs parser, new Range([0, 4], [0, 5]),
-  #       new Range([2, 6], [2, 7]),
-  #       new Range([3, 5], [3, 6])
-  #     expectEqualRefs parser, new Range([2, 6], [2, 7]),
-  #       new Range([0, 4], [0, 5]),
-  #       new Range([3, 5], [3, 6])
-  #     expectEqualRefs parser, new Range([3, 5], [3, 6]),
-  #       new Range([0, 4], [0, 5]),
-  #       new Range([2, 6], [2, 7])
-  #
-  #   it 'should support FUNCTION scope', ->
-  #     parser.parse """
-  #     a.forEach (a) ->
-  #       a.forEach (a) ->
-  #         a * a
-  #     """
-  #     expectEqualRefs parser, new Range([0, 0], [0, 1])
-  #     expectEqualRefs parser, new Range([0, 11], [0, 12]),
-  #       new Range([1, 2], [1, 3])
-  #     expectEqualRefs parser, new Range([1, 2], [1, 3]),
-  #       new Range([0, 11], [0, 12])
-  #     expectEqualRefs parser, new Range([1, 13], [1, 14]),
-  #       new Range([2, 4], [2, 5]),
-  #       new Range([2, 8], [2, 9])
-  #     expectEqualRefs parser, new Range([2, 4], [2, 5]),
-  #       new Range([1, 13], [1, 14]),
-  #       new Range([2, 8], [2, 9])
-  #     expectEqualRefs parser, new Range([2, 8], [2, 9]),
-  #       new Range([1, 13], [1, 14]),
-  #       new Range([2, 4], [2, 5])
 
-    it 'should support OBJECT literal', ->
+    it 'should support FUNCTION statement', ->
       parser.parse """
-      x = 1
-      point = x: x * x
-      point.x = 2
+      a = b = 100
+      calc = (a) ->
+        a * b
+      a /= b
       """
-      expectEqualRefs parser, new Range([0, 0], [0, 1]),
-        new Range([1, 11], [1, 12]),
-        new Range([1, 15], [1, 16])
+      # expectEqualRefs parser, new Range([0, 0], [0, 1]),
+      #   new Range([3, 0], [3, 1])
+      expectEqualRefs parser, new Range([1, 8], [1, 9]),
+        new Range([2, 2], [2, 3])
+      # expectEqualRefs parser, new Range([2, 2], [2, 3]),
+      #   new Range([1, 8], [1, 9])
+      # expectEqualRefs parser, new Range([3, 0], [3, 1]),
+      #   new Range([0, 0], [0, 1])
+      # expectEqualRefs parser, new Range([0, 4], [0, 5]),
+      #   new Range([2, 6], [2, 7]),
+      #   new Range([3, 5], [3, 6])
+      # expectEqualRefs parser, new Range([2, 6], [2, 7]),
+      #   new Range([0, 4], [0, 5]),
+      #   new Range([3, 5], [3, 6])
+      # expectEqualRefs parser, new Range([3, 5], [3, 6]),
+      #   new Range([0, 4], [0, 5]),
+      #   new Range([2, 6], [2, 7])
+
+    # it 'should support FUNCTION scope', ->
+    #   parser.parse """
+    #   a.forEach (a) ->
+    #     a.forEach (a) ->
+    #       a * a
+    #   """
+    #   expectEqualRefs parser, new Range([0, 0], [0, 1])
+    #   expectEqualRefs parser, new Range([0, 11], [0, 12]),
+    #     new Range([1, 2], [1, 3])
+    #   expectEqualRefs parser, new Range([1, 2], [1, 3]),
+    #     new Range([0, 11], [0, 12])
+    #   expectEqualRefs parser, new Range([1, 13], [1, 14]),
+    #     new Range([2, 4], [2, 5]),
+    #     new Range([2, 8], [2, 9])
+    #   expectEqualRefs parser, new Range([2, 4], [2, 5]),
+    #     new Range([1, 13], [1, 14]),
+    #     new Range([2, 8], [2, 9])
+    #   expectEqualRefs parser, new Range([2, 8], [2, 9]),
+    #     new Range([1, 13], [1, 14]),
+    #     new Range([2, 4], [2, 5])
+
+    # it 'should support OBJECT literal', ->
+    #   parser.parse """
+    #   x = 1
+    #   point = x: x * x
+    #   point.x = 2
+    #   """
+    #   expectEqualRefs parser, new Range([0, 0], [0, 1]),
+    #     new Range([1, 11], [1, 12]),
+    #     new Range([1, 15], [1, 16])
       # expectEqualRefs parser, new Range([1, 11], [1, 12]),
       #   new Range([0, 0], [0, 1]),
       #   new Range([1, 15], [1, 16])
@@ -144,7 +144,7 @@ describe 'Parser', ->
       #   new Range([1, 15], [1, 16]),
       #   new Range([0, 0], [0, 1])
 
-    # it 'should find ref from outer in ARRAY', ->
+    # it 'should support ARRAY literal', ->
     #   parser.parse """
     #   a = 10
     #   b = 5
