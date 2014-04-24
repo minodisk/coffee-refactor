@@ -1,7 +1,6 @@
 # v0.1.13 on 2014/04/
 
-* Refactoring code.
-*
+* Fixed an issue causing stopping highlighting when typing wrong code.
 
 # v0.1.12 on 2014/04/20
 

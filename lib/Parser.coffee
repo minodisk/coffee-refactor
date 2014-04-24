@@ -131,8 +131,10 @@ module.exports = class Parser
     # 2. compile Code
     # 3. check declared variable in lexical scope of the block
     code = new Code code.params, new Block(code.body), code.tag
-    code.compileNode code
-    return true for variable in code.scope.variables when variable.name is target.value
+    try
+      code.compileNode code
+      return true for variable in code.scope.variables when variable.name is target.value
+    catch err
     false
 
   ###
