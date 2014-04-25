@@ -48,6 +48,9 @@ module.exports = class Parser
 
   @findReferences: (node, targetLocationData) ->
     target = @findSymbol node, targetLocationData
+
+    console.log target
+
     return [] unless target?
     @traverseCode(node, target)[0]
 
@@ -59,10 +62,22 @@ module.exports = class Parser
       return false if target?
 
       # Skip primitive node
-      return false if child.isString?() or \
-                      child.isSimpleNumber?() or \
-                      child.isHexNumber?() or \
-                      child.isRegex?()
+      return true if child.isString?() or \
+                     child.isSimpleNumber?() or \
+                     child.isHexNumber?() or \
+                     child.isRegex?()
+
+      # Skip object key access
+      if child.asKey
+        return true
+
+      # Skip key in object literal
+      if child instanceof Value and \
+         parent.context is 'object' and \
+         parent instanceof Assign and \
+         child is parent.variable
+        return true
+
 
       if child instanceof For
         if child.name? and \
@@ -101,10 +116,16 @@ module.exports = class Parser
         else if isDeclared
           return false
 
-      return true if child.asKey or \
-                     child instanceof Value and \
-                     parent.context is 'object' and \
-                     parent instanceof Assign
+      # Skip object key access
+      if child.asKey
+        return true
+
+      # Skip key in object literal
+      if child instanceof Value and \
+         parent.context is 'object' and \
+         parent instanceof Assign and \
+         child is parent.variable
+        return true
 
       if child instanceof For
         if Parser.isSameLiteral child.name, target

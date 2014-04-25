@@ -1,6 +1,8 @@
-# v0.1.13 on 2014/04/
+# v0.2.0 on 2014/04/25
 
 * Fixed an issue causing stopping highlighting when typing wrong code.
+* Skip key of object literal.
+* Skip key access.
 
 # v0.1.12 on 2014/04/20
 
