@@ -51,10 +51,11 @@ module.exports = class Parser
     return [] unless target?
     @traverseCode(node, target)[0]
 
-  @findSymbol: (node, targetLocationData) ->
+  @findSymbol: (parent, targetLocationData) ->
     target = null
 
-    node.traverseChildren true, (child) ->
+    parent.eachChild (child) ->
+      # Skip if target is found
       return false if target?
 
       # Skip primitive node
@@ -76,6 +77,9 @@ module.exports = class Parser
         if Parser.isContainsLocationData child.locationData, targetLocationData
           target = child
           return false
+
+      target = Parser.findSymbol child, targetLocationData
+      return false if target?
 
     target
 
