@@ -21,14 +21,43 @@ Toggle with `ctrl-alt-r`.
 
 ### Supported Symbols
 
-* variable
-* function
-* parameter
-* class
-* for-in name and index
-* for-of key and val
+* variable name
+* function name
+* parameter name
+* class name
+* for-in value and index
+* for-of key and value
+
+## Custom Style
+
+Override with `Atom > Open Your Stylesheet`.
+
+```less
+.editor {
+  .coffee-refactor {
+    .marker {
+      .region {
+        position: absolute;
+        border-radius: 2px;
+        box-sizing: border-box;
+        background-color: rgba(54, 175, 144, 0.2);
+        border: 1px solid rgba(54, 175, 144, 0.5);
+        &.first {
+          border-radius: 2px 2px 0 0;
+        }
+        &.middle {
+          border-radius: 0;
+        }
+        &.last {
+          border-radius: 0 0 2px 2px;
+        }
+      }
+    }
+  }
+}
+```
 
 ## See
 
-* [ChangeLog](CHANGELOG.md)
+* [Changelog](CHANGELOG.md)
 * [MITLicense](LICENSE.md)

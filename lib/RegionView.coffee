@@ -9,7 +9,7 @@ class RegionView extends View
   @SINGLE_ROW: parseInt '11', 2
 
   @content: ->
-    @div class: 'region highlight-info'
+    @div class: 'region'
 
   constructor: (tl, br, isFirstRow, isLastRow) ->
     super()
