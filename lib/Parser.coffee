@@ -64,10 +64,12 @@ module.exports = class Parser
                       child.isRegex?()
 
       if child instanceof For
-        if child.name? and Parser.isContainsLocationData child.name.locationData, targetLocationData
+        if child.name? and \
+           Parser.isContainsLocationData child.name.locationData, targetLocationData
           target = child.name
           return false
-        if child.index? and Parser.isContainsLocationData child.index.locationData, targetLocationData
+        if child.index? and \
+           Parser.isContainsLocationData child.index.locationData, targetLocationData
           target = child.index
           return false
       if child instanceof Literal
@@ -95,7 +97,10 @@ module.exports = class Parser
         else if isDeclared
           return false
 
-      return true if child instanceof Value and parent.context is 'object' and parent instanceof Assign
+      return true if child.asKey or \
+                     child instanceof Value and \
+                     parent.context is 'object' and \
+                     parent instanceof Assign
 
       if child instanceof For
         if Parser.isSameLiteral child.name, target
