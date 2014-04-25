@@ -49,7 +49,7 @@ module.exports = class Parser
   @findReferences: (node, targetLocationData) ->
     target = @findSymbol node, targetLocationData
 
-    console.log target
+    # console.log target
 
     return [] unless target?
     @traverseCode(node, target)[0]

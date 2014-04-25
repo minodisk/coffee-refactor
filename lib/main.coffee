@@ -23,7 +23,7 @@ new class Main
       view.destruct()
 
   serialize: ->
-    console.log 'serialize'
+    # console.log 'serialize'
 
 
   callViews: (e, methodName, args...) ->
