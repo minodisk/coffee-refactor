@@ -27,12 +27,8 @@ new class Main
 
 
   callViews: (e, methodName, args...) ->
-    # isCalled = false
     for view, i in @refactoringViews
       view[methodName].apply view, args
-
-    # unless isCalled
-    #   e.abortKeyBinding()
 
   callActiveViews: (e, methodName, args...) ->
     activePaneItem = atom.workspaceView.getActivePaneItem()
@@ -47,8 +43,13 @@ new class Main
 
   onEditorViewCreated: (editorView) =>
     refactoringView = new RefactoringView editorView
-    editorView.getEditor().on 'destroyed', =>
+    onEditorDestroyed = =>
+      editor.off 'destroyed', onEditorDestroyed
       @onEditorViewDestroyed refactoringView
+
+    editor = editorView.getEditor()
+    editor.on 'destroyed', onEditorDestroyed
+
     refactoringView.highlight @isHighlight
     @refactoringViews.push refactoringView
 
