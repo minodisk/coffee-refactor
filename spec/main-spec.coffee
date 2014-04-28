@@ -26,10 +26,7 @@ describe "CoffeeRefactor", ->
         activationPromise
 
       runs ->
-        console.log inspect atom.workspaceView.find('workspace').length
         $el = atom.workspaceView.find('.coffee-refactor')
-        console.log $el.length
-        expect($el).toHaveLength 1
         # expect(atom.workspaceView.find('.coffee-refactor')).toExist()
         atom.workspaceView.trigger 'coffee-refactor:rename'
         # expect(atom.workspaceView.find('.coffee-refactor')).not.toExist()

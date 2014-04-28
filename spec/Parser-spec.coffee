@@ -219,3 +219,41 @@ describe 'Parser', ->
         new Range([0, 4], [0, 7])
       expectEqualRefs parser, new Range([1, 19], [1, 22]),
         new Range([0, 9], [0, 12])
+
+    it 'should support FUNCTION in ARRAY', ->
+      parser.parse """
+      [
+        (a) ->
+          a 1
+        (a) ->
+          a 2
+      ]
+      """
+      expectEqualRefs parser, new Range([1, 3], [1, 4]),
+        new Range([2, 4], [2, 5])
+      expectEqualRefs parser, new Range([3, 3], [3, 4]),
+        new Range([4, 4], [4, 5])
+
+    it 'should support destructuring assignment', ->
+      parser.parse """
+      a = b = c = 100
+      func = ({ a: { b: c } }) ->
+        a 1
+        b 2
+        c 3
+      """
+      expectNoRefs parser, new Range([0, 0], [0, 1])
+      expectEqualRefs parser, new Range([0, 4], [0, 5]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs parser, new Range([3, 2], [3, 3]),
+        new Range([0, 4], [0, 5])
+      expectNoRefs parser, new Range([0, 8], [0, 9])
+      expectEqualRefs parser, new Range([1, 10], [1, 11]),
+        new Range([2, 2], [2, 3])
+      expectEqualRefs parser, new Range([2, 2], [2, 3]),
+        new Range([1, 10], [1, 11])
+      expectNoRefs parser, new Range([1, 15], [1, 16])
+      expectEqualRefs parser, new Range([1, 18], [1, 19]),
+        new Range([4, 2], [4, 3])
+      expectEqualRefs parser, new Range([4, 2], [4, 3]),
+        new Range([1, 18], [1, 19])
