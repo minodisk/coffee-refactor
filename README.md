@@ -30,32 +30,7 @@ Toggle with `ctrl-alt-r`.
 
 ## Custom Style
 
-Override with `Atom > Open Your Stylesheet`.
-
-```less
-.editor {
-  .coffee-refactor {
-    .marker {
-      .region {
-        position: absolute;
-        border-radius: 2px;
-        box-sizing: border-box;
-        background-color: rgba(54, 175, 144, 0.2);
-        border: 1px solid rgba(54, 175, 144, 0.5);
-        &.first {
-          border-radius: 2px 2px 0 0;
-        }
-        &.middle {
-          border-radius: 0;
-        }
-        &.last {
-          border-radius: 0 0 2px 2px;
-        }
-      }
-    }
-  }
-}
-```
+Override [stylesheet](stylesheets/coffee-refactor.less) with `Atom > Open Your Stylesheet`.
 
 ## See
 
