@@ -2,7 +2,7 @@
 
 Refactor CoffeeScript for [Atom](https://atom.io/).
 
-![capture](https://cloud.githubusercontent.com/assets/514164/2703394/345b1d5a-c44f-11e3-9640-b9a20c4b7f70.gif)
+![capture_7](https://cloud.githubusercontent.com/assets/514164/2807941/853dbfc4-cd01-11e3-937f-04c8b9c5405e.gif)
 
 ### Rename references
 
