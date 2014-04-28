@@ -1,5 +1,6 @@
 CoffeeRefactor = require '../lib/main'
 { WorkspaceView } = require 'atom'
+{ inspect } = require 'util'
 
 # Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
 #
@@ -11,20 +12,24 @@ describe "CoffeeRefactor", ->
 
   beforeEach ->
     atom.workspaceView = new WorkspaceView
-    activationPromise = atom.packages.activatePackage('coffee-refactor')
+    activationPromise = atom.packages.activatePackage 'coffee-refactor'
 
-  describe "when the coffee-refactor:rename event is triggered", ->
+  describe "when the coffee-refactor:toggle-highlight event is triggered", ->
     it "attaches and then detaches the view", ->
-      # expect(atom.workspaceView.find('.coffee-refactor')).not.toExist()
+      expect(atom.workspaceView.find('.coffee-refactor')).not.toExist()
 
       # This is an activation event, triggering it will cause the package to be
       # activated.
-      atom.workspaceView.trigger 'coffee-refactor:rename'
+      atom.workspaceView.trigger 'coffee-refactor:toggle-highlight'
 
       waitsForPromise ->
         activationPromise
 
       runs ->
+        console.log inspect atom.workspaceView.find('workspace').length
+        $el = atom.workspaceView.find('.coffee-refactor')
+        console.log $el.length
+        expect($el).toHaveLength 1
         # expect(atom.workspaceView.find('.coffee-refactor')).toExist()
         atom.workspaceView.trigger 'coffee-refactor:rename'
         # expect(atom.workspaceView.find('.coffee-refactor')).not.toExist()
