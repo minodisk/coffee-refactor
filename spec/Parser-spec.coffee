@@ -220,6 +220,60 @@ describe 'Parser', ->
       expectEqualRefs parser, new Range([1, 19], [1, 22]),
         new Range([0, 9], [0, 12])
 
+    it 'should support destructuring assignment of ARRAY', ->
+      parser.parse """
+      a = b = c = 1
+      [ a, [ b, c ] ] = obj
+      func = ([ a, [ b, c ] ]) ->
+        a = b = c = 2
+      """
+      expectEqualRefs parser, new Range([0, 0], [0, 1]),
+        new Range([1, 2], [1, 3])
+      expectEqualRefs parser, new Range([1, 2], [1, 3]),
+        new Range([0, 0], [0, 1])
+      expectEqualRefs parser, new Range([0, 4], [0, 5]),
+        new Range([1, 7], [1, 8])
+      expectEqualRefs parser, new Range([1, 7], [1, 8]),
+        new Range([0, 4], [0, 5])
+      expectEqualRefs parser, new Range([0, 8], [0, 9]),
+        new Range([1, 10], [1, 11])
+      expectEqualRefs parser, new Range([1, 10], [1, 11]),
+        new Range([0, 8], [0, 9])
+      expectEqualRefs parser, new Range([2, 10], [2, 11]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs parser, new Range([2, 15], [2, 16]),
+        new Range([3, 6], [3, 7])
+      expectEqualRefs parser, new Range([2, 18], [2, 19]),
+        new Range([3, 10], [3, 11])
+
+    it 'should support destructuring assignment of OBJECT', ->
+      parser.parse """
+      a = b = c = 1
+      { a: { b: c } } = obj
+      func = ({ a: { b: c } }) ->
+        a = b = c = 2
+      """
+      expectNoRefs parser, new Range([1, 2], [1, 3])
+      expectNoRefs parser, new Range([1, 7], [1, 8])
+      expectNoRefs parser, new Range([2, 10], [2, 11])
+      expectNoRefs parser, new Range([2, 15], [2, 16])
+      expectEqualRefs parser, new Range([0, 0], [0, 1]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs parser, new Range([3, 2], [3, 3]),
+        new Range([0, 0], [0, 1])
+      expectEqualRefs parser, new Range([0, 4], [0, 5]),
+        new Range([3, 6], [3, 7])
+      expectEqualRefs parser, new Range([3, 6], [3, 7]),
+        new Range([0, 4], [0, 5])
+      expectEqualRefs parser, new Range([0, 8], [0, 9]),
+        new Range([1, 10], [1, 11])
+      expectEqualRefs parser, new Range([1, 10], [1, 11]),
+        new Range([0, 8], [0, 9])
+      expectEqualRefs parser, new Range([2, 18], [2, 19]),
+        new Range([3, 10], [3, 11])
+      expectEqualRefs parser, new Range([3, 10], [3, 11]),
+        new Range([2, 18], [2, 19])
+
     it 'should support FUNCTION in ARRAY', ->
       parser.parse """
       [
@@ -231,29 +285,9 @@ describe 'Parser', ->
       """
       expectEqualRefs parser, new Range([1, 3], [1, 4]),
         new Range([2, 4], [2, 5])
+      expectEqualRefs parser, new Range([2, 4], [2, 5]),
+        new Range([1, 3], [1, 4])
       expectEqualRefs parser, new Range([3, 3], [3, 4]),
         new Range([4, 4], [4, 5])
-
-    it 'should support destructuring assignment', ->
-      parser.parse """
-      a = b = c = 100
-      func = ({ a: { b: c } }) ->
-        a 1
-        b 2
-        c 3
-      """
-      expectNoRefs parser, new Range([0, 0], [0, 1])
-      expectEqualRefs parser, new Range([0, 4], [0, 5]),
-        new Range([3, 2], [3, 3])
-      expectEqualRefs parser, new Range([3, 2], [3, 3]),
-        new Range([0, 4], [0, 5])
-      expectNoRefs parser, new Range([0, 8], [0, 9])
-      expectEqualRefs parser, new Range([1, 10], [1, 11]),
-        new Range([2, 2], [2, 3])
-      expectEqualRefs parser, new Range([2, 2], [2, 3]),
-        new Range([1, 10], [1, 11])
-      expectNoRefs parser, new Range([1, 15], [1, 16])
-      expectEqualRefs parser, new Range([1, 18], [1, 19]),
-        new Range([4, 2], [4, 3])
-      expectEqualRefs parser, new Range([4, 2], [4, 3]),
-        new Range([1, 18], [1, 19])
+      expectEqualRefs parser, new Range([4, 4], [4, 5]),
+        new Range([3, 3], [3, 4])

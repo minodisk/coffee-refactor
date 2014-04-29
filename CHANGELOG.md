@@ -1,3 +1,7 @@
+# v0.2.1 on 2014/04/29
+
+* Fixed an issue causing finding references to be wrong in FUNCTION in ARRAY.
+
 # v0.2.0 on 2014/04/25
 
 * Fixed an issue causing stopping highlighting when typing wrong code.

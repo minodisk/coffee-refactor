@@ -1,5 +1,5 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Block, Literal, For, Obj, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Block, Literal, For, Obj, Arr, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 { inspect } = require 'util'
 
@@ -48,9 +48,6 @@ module.exports = class Parser
 
   @findReferences: (node, targetLocationData) ->
     target = @findSymbol node, targetLocationData
-
-    # console.log target
-
     return [] unless target?
     @traverseCode(node, target)[0]
 
@@ -78,7 +75,6 @@ module.exports = class Parser
          child is parent.variable
         return true
 
-
       if child instanceof For
         if child.name? and \
            Parser.isContainsLocationData child.name.locationData, targetLocationData
@@ -102,6 +98,7 @@ module.exports = class Parser
     isFixed = false
 
     parent.eachChild (child) ->
+
       if child instanceof Code
         isContains = Parser.isContains child, target
         isDeclared = Parser.isDeclared child, target
@@ -114,7 +111,9 @@ module.exports = class Parser
           else
             dests.concat childDests
         else if isDeclared
-          return false
+          return true
+
+
 
       # Skip object key access
       if child.asKey
