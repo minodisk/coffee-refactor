@@ -94,7 +94,7 @@ module.exports = class Parser
 
     target
 
-  @traverseCode: (parent, target, dests = []) ->
+  @traverseCode: (parent, target, isDeclaredInParent = false, dests = []) ->
     isFixed = false
 
     parent.eachChild (child) ->
@@ -103,7 +103,7 @@ module.exports = class Parser
         isContains = Parser.isContains child, target
         isDeclared = Parser.isDeclared child, target
         if isContains
-          [ childDests, isChildFixed ] = Parser.traverseCode child, target, null
+          [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent or isDeclared, null
           if isDeclared or isChildFixed
             dests = childDests
             isFixed = true
@@ -112,8 +112,6 @@ module.exports = class Parser
             dests.concat childDests
         else if isDeclared
           return true
-
-
 
       # Skip object key access
       if child.asKey
@@ -134,13 +132,16 @@ module.exports = class Parser
       if Parser.isSameLiteral child, target
         dests.push child
 
-      [ childDests, isChildFixed ] = Parser.traverseCode child, target, dests
+      [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent, dests
+      # console.log '------------'
+      # console.log inspect childDests
+      # console.log isChildFixed
       if isChildFixed
         dests = childDests
         isFixed = true
         return false
       else
-        dests.concat nodes
+        dests.concat nodes  #TODO `childDests` instead of `node`
 
     [ dests, isFixed ]
 
@@ -162,7 +163,8 @@ module.exports = class Parser
     code = new Code code.params, new Block(code.body), code.tag
     try
       code.compileNode code
-      return true for variable in code.scope.variables when variable.name is target.value
+      for variable in code.scope.variables when variable.name is target.value
+        return true
     catch err
     false
 
