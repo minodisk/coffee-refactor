@@ -291,3 +291,13 @@ describe 'Parser', ->
         new Range([4, 4], [4, 5])
       expectEqualRefs parser, new Range([4, 4], [4, 5]),
         new Range([3, 3], [3, 4])
+
+    it 'should support independent scope', ->
+      parser.parse """
+      func0 = ->
+        a = 100
+      func1 = ->
+        a = 100
+      """
+      expectNoRefs parser, new Range([1, 2], [1, 3])
+      expectNoRefs parser, new Range([3, 2], [3, 3])
