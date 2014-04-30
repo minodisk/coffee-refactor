@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "coffee-script": "~1.7.1",
-    "underscore": "~1.6.0"
+    "lodash": "~2.4.1"
   },
   "devDependencies": {
     "grunt-este-watch": "~0.1.15",

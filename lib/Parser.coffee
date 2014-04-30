@@ -1,9 +1,11 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Block, Literal, For, Obj, Arr, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Base, Value, Code, Block, Literal, For, Obj, Arr, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 { inspect } = require 'util'
+_ = require 'lodash'
 
 
+LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
 Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 
@@ -58,6 +60,9 @@ module.exports = class Parser
       # Skip if target is found
       return false if target?
 
+      # Skip no locationData
+      return true unless child.locationData?
+
       # Skip primitive node
       return true if child.isString?() or \
                      child.isSimpleNumber?() or \
@@ -94,24 +99,44 @@ module.exports = class Parser
 
     target
 
-  @traverseCode: (parent, target, isDeclaredInParent = false, dests = []) ->
+  @traverseCode: (parent, target, isDeclaredInParent) ->
     isFixed = false
+    dests = []
 
+    unless isDeclaredInParent?
+      isDeclaredInParent = Parser.isDeclaredRoot parent, target
+      console.log isDeclaredInParent
+
+    j = 0
     parent.eachChild (child) ->
+      j++
 
       if child instanceof Code
         isContains = Parser.isContains child, target
         isDeclared = Parser.isDeclared child, target
+        [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent or isDeclared
         if isContains
-          [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent or isDeclared, null
-          if isDeclared or isChildFixed
+          if isChildFixed
             dests = childDests
             isFixed = true
             return false
-          else
-            dests.concat childDests
-        else if isDeclared
-          return true
+          if isDeclared
+            # dests = dests.concat childDests
+            dests = childDests
+            isFixed = true
+            return false
+          dests = dests.concat childDests
+        else
+          # console.log inspect { isDeclared, isDeclaredInParent }
+          if isDeclared
+            return true
+          if isDeclaredInParent
+            # [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent or isDeclared
+            dests = dests.concat childDests
+            return true
+          # if isDeclared
+          #   return true
+        return true
 
       # Skip object key access
       if child.asKey
@@ -131,17 +156,16 @@ module.exports = class Parser
           dests.push child.index
       if Parser.isSameLiteral child, target
         dests.push child
+        return true
 
-      [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent, dests
-      # console.log '------------'
-      # console.log inspect childDests
-      # console.log isChildFixed
+      [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent
       if isChildFixed
         dests = childDests
         isFixed = true
         return false
       else
-        dests.concat nodes  #TODO `childDests` instead of `node`
+        dests = dests.concat childDests
+        return true
 
     [ dests, isFixed ]
 
@@ -149,6 +173,21 @@ module.exports = class Parser
     for key, val of parent when parent.hasOwnProperty key
       return true if child is val
     false
+
+  @isDeclaredRoot: (root, target) ->
+    # console.log root instanceof Base
+    # root.compileRoot {}
+    # console.log inspect root
+    # # console.log inspect new Block(root.expressions).compileNode {}
+    # root = new Block root.expressions
+    # try
+    #   root.compileRoot {}
+    #   # console.log inspect root
+    #   for variable in root.scope.variables when variable.name is target.value
+    #     return true
+    # catch err
+    #   console.error err
+    # false
 
   ###
   Check the target `Literal` is declared in the `Code`
