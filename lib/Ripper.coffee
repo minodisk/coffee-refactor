@@ -49,10 +49,10 @@ module.exports = class Parser
       b.last_line is a.last_line and b.last_column <= a.last_column
     )
 
-  @findReferences: (nodes, targetLocationData) ->
-    target = @findSymbol nodes.forFinding, targetLocationData
+  @find: ({ symbol, references }, targetLocationData) ->
+    target = @findSymbol symbol, targetLocationData
     return [] unless target?
-    _.uniq @traverseCode(nodes.forTraversing, target)[0]
+    _.uniq @findReferences(references, target)[0]
 
   @findSymbol: (parent, targetLocationData) ->
     target = null
@@ -100,7 +100,7 @@ module.exports = class Parser
 
     target
 
-  @traverseCode: (parent, target, isDeclaredInParent) ->
+  @findReferences: (parent, target, isDeclaredInParent) ->
     isDeclaredInParent ?= Parser.isDeclaredRoot parent, target
     isFixed = false
     dests = []
@@ -109,7 +109,10 @@ module.exports = class Parser
       if child instanceof Code
         isContains = Parser.isContains child, target
         isDeclared = Parser.isDeclared child, target
-        [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent or isDeclared
+        console.log inspect { isDeclaredInParent, isDeclared, isContains }
+
+        [ childDests, isChildFixed ] = Parser.findReferences child, target, isDeclaredInParent or isDeclared
+
 
         if isContains
           if isChildFixed
@@ -125,11 +128,8 @@ module.exports = class Parser
           if isDeclared
             return true
           if isDeclaredInParent
-            # [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent or isDeclared
             dests = dests.concat childDests
             return true
-          # if isDeclared
-          #   return true
         return true
 
       # Skip object key access
@@ -152,7 +152,7 @@ module.exports = class Parser
         dests.push child
         return true
 
-      [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent
+      [ childDests, isChildFixed ] = Parser.findReferences child, target, isDeclaredInParent
       if isChildFixed
         dests = childDests
         isFixed = true
@@ -170,14 +170,15 @@ module.exports = class Parser
 
   @isDeclaredRoot: (root, target) ->
     try
+      #TODO cache declaredVariables
       if root.compiled?
         o = root.compiled
       else
         o = bare: true
         root.compileRoot o
         root.compiled = o
-      { scope: { variables } } = o
-      return true for variable in variables when variable.name is target.value
+      variables = o.scope.declaredVariables()
+      return variables.indexOf(target.value) isnt -1
     catch err
     false
 
@@ -189,15 +190,17 @@ module.exports = class Parser
   ###
   @isDeclared: (code, target) ->
     try
+      #TODO cache declaredVariables
       if code.compiled?
         o = code.compiled
       else
-        o = indent: ''
-        code = new Code code.params, new Block(code.body), code.tag
+        o =
+          indent: ''
+          bare: true
         code.compileNode o
         code.compiled = o
-      { scope: { variables } } = o
-      return true for variable in variables when variable.name is target.value
+      variables = o.scope.declaredVariables()
+      return variables.indexOf(target.value) isnt -1
     catch err
     false
 
@@ -238,8 +241,8 @@ module.exports = class Parser
   parse: (code) ->
     try
       @nodes =
-        forFinding: nodes code
-        forTraversing: nodes code
+        symbol    : nodes code
+        references: nodes code
     catch err
       delete @nodes
 
@@ -247,6 +250,6 @@ module.exports = class Parser
     return [] unless @nodes?
 
     targetLocationData = Parser.rangeToLocationData range
-    foundNodes = Parser.findReferences @nodes, targetLocationData
+    foundNodes = Parser.find @nodes, targetLocationData
     for { locationData }, i in foundNodes
       Parser.locationDataToRange locationData
