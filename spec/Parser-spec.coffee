@@ -236,7 +236,6 @@ describe 'Parser', ->
       expectEqualRefs parser, new Range([3, 10], [3, 11]),
         new Range([2, 18], [2, 19])
 
-
     it 'should recognize the scope of variable', ->
       parser.parse """
       a = b = 100

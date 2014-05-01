@@ -49,10 +49,10 @@ module.exports = class Parser
       b.last_line is a.last_line and b.last_column <= a.last_column
     )
 
-  @findReferences: ({ forFinding, forTraversing }, targetLocationData) ->
-    target = @findSymbol forFinding, targetLocationData
+  @findReferences: (nodes, targetLocationData) ->
+    target = @findSymbol nodes.forFinding, targetLocationData
     return [] unless target?
-    _.uniq @traverseCode(forTraversing, target)[0]
+    _.uniq @traverseCode(nodes.forTraversing, target)[0]
 
   @findSymbol: (parent, targetLocationData) ->
     target = null
@@ -101,11 +101,9 @@ module.exports = class Parser
     target
 
   @traverseCode: (parent, target, isDeclaredInParent) ->
+    isDeclaredInParent ?= Parser.isDeclaredRoot parent, target
     isFixed = false
     dests = []
-
-    unless isDeclaredInParent?
-      isDeclaredInParent = Parser.isDeclaredRoot parent, target
 
     parent.eachChild (child) ->
       if child instanceof Code
@@ -135,7 +133,7 @@ module.exports = class Parser
         return true
 
       # Skip object key access
-      if child.asKey
+      if child.asKey and child.unfoldedSoak isnt false
         return true
 
       # Skip key in object literal
