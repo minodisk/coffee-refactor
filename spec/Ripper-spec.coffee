@@ -148,7 +148,17 @@ describe 'Parser', ->
         new Range([1, 2], [1, 3]),
         new Range([1, 6], [1, 7])
 
-    it 'should support `for-of` statement', ->
+    it 'should support `for-in` statement without index', ->
+      ripper.parse """
+      for variable in variables
+        console.log variable
+      """
+      expectEqualRefs ripper, new Range([0, 4], [0, 12]),
+        new Range([1, 14], [1, 22])
+      expectEqualRefs ripper, new Range([1, 14], [1, 22]),
+        new Range([0, 4], [0, 12])
+
+    it 'should support `for-in` statement with index', ->
       ripper.parse """
       for elem, i in arr
         console.log i, elem
@@ -281,6 +291,25 @@ describe 'Parser', ->
       expectEqualRefs ripper, new Range([2, 8], [2, 9]),
         new Range([1, 13], [1, 14]),
         new Range([2, 4], [2, 5])
+
+    it 'should recognize nested scope with variable', ->
+      ripper.parse """
+      func0 = ->
+        a = 100
+        func1 = ->
+          a = 200
+        func2 = ->
+          a = 300
+      """
+      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
+        new Range([3, 4], [3, 5]),
+        new Range([5, 4], [5, 5])
+      expectEqualRefs ripper, new Range([3, 4], [3, 5]),
+        new Range([1, 2], [1, 3]),
+        new Range([5, 4], [5, 5])
+      expectEqualRefs ripper, new Range([5, 4], [5, 5]),
+        new Range([1, 2], [1, 3]),
+        new Range([3, 4], [3, 5])
 
     it 'should recognize declared variable in independent scopes', ->
       ripper.parse """
