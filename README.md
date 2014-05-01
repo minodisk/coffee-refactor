@@ -1,6 +1,4 @@
-# Coffee Refactor package
-
-[![Build Status](https://travis-ci.org/minodisk/coffee-refactor.svg?branch=master)](https://travis-ci.org/minodisk/coffee-refactor)
+# Coffee Refactor package [![Build Status](https://travis-ci.org/minodisk/coffee-refactor.svg?branch=master)](https://travis-ci.org/minodisk/coffee-refactor)
 
 Refactor CoffeeScript for [Atom](https://atom.io/).
 
@@ -29,6 +27,10 @@ Toggle with `ctrl-alt-r`.
 * class name
 * for-in value and index
 * for-of key and value
+
+## Custom Keymap
+
+Override [keymap](kaymaps/coffee-refactor.cson) with `Atom > Open Your Keymap`.
 
 ## Custom Style
 
