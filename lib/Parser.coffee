@@ -33,6 +33,7 @@ module.exports = class Parser
     last_column : end.column - 1
 
   @isEqualLocationData: (a, b) ->
+    return false unless a? and b?
     a.first_line   is b.first_line   and \
     a.first_column is b.first_column and \
     a.last_line    is b.last_line    and \
@@ -48,10 +49,16 @@ module.exports = class Parser
       b.last_line is a.last_line and b.last_column <= a.last_column
     )
 
-  @findReferences: (node, targetLocationData) ->
-    target = @findSymbol node, targetLocationData
+  @findReferences: (code, targetLocationData) ->
+    try
+      nodesForFinding = nodes code
+      nodesForTraversing = nodes code
+    catch err
+      return []
+
+    target = @findSymbol nodesForFinding, targetLocationData
     return [] unless target?
-    @traverseCode(node, target)[0]
+    _.uniq @traverseCode(nodesForTraversing, target)[0]
 
   @findSymbol: (parent, targetLocationData) ->
     target = null
@@ -105,29 +112,24 @@ module.exports = class Parser
 
     unless isDeclaredInParent?
       isDeclaredInParent = Parser.isDeclaredRoot parent, target
-      console.log isDeclaredInParent
 
-    j = 0
     parent.eachChild (child) ->
-      j++
-
       if child instanceof Code
         isContains = Parser.isContains child, target
         isDeclared = Parser.isDeclared child, target
         [ childDests, isChildFixed ] = Parser.traverseCode child, target, isDeclaredInParent or isDeclared
+
         if isContains
           if isChildFixed
             dests = childDests
             isFixed = true
             return false
           if isDeclared
-            # dests = dests.concat childDests
             dests = childDests
             isFixed = true
             return false
           dests = dests.concat childDests
         else
-          # console.log inspect { isDeclared, isDeclaredInParent }
           if isDeclared
             return true
           if isDeclaredInParent
@@ -175,19 +177,17 @@ module.exports = class Parser
     false
 
   @isDeclaredRoot: (root, target) ->
-    # console.log root instanceof Base
-    # root.compileRoot {}
-    # console.log inspect root
-    # # console.log inspect new Block(root.expressions).compileNode {}
-    # root = new Block root.expressions
-    # try
-    #   root.compileRoot {}
-    #   # console.log inspect root
-    #   for variable in root.scope.variables when variable.name is target.value
-    #     return true
-    # catch err
-    #   console.error err
-    # false
+    try
+      if root.compiled?
+        o = root.compiled
+      else
+        o = bare: true
+        root.compileRoot o
+        root.compiled = o
+      { scope: { variables } } = o
+      return true for variable in variables when variable.name is target.value
+    catch err
+    false
 
   ###
   Check the target `Literal` is declared in the `Code`
@@ -196,14 +196,16 @@ module.exports = class Parser
   @returns {Boolean} Has declarations in the `Code`
   ###
   @isDeclared: (code, target) ->
-    # 1. clone Code instance
-    # 2. compile Code
-    # 3. check declared variable in lexical scope of the block
-    code = new Code code.params, new Block(code.body), code.tag
     try
-      code.compileNode code
-      for variable in code.scope.variables when variable.name is target.value
-        return true
+      if code.compiled?
+        o = code.compiled
+      else
+        o = indent: ''
+        code = new Code code.params, new Block(code.body), code.tag
+        code.compileNode o
+        code.compiled = o
+      { scope: { variables } } = o
+      return true for variable in variables when variable.name is target.value
     catch err
     false
 
@@ -216,8 +218,10 @@ module.exports = class Parser
   @isContains: (node, target) ->
     isContains = false
     node.traverseChildren true, (child) ->
-      isContains or= child is target
-      !isContains
+      if Parser.isEqualLocationData(child.locationData, target.locationData) and \
+         Parser.isSameLiteral(child, target)
+        isContains = true
+        false
     isContains
 
   ###
@@ -227,6 +231,8 @@ module.exports = class Parser
   @returns {Boolean} Has same value
   ###
   @isSameLiteral: (a, b) ->
+    a? and b? and \
+    a.locationData? and b.locationData? and \
     a instanceof Literal and \
     b instanceof Literal and \
     a.value is b.value
@@ -235,17 +241,14 @@ module.exports = class Parser
   nodes: null
 
   destruct: ->
-    delete @nodes
+    delete @code
 
-  parse: (code) ->
-    try
-      @nodes = nodes code
-    catch err
-      @nodes = null
+  parse: (@code) ->
 
   find: (range) ->
-    return [] unless @nodes?
+    return [] unless @code?
 
     targetLocationData = Parser.rangeToLocationData range
-    for { locationData }, i in Parser.findReferences @nodes, targetLocationData
+    foundNodes = Parser.findReferences @code, targetLocationData
+    for { locationData }, i in foundNodes
       Parser.locationDataToRange locationData
