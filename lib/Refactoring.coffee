@@ -1,4 +1,4 @@
-Parser = require './Parser'
+Ripper = require './Ripper'
 { EventEmitter } = require 'events'
 
 
@@ -16,7 +16,7 @@ class Refactoring extends EventEmitter
   constructor: (@editor) ->
     super()
 
-    @parser = new Parser
+    @ripper = new Ripper
 
     @editor.on 'grammar-changed', @checkGrammar
 
@@ -25,13 +25,13 @@ class Refactoring extends EventEmitter
   destruct: =>
     @removeAllListeners()
 
-    @parser.destruct()
+    @ripper.destruct()
 
     @editor.off 'grammar-changed', @checkGrammar
     @editor.off 'contents-modified', @parse
 
     delete @editor
-    delete @parser
+    delete @ripper
 
 
   ###
@@ -61,7 +61,7 @@ class Refactoring extends EventEmitter
   rename: ->
     @editor.selectWord()
     selection = @editor.getLastSelection()
-    ranges = @parser.find selection.getBufferRange()
+    ranges = @ripper.find selection.getBufferRange()
     return false if ranges.length is 0
 
     @selection = selection
@@ -76,12 +76,12 @@ class Refactoring extends EventEmitter
     true
 
   getReferenceRanges: ->
-    @parser.find @editor.getLastSelection().getBufferRange()
+    @ripper.find @editor.getLastSelection().getBufferRange()
 
   ###
   Private methods
   ###
 
   parse: =>
-    @parser.parse @editor.getText()
+    @ripper.parse @editor.getText()
     @emit 'parsed'
