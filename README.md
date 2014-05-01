@@ -1,5 +1,7 @@
 # Coffee Refactor package
 
+[![Build Status](https://travis-ci.org/minodisk/coffee-refactor.svg?branch=master)](https://travis-ci.org/minodisk/coffee-refactor)
+
 Refactor CoffeeScript for [Atom](https://atom.io/).
 
 ![capture_7](https://cloud.githubusercontent.com/assets/514164/2807941/853dbfc4-cd01-11e3-937f-04c8b9c5405e.gif)
