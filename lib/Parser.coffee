@@ -49,16 +49,10 @@ module.exports = class Parser
       b.last_line is a.last_line and b.last_column <= a.last_column
     )
 
-  @findReferences: (code, targetLocationData) ->
-    try
-      nodesForFinding = nodes code
-      nodesForTraversing = nodes code
-    catch err
-      return []
-
-    target = @findSymbol nodesForFinding, targetLocationData
+  @findReferences: ({ forFinding, forTraversing }, targetLocationData) ->
+    target = @findSymbol forFinding, targetLocationData
     return [] unless target?
-    _.uniq @traverseCode(nodesForTraversing, target)[0]
+    _.uniq @traverseCode(forTraversing, target)[0]
 
   @findSymbol: (parent, targetLocationData) ->
     target = null
@@ -241,14 +235,20 @@ module.exports = class Parser
   nodes: null
 
   destruct: ->
-    delete @code
+    delete @nodes
 
-  parse: (@code) ->
+  parse: (code) ->
+    try
+      @nodes =
+        forFinding: nodes code
+        forTraversing: nodes code
+    catch err
+      delete @nodes
 
   find: (range) ->
-    return [] unless @code?
+    return [] unless @nodes?
 
     targetLocationData = Parser.rangeToLocationData range
-    foundNodes = Parser.findReferences @code, targetLocationData
+    foundNodes = Parser.findReferences @nodes, targetLocationData
     for { locationData }, i in foundNodes
       Parser.locationDataToRange locationData
