@@ -179,6 +179,7 @@ module.exports = class Parser
         root.compileRoot o
         root.compiled = o
       { scope: { variables } } = o
+      console.log inspect o.scope.variables
       return true for variable in variables when variable.name is target.value
     catch err
     false
