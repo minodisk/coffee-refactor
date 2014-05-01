@@ -1,3 +1,7 @@
+# v0.2.2 on 2014/05/01
+
+* Fixed an issue causing that didn't discern two symbols in different two scopes.
+
 # v0.2.1 on 2014/04/29
 
 * Fixed an issue causing finding references to be wrong in FUNCTION in ARRAY.
@@ -23,7 +27,7 @@
 
 # v0.1.9 on 2014/04/15
 
-* Fix error thrown when toggle highlight after closing editor.
+* Fixed error thrown when toggle highlight after closing editor.
 * Replace capture in README.
 
 # v0.1.7-v0.1.8 on 2014/04/15
