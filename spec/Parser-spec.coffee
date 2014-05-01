@@ -210,6 +210,8 @@ describe 'Parser', ->
       { a: { b: c } } = obj
       func = ({ a: { b: c } }) ->
         a = b = c = 2
+      func = ({ a }) ->
+        a 1
       """
       expectNoRefs parser, new Range([1, 2], [1, 3])
       expectNoRefs parser, new Range([1, 7], [1, 8])
@@ -231,6 +233,10 @@ describe 'Parser', ->
         new Range([3, 10], [3, 11])
       expectEqualRefs parser, new Range([3, 10], [3, 11]),
         new Range([2, 18], [2, 19])
+      expectEqualRefs parser, new Range([4, 10], [4, 11]),
+        new Range([5, 2], [5, 3])
+      expectEqualRefs parser, new Range([5, 2], [5, 3]),
+        new Range([4, 10], [4, 11])
 
 
     it 'should recognize the scope of variable', ->
