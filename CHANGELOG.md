@@ -1,3 +1,8 @@
+# v0.2.3 on 2014/05/01
+
+* Fixed an issue causing not working highlight in destructuring assignment statement of `Object`.
+* Test on Travis CI.
+
 # v0.2.2 on 2014/05/01
 
 * Fixed an issue causing that didn't discern two symbols in different two scopes.
