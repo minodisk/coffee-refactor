@@ -21,7 +21,8 @@ padL = (str, len, pad = ' ') ->
   str
 
 
-module.exports = class Parser
+module.exports =
+class Ripper
 
   @locationDataToRange: ({ first_line, first_column, last_line, last_column }) ->
     new Range [ first_line, first_column ], [ last_line, last_column + 1 ]
@@ -50,6 +51,7 @@ module.exports = class Parser
     )
 
   @find: ({ symbol, references }, targetLocationData) ->
+    # console.log '-------------------------------'
     target = @findSymbol symbol, targetLocationData
     return [] unless target?
     _.uniq @findReferences(references, target)[0]
@@ -83,36 +85,35 @@ module.exports = class Parser
 
       if child instanceof For
         if child.name? and \
-           Parser.isContainsLocationData child.name.locationData, targetLocationData
+           Ripper.isContainsLocationData child.name.locationData, targetLocationData
           target = child.name
           return false
         if child.index? and \
-           Parser.isContainsLocationData child.index.locationData, targetLocationData
+           Ripper.isContainsLocationData child.index.locationData, targetLocationData
           target = child.index
           return false
       if child instanceof Literal
-        if Parser.isContainsLocationData child.locationData, targetLocationData
+        if Ripper.isContainsLocationData child.locationData, targetLocationData
           target = child
           return false
 
-      target = Parser.findSymbol child, targetLocationData
+      target = Ripper.findSymbol child, targetLocationData
       return false if target?
 
     target
 
   @findReferences: (parent, target, isDeclaredInParent) ->
-    isDeclaredInParent ?= Parser.isDeclaredRoot parent, target
+    isDeclaredInParent ?= Ripper.isDeclaredRoot parent, target
     isFixed = false
     dests = []
 
     parent.eachChild (child) ->
       if child instanceof Code
-        isContains = Parser.isContains child, target
-        isDeclared = Parser.isDeclared child, target
-        console.log inspect { isDeclaredInParent, isDeclared, isContains }
+        isContains = Ripper.isContains child, target
+        isDeclared = Ripper.isDeclared child, target, parent
+        # console.log inspect { isDeclaredInParent, isDeclared, isContains }
 
-        [ childDests, isChildFixed ] = Parser.findReferences child, target, isDeclaredInParent or isDeclared
-
+        [ childDests, isChildFixed ] = Ripper.findReferences child, target, isDeclaredInParent or isDeclared
 
         if isContains
           if isChildFixed
@@ -128,9 +129,12 @@ module.exports = class Parser
           if isDeclared
             return true
           if isDeclaredInParent
+            # console.log inspect childDests
             dests = dests.concat childDests
             return true
         return true
+
+      child.scope = parent.scope
 
       # Skip object key access
       if child.asKey and child.unfoldedSoak isnt false
@@ -144,15 +148,15 @@ module.exports = class Parser
         return true
 
       if child instanceof For
-        if Parser.isSameLiteral child.name, target
+        if Ripper.isSameLiteral child.name, target
           dests.push child.name
-        if Parser.isSameLiteral child.index, target
+        if Ripper.isSameLiteral child.index, target
           dests.push child.index
-      if Parser.isSameLiteral child, target
+      if Ripper.isSameLiteral child, target
         dests.push child
         return true
 
-      [ childDests, isChildFixed ] = Parser.findReferences child, target, isDeclaredInParent
+      [ childDests, isChildFixed ] = Ripper.findReferences child, target, isDeclaredInParent
       if isChildFixed
         dests = childDests
         isFixed = true
@@ -170,14 +174,11 @@ module.exports = class Parser
 
   @isDeclaredRoot: (root, target) ->
     try
-      #TODO cache declaredVariables
-      if root.compiled?
-        o = root.compiled
-      else
+      unless root.scope?
         o = bare: true
         root.compileRoot o
-        root.compiled = o
-      variables = o.scope.declaredVariables()
+        root.scope = o.scope
+      variables = root.scope.declaredVariables()
       return variables.indexOf(target.value) isnt -1
     catch err
     false
@@ -188,21 +189,28 @@ module.exports = class Parser
   @param {Literal} target A `Literal`
   @returns {Boolean} Has declarations in the `Code`
   ###
-  @isDeclared: (code, target) ->
+  @isDeclared: (code, target, parent) ->
     try
-      #TODO cache declaredVariables
-      if code.compiled?
-        o = code.compiled
-      else
+      unless code.compiled?
         o =
+          scope: parent?.scope
           indent: ''
           bare: true
         code.compileNode o
-        code.compiled = o
-      variables = o.scope.declaredVariables()
+        code.scope = o.scope
+      # variables = o.scope.declaredVariables()
+      variables = Ripper.declaredVariables code.scope
+      # console.log inspect code.scope.declaredVariables()
+      # console.log inspect variables
       return variables.indexOf(target.value) isnt -1
     catch err
     false
+
+  @declaredVariables: (scope) ->
+    _.filter (_.pluck scope.variables, 'name'), (name) ->
+      _.isString(name) and name isnt 'arguments'
+
+
 
   ###
   Check the target `Node` exsits in the `Node`.
@@ -213,8 +221,8 @@ module.exports = class Parser
   @isContains: (node, target) ->
     isContains = false
     node.traverseChildren true, (child) ->
-      if Parser.isEqualLocationData(child.locationData, target.locationData) and \
-         Parser.isSameLiteral(child, target)
+      if Ripper.isEqualLocationData(child.locationData, target.locationData) and \
+         Ripper.isSameLiteral(child, target)
         isContains = true
         false
     isContains
@@ -249,7 +257,7 @@ module.exports = class Parser
   find: (range) ->
     return [] unless @nodes?
 
-    targetLocationData = Parser.rangeToLocationData range
-    foundNodes = Parser.find @nodes, targetLocationData
+    targetLocationData = Ripper.rangeToLocationData range
+    foundNodes = Ripper.find @nodes, targetLocationData
     for { locationData }, i in foundNodes
-      Parser.locationDataToRange locationData
+      Ripper.locationDataToRange locationData
