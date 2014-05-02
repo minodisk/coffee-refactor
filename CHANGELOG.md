@@ -1,6 +1,11 @@
+# v0.2.4 on 2014/05/01
+
+* Fixed an issue causing not working in nested scope.
+* Fixed an issue causing not working in construction of `Object`
+
 # v0.2.3 on 2014/05/01
 
-* Fixed an issue causing not working highlight in destructuring assignment statement of `Object`.
+* Fixed an issue causing not working in destructuring assignment statement of `Object`.
 * Test on Travis CI.
 
 # v0.2.2 on 2014/05/01
@@ -9,7 +14,7 @@
 
 # v0.2.1 on 2014/04/29
 
-* Fixed an issue causing finding references to be wrong in FUNCTION in ARRAY.
+* Fixed an issue causing finding references to be wrong in `Function` in `Array`.
 
 # v0.2.0 on 2014/04/25
 
@@ -28,7 +33,7 @@
 
 # v0.1.10 on 2014/04/16
 
-* Support FOR-IN and FOR-OF statement
+* Support `for-in` and `for-of` statement
 
 # v0.1.9 on 2014/04/15
 
