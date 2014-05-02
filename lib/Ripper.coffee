@@ -51,7 +51,6 @@ class Ripper
     )
 
   @find: ({ symbol, references }, targetLocationData) ->
-    # console.log '-------------------------------'
     target = @findSymbol symbol, targetLocationData
     return [] unless target?
     _.uniq @findReferences(references, target)[0]
@@ -111,8 +110,6 @@ class Ripper
       if child instanceof Code
         isContains = Ripper.isContains child, target
         isDeclared = Ripper.isDeclared child, target, parent
-        # console.log inspect { isDeclaredInParent, isDeclared, isContains }
-
         [ childDests, isChildFixed ] = Ripper.findReferences child, target, isDeclaredInParent or isDeclared
 
         if isContains
@@ -129,7 +126,6 @@ class Ripper
           if isDeclared
             return true
           if isDeclaredInParent
-            # console.log inspect childDests
             dests = dests.concat childDests
             return true
         return true
@@ -137,7 +133,7 @@ class Ripper
       child.scope = parent.scope
 
       # Skip object key access
-      if child.asKey and child.unfoldedSoak isnt false
+      if child.asKey and parent.soak is false and child.unfoldedSoak isnt false
         return true
 
       # Skip key in object literal
@@ -178,7 +174,7 @@ class Ripper
         o = bare: true
         root.compileRoot o
         root.scope = o.scope
-      variables = root.scope.declaredVariables()
+      variables = Ripper.declaredSymbols root.scope
       return variables.indexOf(target.value) isnt -1
     catch err
     false
@@ -195,21 +191,20 @@ class Ripper
         o =
           scope: parent?.scope
           indent: ''
-          bare: true
         code.compileNode o
         code.scope = o.scope
-      # variables = o.scope.declaredVariables()
-      variables = Ripper.declaredVariables code.scope
-      # console.log inspect code.scope.declaredVariables()
-      # console.log inspect variables
+      variables = Ripper.declaredSymbols code.scope
       return variables.indexOf(target.value) isnt -1
     catch err
+      console.error err
     false
 
-  @declaredVariables: (scope) ->
-    _.filter (_.pluck scope.variables, 'name'), (name) ->
-      _.isString(name) and name isnt 'arguments'
-
+  @declaredSymbols: (scope) ->
+    realVars = []
+    tempVars = []
+    for { name, type } in scope.variables when (type is 'var' or type is 'param') and _.isString name
+      (if name.charAt(0) is '_' then tempVars else realVars).push name
+    realVars.sort().concat tempVars.sort()
 
 
   ###
