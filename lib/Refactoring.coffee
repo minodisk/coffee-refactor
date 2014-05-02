@@ -79,5 +79,8 @@ class Refactoring extends EventEmitter
   ###
 
   parse: =>
-    @ripper.parse @editor.buffer.getText()
+    text = @editor.buffer.getText()
+    if text isnt @cachedText
+      @cachedText = text
+      @ripper.parse text
     @emit 'parsed'
