@@ -1,6 +1,7 @@
 # v0.2.5 on 2014/05/
 
 * Refactored code.
+* Detect text modification faster.
 
 # v0.2.4 on 2014/05/02
 
