@@ -1,3 +1,7 @@
+# v0.2.5 on 2014/05/
+
+* Refactored code.
+
 # v0.2.4 on 2014/05/02
 
 * Fixed an issue causing not working in nested scope.

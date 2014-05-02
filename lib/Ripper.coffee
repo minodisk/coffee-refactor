@@ -1,5 +1,5 @@
 { nodes } = require 'coffee-script'
-{ Base, Value, Code, Block, Literal, For, Obj, Arr, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Literal, For, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 { inspect } = require 'util'
 { isString, uniq, some } = require 'lodash'
