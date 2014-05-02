@@ -28,7 +28,7 @@ class Refactoring extends EventEmitter
     @ripper.destruct()
 
     @editor.off 'grammar-changed', @checkGrammar
-    @editor.off 'contents-modified', @parse
+    @editor.buffer.off 'changed', @parse
 
     delete @editor
     delete @ripper
@@ -42,9 +42,9 @@ class Refactoring extends EventEmitter
     isCoffee = @editor.getGrammar().name is 'CoffeeScript'
     return if isCoffee is @isCoffee
 
-    @editor.off 'contents-modified', @parse
+    @editor.buffer.off 'changed', @parse
     if isCoffee
-      @editor.on 'contents-modified', @parse
+      @editor.buffer.on 'changed', @parse
       @parse()
 
 
@@ -83,5 +83,5 @@ class Refactoring extends EventEmitter
   ###
 
   parse: =>
-    @ripper.parse @editor.getText()
+    @ripper.parse @editor.buffer.getText()
     @emit 'parsed'
