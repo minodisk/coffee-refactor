@@ -6,9 +6,6 @@ module.exports =
 class Refactoring extends EventEmitter
 
 
-  isCoffee: false
-
-
   ###
   Life Cycle
   ###
@@ -39,11 +36,10 @@ class Refactoring extends EventEmitter
   ###
 
   checkGrammar: (e) =>
-    isCoffee = @editor.getGrammar().name is 'CoffeeScript'
-    return if isCoffee is @isCoffee
+    @isCoffee = @editor.getGrammar().name is 'CoffeeScript'
 
     @editor.buffer.off 'changed', @parse
-    if isCoffee
+    if @isCoffee
       @editor.buffer.on 'changed', @parse
       @parse()
 
