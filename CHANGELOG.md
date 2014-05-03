@@ -1,4 +1,10 @@
-# v0.2.4 on 2014/05/01
+# v0.3.0 on 2014/05/04
+
+* Refactored code.
+* Detect text modification faster.
+* Tune the performance of highlighting.
+
+# v0.2.4 on 2014/05/02
 
 * Fixed an issue causing not working in nested scope.
 * Fixed an issue causing not working in construction of `Object`

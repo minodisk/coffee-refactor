@@ -14,17 +14,18 @@ class RefactoringingView extends View
     @isHighlight = false
 
     @refactoring = new Refactoring @editorView.getEditor()
-    @refactoring.on 'parsed', @updateHighlight
+    @refactoring.on 'parse:start', @onParseStart
+    @refactoring.on 'parse:end', @onParseEnd
 
     @editorView.underlayer.append @
-    @editorView.on 'cursor:moved', @updateHighlight
+    @editorView.on 'cursor:moved', @onCursorMoved
 
   destruct: =>
     @remove()
 
     @refactoring.destruct()
 
-    @editorView.off 'cursor:moved', @updateHighlight
+    @editorView.off 'cursor:moved', @onCursorMoved
 
     delete @isHighlight
     delete @refactoring
@@ -44,11 +45,25 @@ class RefactoringingView extends View
     @refactoring.done()
 
 
-  highlight: (@isHighlight) ->
-    @updateHighlight()
+  setHighlight: (@isHighlight) ->
+    @highlight()
     true
 
-  updateHighlight: =>
+  onParseStart: =>
+    @editorView.off 'cursor:moved', @onCursorMoved
+    @empty()
+
+  onParseEnd: =>
+    @editorView.off 'cursor:moved', @onCursorMoved
+    @editorView.on 'cursor:moved', @onCursorMoved
+    @highlight()
+
+  onCursorMoved: =>
+    unless @refactoring.isParsing
+      clearTimeout @timeoutId
+      @timeoutId = setTimeout @highlight, 0
+
+  highlight: =>
     @empty()
     if @isHighlight
       @highlightAt @refactoring.getReferenceRanges()

@@ -6,9 +6,6 @@ module.exports =
 class Refactoring extends EventEmitter
 
 
-  isCoffee: false
-
-
   ###
   Life Cycle
   ###
@@ -28,7 +25,7 @@ class Refactoring extends EventEmitter
     @ripper.destruct()
 
     @editor.off 'grammar-changed', @checkGrammar
-    @editor.off 'contents-modified', @parse
+    @editor.buffer.off 'changed', @onBufferChanged
 
     delete @editor
     delete @ripper
@@ -39,12 +36,11 @@ class Refactoring extends EventEmitter
   ###
 
   checkGrammar: (e) =>
-    isCoffee = @editor.getGrammar().name is 'CoffeeScript'
-    return if isCoffee is @isCoffee
+    @isCoffee = @editor.getGrammar().name is 'CoffeeScript'
 
-    @editor.off 'contents-modified', @parse
-    if isCoffee
-      @editor.on 'contents-modified', @parse
+    @editor.buffer.off 'changed', @onBufferChanged
+    if @isCoffee
+      @editor.buffer.on 'changed', @onBufferChanged
       @parse()
 
 
@@ -82,6 +78,18 @@ class Refactoring extends EventEmitter
   Private methods
   ###
 
+  onBufferChanged: =>
+    clearTimeout @timeoutId
+    @timeoutId = setTimeout @parse, 0
+    unless @isParsing
+      @isParsing = true
+      @emit 'parse:start'
+
   parse: =>
-    @ripper.parse @editor.getText()
-    @emit 'parsed'
+    text = @editor.buffer.getText()
+    if text isnt @cachedText
+      @cachedText = text
+      @ripper.parse text
+    if @isParsing
+      @isParsing = false
+      @emit 'parse:end'
