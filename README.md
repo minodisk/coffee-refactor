@@ -2,7 +2,13 @@
 
 Refactor CoffeeScript for [Atom](https://atom.io/).
 
-![capture_7](https://cloud.githubusercontent.com/assets/514164/2807941/853dbfc4-cd01-11e3-937f-04c8b9c5405e.gif)
+### Highlight references
+
+Highlight all references of a symbol under the cursor.
+
+Toggle with `ctrl-alt-r`.
+
+![capture_highlight](https://cloud.githubusercontent.com/assets/514164/2870666/5a3aafbe-d2d6-11e3-959f-14957255a980.gif)
 
 ### Rename references
 
@@ -13,11 +19,7 @@ Rename all references of a symbol under the cursor.
 3. Type new name.
 4. Finish renaming with `enter`.
 
-### Highlight references
-
-Highlight all references of a symbol under the cursor.
-
-Toggle with `ctrl-alt-r`.
+![capture_rename](https://cloud.githubusercontent.com/assets/514164/2870667/63182d8c-d2d6-11e3-854b-8c196becfd60.gif)
 
 ### Supported Symbols
 
