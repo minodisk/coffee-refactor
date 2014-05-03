@@ -25,7 +25,7 @@ class Refactoring extends EventEmitter
     @ripper.destruct()
 
     @editor.off 'grammar-changed', @checkGrammar
-    @editor.buffer.off 'changed', @parse
+    @editor.buffer.off 'changed', @onBufferChanged
 
     delete @editor
     delete @ripper
@@ -38,9 +38,9 @@ class Refactoring extends EventEmitter
   checkGrammar: (e) =>
     @isCoffee = @editor.getGrammar().name is 'CoffeeScript'
 
-    @editor.buffer.off 'changed', @parse
+    @editor.buffer.off 'changed', @onBufferChanged
     if @isCoffee
-      @editor.buffer.on 'changed', @parse
+      @editor.buffer.on 'changed', @onBufferChanged
       @parse()
 
 
@@ -78,9 +78,18 @@ class Refactoring extends EventEmitter
   Private methods
   ###
 
+  onBufferChanged: =>
+    clearTimeout @timeoutId
+    @timeoutId = setTimeout @parse, 0
+    unless @isParsing
+      @isParsing = true
+      @emit 'parse:start'
+
   parse: =>
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
       @ripper.parse text
-    @emit 'parsed'
+    if @isParsing
+      @isParsing = false
+      @emit 'parse:end'
