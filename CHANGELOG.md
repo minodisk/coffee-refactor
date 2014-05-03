@@ -1,7 +1,8 @@
-# v0.2.5 on 2014/05/
+# v0.3.0 on 2014/05/04
 
 * Refactored code.
 * Detect text modification faster.
+* Tune the performance of highlighting.
 
 # v0.2.4 on 2014/05/02
 
