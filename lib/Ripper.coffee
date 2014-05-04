@@ -22,7 +22,7 @@ class Ripper
     target = null
 
     parent.eachChild (child) =>
-      # Skip if target is found
+      # Break this loop if target is found
       return false if target?
       # Skip no locationData
       return true unless child.locationData?
@@ -132,11 +132,8 @@ class Ripper
     name for { type, name } in scope.variables when @isScopedSymbol type, name
 
   @isScopedSymbol: (type, name) ->
-    (
-      type is 'var'   or
-      type is 'param'
-    )                       and
-    isString(name)        and
+    (type is 'var' or type is 'param') and
+    isString(name)                     and
     name.charAt(0) isnt '_'
 
   @isPrimitive: (node) ->
@@ -178,9 +175,9 @@ class Ripper
 
   @isEqualLocationData: (a, b) ->
     return false unless a? and b?
-    a.first_line   is b.first_line   and \
-    a.first_column is b.first_column and \
-    a.last_line    is b.last_line    and \
+    a.first_line   is b.first_line   and
+    a.first_column is b.first_column and
+    a.last_line    is b.last_line    and
     a.last_column  is b.last_column
 
   @isSameLiteral: (a, b) ->
