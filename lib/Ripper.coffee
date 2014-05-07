@@ -48,16 +48,15 @@ class Ripper
       #   return false
 
       if child instanceof For
-        if @isContainsLocationData child.name, targetLocationData
+        if child.name? and
+           @isEqualsLocationData child.name.locationData, targetLocationData
           target = child.name
           return false
-        else if @isContainsLocationData child.index, targetLocationData
+        else if child.index? and
+                @isEqualsLocationData child.index.locationData, targetLocationData
           target = child.index
           return false
       else if child instanceof Literal
-        # if @isContainsLocationData child, targetLocationData #TODO use @isEqualsLocationData()
-        #   unless @isEqualsLocationData child.locationData, targetLocationData
-        #     console.log inspect child
         if @isEqualsLocationData child.locationData, targetLocationData
           target = child
           return false
@@ -137,19 +136,19 @@ class Ripper
     a.last_line is b.last_line       and
     a.last_column is b.last_column
 
-  @isContainsLocationData: (node, locationData) ->
-    return false unless node? and node.locationData?
-    nodeLocationData = node.locationData
-    (
-      nodeLocationData.first_line < locationData.first_line      or
-      nodeLocationData.first_line is locationData.first_line     and
-      nodeLocationData.first_column <= locationData.first_column
-    ) and
-    (
-      locationData.last_line < nodeLocationData.last_line      or
-      locationData.last_line is nodeLocationData.last_line     and
-      locationData.last_column <= nodeLocationData.last_column
-    )
+  # @isContainsLocationData: (node, locationData) ->
+  #   return false unless node? and node.locationData?
+  #   nodeLocationData = node.locationData
+  #   (
+  #     nodeLocationData.first_line < locationData.first_line      or
+  #     nodeLocationData.first_line is locationData.first_line     and
+  #     nodeLocationData.first_column <= locationData.first_column
+  #   ) and
+  #   (
+  #     locationData.last_line < nodeLocationData.last_line      or
+  #     locationData.last_line is nodeLocationData.last_line     and
+  #     locationData.last_column <= nodeLocationData.last_column
+  #   )
 
   @declaredSymbols: (scope) ->
     name for { type, name } in scope.variables when @isScopedSymbol type, name
