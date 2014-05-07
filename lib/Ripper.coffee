@@ -76,6 +76,9 @@ class Ripper
 
       if child instanceof Code
         isDeclared = @isDeclared target, child, parent
+        console.log '-------------------------'
+        for expression in child.body.expressions
+          console.log inspect expression
         childRef = @findReference child, target, isDeclaredInParent or isDeclared
 
         if @hasTarget childRef.data, target
@@ -101,6 +104,7 @@ class Ripper
       return true if @isKeyOfObjectLiteral parent, child
 
       if @isSameLiteral child, target
+        # console.log inspect child
         data.push child
         return true
 
@@ -131,10 +135,10 @@ class Ripper
     last_column : end.column - 1
 
   @isEqualsLocationData: (a, b) ->
-    a.first_line is b.first_line     and
+    a.first_line   is b.first_line   and
     a.first_column is b.first_column and
-    a.last_line is b.last_line       and
-    a.last_column is b.last_column
+    a.last_line    is b.last_line    and
+    a.last_column  is b.last_column
 
   # @isContainsLocationData: (node, locationData) ->
   #   return false unless node? and node.locationData?
@@ -183,11 +187,16 @@ class Ripper
           child.compileRoot o
         else
           o.scope = parent.scope
+          # o.scope =
+          #   parent: parent
           child.compileNode o
+          # console.log '>'
+          # console.log inspect o.scope
         child.scope = o.scope
       symbols = @declaredSymbols child.scope
       return symbols.indexOf(target.value) isnt -1
     catch err
+      console.error err
     false
 
   @hasTarget: (refs, target) ->
