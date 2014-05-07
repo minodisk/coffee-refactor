@@ -55,7 +55,10 @@ class Ripper
           target = child.index
           return false
       else if child instanceof Literal
-        if @isContainsLocationData child, targetLocationData #TODO use @isEqualsLocationData()
+        # if @isContainsLocationData child, targetLocationData #TODO use @isEqualsLocationData()
+        #   unless @isEqualsLocationData child.locationData, targetLocationData
+        #     console.log inspect child
+        if @isEqualsLocationData child.locationData, targetLocationData
           target = child
           return false
 
