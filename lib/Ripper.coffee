@@ -1,8 +1,8 @@
 { nodes } = require 'coffee-script'
-n = { Value, Code, Literal, For, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Literal, For, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 { inspect } = require 'util'
-{ isString, uniq, some } = require 'lodash'
+{ isString, isArray, uniq, some } = require 'lodash'
 
 
 LEVEL_TOP = 1
@@ -16,25 +16,17 @@ class Ripper
   @find: ({ symbol, references }, targetLocationData) ->
     target = @findSymbol symbol, targetLocationData
     return [] unless target?
-    @findReference(references, target).data
+    if isArray target
+      console.log inspect target[0]
+      console.log inspect @findReference(references, target[0])
+    else
+      @findReference(references, target).data
 
   @findSymbol: (parent, targetLocationData) ->
     target = null
 
     parent.eachChild (child) =>
       # child.parent = parent
-
-      if child instanceof n.Access and
-         @isEqualsLocationData child.name.locationData, targetLocationData
-        console.log '------------------------'
-        console.log inspect child.name.locationData
-        console.log inspect targetLocationData
-        # console.log inspect parent.base
-        # some parent.properties, (property) ->
-        #   console.log property is child
-        #   console.log property
-        #   property is child
-        # return true
 
       # Break this loop if target is found
       return false if target?
@@ -46,6 +38,14 @@ class Ripper
       return true if @isKeyOfObjectAccess parent, child
       # Skip key in object literal
       return true if @isKeyOfObjectLiteral parent, child
+
+      # if child instanceof Access and
+      #    @isEqualsLocationData child.name.locationData, targetLocationData
+      #   target = [ parent.base ]
+      #   for property in parent.properties
+      #     target.push property
+      #     break if property is child
+      #   return false
 
       if child instanceof For
         if @isContainsLocationData child.name, targetLocationData
