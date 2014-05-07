@@ -1,5 +1,5 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Literal, For, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+n = { Value, Code, Literal, For, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { Range } = require 'atom'
 { inspect } = require 'util'
 { isString, uniq, some } = require 'lodash'
@@ -22,6 +22,20 @@ class Ripper
     target = null
 
     parent.eachChild (child) =>
+      # child.parent = parent
+
+      if child instanceof n.Access and
+         @isEqualsLocationData child.name.locationData, targetLocationData
+        console.log '------------------------'
+        console.log inspect child.name.locationData
+        console.log inspect targetLocationData
+        # console.log inspect parent.base
+        # some parent.properties, (property) ->
+        #   console.log property is child
+        #   console.log property
+        #   property is child
+        # return true
+
       # Break this loop if target is found
       return false if target?
       # Skip no locationData
@@ -41,7 +55,7 @@ class Ripper
           target = child.index
           return false
       else if child instanceof Literal
-        if @isContainsLocationData child, targetLocationData
+        if @isContainsLocationData child, targetLocationData #TODO use @isEqualsLocationData()
           target = child
           return false
 
@@ -114,17 +128,23 @@ class Ripper
     last_line   : end.row
     last_column : end.column - 1
 
+  @isEqualsLocationData: (a, b) ->
+    a.first_line is b.first_line     and
+    a.first_column is b.first_column and
+    a.last_line is b.last_line       and
+    a.last_column is b.last_column
+
   @isContainsLocationData: (node, locationData) ->
     return false unless node? and node.locationData?
     nodeLocationData = node.locationData
     (
-      nodeLocationData.first_line < locationData.first_line  or
-      nodeLocationData.first_line is locationData.first_line and
+      nodeLocationData.first_line < locationData.first_line      or
+      nodeLocationData.first_line is locationData.first_line     and
       nodeLocationData.first_column <= locationData.first_column
     ) and
     (
-      locationData.last_line < nodeLocationData.last_line or
-      locationData.last_line is nodeLocationData.last_line and
+      locationData.last_line < nodeLocationData.last_line      or
+      locationData.last_line is nodeLocationData.last_line     and
       locationData.last_column <= nodeLocationData.last_column
     )
 
@@ -189,8 +209,6 @@ class Ripper
     a.value is b.value
 
 
-  nodes: null
-
   destruct: ->
     delete @nodes
 
@@ -204,7 +222,6 @@ class Ripper
 
   find: (range) ->
     return [] unless @nodes?
-
     targetLocationData = Ripper.rangeToLocationData range
     foundNodes = Ripper.find @nodes, targetLocationData
     for { locationData }, i in foundNodes
