@@ -14,7 +14,6 @@ class Refactoring extends EventEmitter
     super()
 
     @ripper = new Ripper
-    @ripper.on 'error:compile', @onErrorCompile
 
     @editor.on 'grammar-changed', @checkGrammar
 
@@ -94,10 +93,13 @@ class Refactoring extends EventEmitter
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
-      @ripper.parse text
+      @ripper.parse text, @parseCallback
     if @isParsing
       @isParsing = false
       @emit 'parse:end'
 
-  onErrorCompile: (err) =>
-    @emit 'parse:error', err
+  parseCallback: (err) =>
+    if err?
+      @emit 'parse:error', err
+      return
+    @emit 'parse:success'

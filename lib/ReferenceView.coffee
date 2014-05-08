@@ -12,7 +12,6 @@ class ReferenceView extends View
     @isEnabled = false
 
   setEnabled: (@isEnabled) ->
-    console.log 'setEnabled:', @isEnabled
 
   highlight: (ranges) =>
     return unless @isEnabled
@@ -20,6 +19,5 @@ class ReferenceView extends View
     @highlightAt ranges
 
   highlightAt: (ranges) ->
-    console.log 'highlightAt:', ranges
     for range in ranges
       @append new MarkerView @editorView, @refactoring, range

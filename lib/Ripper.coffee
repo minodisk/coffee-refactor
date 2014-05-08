@@ -1,4 +1,3 @@
-{ EventEmitter } = require 'events'
 { nodes } = require 'coffee-script'
 { Value, Code, Literal, For, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../node_modules/coffee-script/lib/coffee-script/helpers'
@@ -13,7 +12,7 @@ Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 
 
 module.exports =
-class Ripper extends EventEmitter
+class Ripper
 
   @find: (root, targetLocationData) ->
     target = @findSymbol root, targetLocationData
@@ -218,13 +217,14 @@ class Ripper extends EventEmitter
   destruct: ->
     delete @nodes
 
-  parse: (code) ->
+  parse: (code, callback) ->
     try
       rawNodes = nodes code
     catch err
-      @emit 'error:compile', err
+      callback? err
       return
     @nodes = Ripper.generateNodes rawNodes
+    callback?()
 
   find: (range) ->
     return [] unless @nodes?

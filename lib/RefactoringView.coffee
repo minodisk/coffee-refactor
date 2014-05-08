@@ -16,6 +16,7 @@ class RefactoringingView extends View
     # Setup model
     @refactoring = new Refactoring @editorView.getEditor()
     @refactoring.on 'parse:error', @onParseError
+    @refactoring.on 'parse:success', @onParseSuccess
     @refactoring.on 'parse:start', @onParseStart
     @refactoring.on 'parse:end', @onParseEnd
 
@@ -28,8 +29,6 @@ class RefactoringingView extends View
     @append @referenceView
     @errorView = new ErrorView @editorView, @refactoring
     @append @errorView
-
-    console.log 'append complete'
 
   destruct: =>
     @remove()
@@ -65,6 +64,9 @@ class RefactoringingView extends View
   onParseError: (err) =>
     if err.location?
       @errorView.highlight [ LocationDataUtil.locationDataToRange(err.location) ], err.message
+
+  onParseSuccess: =>
+    @errorView.empty()
 
   onParseStart: =>
     @editorView.off 'cursor:moved', @onCursorMoved
