@@ -1,8 +1,9 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Literal, For, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Literal, For, Assign, Access } = nodesRef = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ flatten } = nodesRef = require '../node_modules/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { inspect } = require 'util'
-{ isString, isArray, uniq, some } = require 'lodash'
+{ isString, isArray, uniq, some } = _ = require 'lodash'
 
 
 LEVEL_TOP = 1
@@ -13,19 +14,19 @@ Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 module.exports =
 class Ripper
 
-  @find: ({ symbol, references }, targetLocationData) ->
-    target = @findSymbol symbol, targetLocationData
+  @find: (root, targetLocationData) ->
+    target = @findSymbol root, targetLocationData
     return [] unless target?
-    if isArray target
-      console.log inspect target[0]
-      console.log inspect @findReference(references, target[0])
-    else
-      @findReference(references, target).data
+    # if isArray target
+    #   console.log inspect target[0]
+    #   console.log inspect @findReference(root, target[0])
+    # else
+    @findReference(root, target).data
 
   @findSymbol: (parent, targetLocationData) ->
     target = null
 
-    parent.eachChild (child) =>
+    _.each parent._children, (child) =>
       # child.parent = parent
 
       # Break this loop if target is found
@@ -71,14 +72,12 @@ class Ripper
     isFixed = false
     data = []
 
-    parent.eachChild (child) =>
+    _.each parent._children, (child) =>
+    # parent.eachChild (child) =>
       return false if isFixed
 
       if child instanceof Code
         isDeclared = @isDeclared target, child, parent
-        console.log '-------------------------'
-        for expression in child.body.expressions
-          console.log inspect expression
         childRef = @findReference child, target, isDeclaredInParent or isDeclared
 
         if @hasTarget childRef.data, target
@@ -104,7 +103,6 @@ class Ripper
       return true if @isKeyOfObjectLiteral parent, child
 
       if @isSameLiteral child, target
-        # console.log inspect child
         data.push child
         return true
 
@@ -124,6 +122,26 @@ class Ripper
 
     data = uniq data
     { isFixed, data }
+
+  @isDeclared: (target, child, parent) ->
+    try
+      unless child.scope?
+        o = indent: ''
+        unless parent?
+          child.compileRoot o
+        else
+          o.scope = parent.scope
+          child.compileNode o
+        child.scope = o.scope
+      symbols = @declaredSymbols child.scope
+      return symbols.indexOf(target.value) isnt -1
+    catch err
+    false
+
+  @hasTarget: (refs, target) ->
+    some refs, (ref) =>
+      @isEqualLocationData(ref.locationData, target.locationData) and
+      @isSameLiteral(ref, target)
 
   @locationDataToRange: ({ first_line, first_column, last_line, last_column }) ->
     new Range [ first_line, first_column ], [ last_line, last_column + 1 ]
@@ -179,31 +197,6 @@ class Ripper
     parent instanceof Assign   and
     child instanceof Value
 
-  @isDeclared: (target, child, parent) ->
-    try
-      unless child.scope?
-        o = indent: ''
-        unless parent?
-          child.compileRoot o
-        else
-          o.scope = parent.scope
-          # o.scope =
-          #   parent: parent
-          child.compileNode o
-          # console.log '>'
-          # console.log inspect o.scope
-        child.scope = o.scope
-      symbols = @declaredSymbols child.scope
-      return symbols.indexOf(target.value) isnt -1
-    catch err
-      console.error err
-    false
-
-  @hasTarget: (refs, target) ->
-    some refs, (ref) =>
-      @isEqualLocationData(ref.locationData, target.locationData) and
-      @isSameLiteral(ref, target)
-
   @isEqualLocationData: (a, b) ->
     return false unless a? and b?
     a.first_line   is b.first_line   and
@@ -219,17 +212,35 @@ class Ripper
     b instanceof Literal                and
     a.value is b.value
 
+  @generateNodes: (parent) ->
+    return unless parent.children?
+    children = []
+    for attr in parent.children when parent[attr]
+      children.push parent[attr]
+    children = flatten children
+    for child in children
+      @generateNodes child
+    parent._children = children
+    parent
+
+    # unless parent._children?
+    #   children = for attr in parent.children when parent[attr]
+    #     parent[attr]
+    #   children = flatten children
+    #   parent._children = children
+    # parent
+
 
   destruct: ->
     delete @nodes
 
   parse: (code) ->
     try
-      @nodes =
-        symbol    : nodes code
-        references: nodes code
+      rawNodes = nodes code
     catch err
-      delete @nodes
+      err #TODO output at the next step
+      return
+    @nodes = Ripper.generateNodes rawNodes
 
   find: (range) ->
     return [] unless @nodes?
