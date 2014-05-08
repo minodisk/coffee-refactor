@@ -1,3 +1,7 @@
+# v0.3.2 on 2014/05/
+
+* Implement highlighting compile error experimentally.
+
 # v0.3.1 on 2014/05/08
 
 * Fixed an issue causing not working highlight in Atom v0.94.0.

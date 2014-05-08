@@ -2,6 +2,8 @@
 
 Refactor CoffeeScript for [Atom](https://atom.io/).
 
+## Reference Finder
+
 ### Highlight references
 
 Highlight all references of a symbol under the cursor.
@@ -30,11 +32,17 @@ Rename all references of a symbol under the cursor.
 * for-in value and index
 * for-of key and value
 
-## Custom Keymap
+## Highlight Compile Error (EXPERIMENTAL)
+
+
+
+## Custom Setting
+
+### Keymap
 
 Override [keymap](kaymaps/coffee-refactor.cson) with `Atom > Open Your Keymap`.
 
-## Custom Style
+### Style
 
 Override [stylesheet](stylesheets/coffee-refactor.less) with `Atom > Open Your Stylesheet`.
 
