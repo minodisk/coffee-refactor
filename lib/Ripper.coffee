@@ -4,6 +4,7 @@
 { Range } = require 'atom'
 { inspect } = require 'util'
 { isString, isArray, uniq, some } = _ = require 'lodash'
+{ locationDataToRange, rangeToLocationData, isEqualsLocationData } = require './LocationDataUtil'
 
 
 LEVEL_TOP = 1
@@ -39,7 +40,7 @@ class Ripper
       return true if @isKeyOfObjectLiteral parent, child
 
       # if child instanceof Access and
-      #    @isEqualsLocationData child.name.locationData, targetLocationData
+      #    isEqualsLocationData child.name.locationData, targetLocationData
       #   target = [ parent.base ]
       #   for property in parent.properties
       #     target.push property
@@ -48,15 +49,15 @@ class Ripper
 
       if child instanceof For
         if child.name? and
-           @isEqualsLocationData child.name.locationData, targetLocationData
+           isEqualsLocationData child.name.locationData, targetLocationData
           target = child.name
           return false
         else if child.index? and
-                @isEqualsLocationData child.index.locationData, targetLocationData
+                isEqualsLocationData child.index.locationData, targetLocationData
           target = child.index
           return false
       else if child instanceof Literal
-        if @isEqualsLocationData child.locationData, targetLocationData
+        if isEqualsLocationData child.locationData, targetLocationData
           target = child
           return false
 
@@ -137,23 +138,8 @@ class Ripper
 
   @hasTarget: (refs, target) ->
     some refs, (ref) =>
-      @isEqualLocationData(ref.locationData, target.locationData) and
+      isEqualsLocationData(ref.locationData, target.locationData) and
       @isSameLiteral(ref, target)
-
-  @locationDataToRange: ({ first_line, first_column, last_line, last_column }) ->
-    new Range [ first_line, first_column ], [ last_line, last_column + 1 ]
-
-  @rangeToLocationData: ({ start, end }) ->
-    first_line  : start.row
-    first_column: start.column
-    last_line   : end.row
-    last_column : end.column - 1
-
-  @isEqualsLocationData: (a, b) ->
-    a.first_line   is b.first_line   and
-    a.first_column is b.first_column and
-    a.last_line    is b.last_line    and
-    a.last_column  is b.last_column
 
   @declaredSymbols: (scope) ->
     name for { type, name } in scope.variables when @isScopedSymbol type, name
@@ -179,13 +165,6 @@ class Ripper
     child is parent.variable   and
     parent instanceof Assign   and
     child instanceof Value
-
-  @isEqualLocationData: (a, b) ->
-    return false unless a? and b?
-    a.first_line   is b.first_line   and
-    a.first_column is b.first_column and
-    a.last_line    is b.last_line    and
-    a.last_column  is b.last_column
 
   @isSameLiteral: (a, b) ->
     a?                                  and
@@ -228,7 +207,7 @@ class Ripper
 
   find: (range) ->
     return [] unless @nodes?
-    targetLocationData = Ripper.rangeToLocationData range
+    targetLocationData = rangeToLocationData range
     foundNodes = Ripper.find @nodes, targetLocationData
     for { locationData }, i in foundNodes
-      Ripper.locationDataToRange locationData
+      locationDataToRange locationData
