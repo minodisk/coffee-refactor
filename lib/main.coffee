@@ -12,7 +12,7 @@ new class Main
 
     atom.workspaceView.command 'coffee-refactor:toggle-highlight', (e) =>
       @isHighlight = !@isHighlight
-      @callViews e, 'setHighlight', @isHighlight
+      @callViews e, 'setEnabled', @isHighlight
     atom.workspaceView.command 'coffee-refactor:rename', (e) =>
       @callActiveViews e, 'rename'
     atom.workspaceView.command 'coffee-refactor:done', (e) =>
@@ -50,7 +50,7 @@ new class Main
     editor = editorView.getEditor()
     editor.on 'destroyed', onEditorDestroyed
 
-    refactoringView.setHighlight @isHighlight
+    refactoringView.setEnabled @isHighlight
     @refactoringViews.push refactoringView
 
   onEditorViewDestroyed: (refactoringView) ->

@@ -1,6 +1,7 @@
+{ EventEmitter } = require 'events'
 { nodes } = require 'coffee-script'
-{ Value, Code, Literal, For, Assign, Access } = nodesRef = require '../node_modules/coffee-script/lib/coffee-script/nodes'
-{ flatten } = nodesRef = require '../node_modules/coffee-script/lib/coffee-script/helpers'
+{ Value, Code, Literal, For, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ flatten } = require '../node_modules/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { inspect } = require 'util'
 { isString, isArray, uniq, some } = _ = require 'lodash'
@@ -12,7 +13,7 @@ Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 
 
 module.exports =
-class Ripper
+class Ripper extends EventEmitter
 
   @find: (root, targetLocationData) ->
     target = @findSymbol root, targetLocationData
@@ -27,8 +28,6 @@ class Ripper
     target = null
 
     _.each parent._children, (child) =>
-      # child.parent = parent
-
       # Break this loop if target is found
       return false if target?
       # Skip no locationData
@@ -73,7 +72,6 @@ class Ripper
     data = []
 
     _.each parent._children, (child) =>
-    # parent.eachChild (child) =>
       return false if isFixed
 
       if child instanceof Code
@@ -158,20 +156,6 @@ class Ripper
     a.last_line    is b.last_line    and
     a.last_column  is b.last_column
 
-  # @isContainsLocationData: (node, locationData) ->
-  #   return false unless node? and node.locationData?
-  #   nodeLocationData = node.locationData
-  #   (
-  #     nodeLocationData.first_line < locationData.first_line      or
-  #     nodeLocationData.first_line is locationData.first_line     and
-  #     nodeLocationData.first_column <= locationData.first_column
-  #   ) and
-  #   (
-  #     locationData.last_line < nodeLocationData.last_line      or
-  #     locationData.last_line is nodeLocationData.last_line     and
-  #     locationData.last_column <= nodeLocationData.last_column
-  #   )
-
   @declaredSymbols: (scope) ->
     name for { type, name } in scope.variables when @isScopedSymbol type, name
 
@@ -238,7 +222,7 @@ class Ripper
     try
       rawNodes = nodes code
     catch err
-      err #TODO output at the next step
+      @emit 'error:compile', err
       return
     @nodes = Ripper.generateNodes rawNodes
 

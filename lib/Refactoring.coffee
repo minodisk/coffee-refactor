@@ -14,6 +14,7 @@ class Refactoring extends EventEmitter
     super()
 
     @ripper = new Ripper
+    @ripper.on 'error:compile', @onErrorCompile
 
     @editor.on 'grammar-changed', @checkGrammar
 
@@ -97,3 +98,6 @@ class Refactoring extends EventEmitter
     if @isParsing
       @isParsing = false
       @emit 'parse:end'
+
+  onErrorCompile: (err) =>
+    @emit 'parse:error', err
