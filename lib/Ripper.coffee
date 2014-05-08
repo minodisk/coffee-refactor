@@ -1,8 +1,9 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Literal, For, Assign } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Literal, For, Assign, Access } = nodesRef = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ flatten } = nodesRef = require '../node_modules/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { inspect } = require 'util'
-{ isString, uniq, some } = require 'lodash'
+{ isString, isArray, uniq, some } = _ = require 'lodash'
 
 
 LEVEL_TOP = 1
@@ -13,16 +14,22 @@ Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 module.exports =
 class Ripper
 
-  @find: ({ symbol, references }, targetLocationData) ->
-    target = @findSymbol symbol, targetLocationData
+  @find: (root, targetLocationData) ->
+    target = @findSymbol root, targetLocationData
     return [] unless target?
-    @findReference(references, target).data
+    # if isArray target
+    #   console.log inspect target[0]
+    #   console.log inspect @findReference(root, target[0])
+    # else
+    @findReference(root, target).data
 
   @findSymbol: (parent, targetLocationData) ->
     target = null
 
-    parent.eachChild (child) =>
-      # Skip if target is found
+    _.each parent._children, (child) =>
+      # child.parent = parent
+
+      # Break this loop if target is found
       return false if target?
       # Skip no locationData
       return true unless child.locationData?
@@ -33,15 +40,25 @@ class Ripper
       # Skip key in object literal
       return true if @isKeyOfObjectLiteral parent, child
 
+      # if child instanceof Access and
+      #    @isEqualsLocationData child.name.locationData, targetLocationData
+      #   target = [ parent.base ]
+      #   for property in parent.properties
+      #     target.push property
+      #     break if property is child
+      #   return false
+
       if child instanceof For
-        if @isContainsLocationData child.name, targetLocationData
+        if child.name? and
+           @isEqualsLocationData child.name.locationData, targetLocationData
           target = child.name
           return false
-        else if @isContainsLocationData child.index, targetLocationData
+        else if child.index? and
+                @isEqualsLocationData child.index.locationData, targetLocationData
           target = child.index
           return false
       else if child instanceof Literal
-        if @isContainsLocationData child, targetLocationData
+        if @isEqualsLocationData child.locationData, targetLocationData
           target = child
           return false
 
@@ -55,7 +72,8 @@ class Ripper
     isFixed = false
     data = []
 
-    parent.eachChild (child) =>
+    _.each parent._children, (child) =>
+    # parent.eachChild (child) =>
       return false if isFixed
 
       if child instanceof Code
@@ -105,57 +123,6 @@ class Ripper
     data = uniq data
     { isFixed, data }
 
-  @locationDataToRange: ({ first_line, first_column, last_line, last_column }) ->
-    new Range [ first_line, first_column ], [ last_line, last_column + 1 ]
-
-  @rangeToLocationData: ({ start, end }) ->
-    first_line  : start.row
-    first_column: start.column
-    last_line   : end.row
-    last_column : end.column - 1
-
-  @isContainsLocationData: (node, locationData) ->
-    return false unless node? and node.locationData?
-    nodeLocationData = node.locationData
-    (
-      nodeLocationData.first_line < locationData.first_line  or
-      nodeLocationData.first_line is locationData.first_line and
-      nodeLocationData.first_column <= locationData.first_column
-    ) and
-    (
-      locationData.last_line < nodeLocationData.last_line or
-      locationData.last_line is nodeLocationData.last_line and
-      locationData.last_column <= nodeLocationData.last_column
-    )
-
-  @declaredSymbols: (scope) ->
-    name for { type, name } in scope.variables when @isScopedSymbol type, name
-
-  @isScopedSymbol: (type, name) ->
-    (
-      type is 'var'   or
-      type is 'param'
-    )                       and
-    isString(name)        and
-    name.charAt(0) isnt '_'
-
-  @isPrimitive: (node) ->
-    node.isString?()       or
-    node.isSimpleNumber?() or
-    node.isHexNumber?()    or
-    node.isRegex?()
-
-  @isKeyOfObjectAccess: (parent, child) ->
-    parent.soak is false          and
-    child.asKey                   and
-    child.unfoldedSoak isnt false
-
-  @isKeyOfObjectLiteral: (parent, child) ->
-    parent.context is 'object' and
-    child is parent.variable   and
-    parent instanceof Assign   and
-    child instanceof Value
-
   @isDeclared: (target, child, parent) ->
     try
       unless child.scope?
@@ -176,11 +143,65 @@ class Ripper
       @isEqualLocationData(ref.locationData, target.locationData) and
       @isSameLiteral(ref, target)
 
+  @locationDataToRange: ({ first_line, first_column, last_line, last_column }) ->
+    new Range [ first_line, first_column ], [ last_line, last_column + 1 ]
+
+  @rangeToLocationData: ({ start, end }) ->
+    first_line  : start.row
+    first_column: start.column
+    last_line   : end.row
+    last_column : end.column - 1
+
+  @isEqualsLocationData: (a, b) ->
+    a.first_line   is b.first_line   and
+    a.first_column is b.first_column and
+    a.last_line    is b.last_line    and
+    a.last_column  is b.last_column
+
+  # @isContainsLocationData: (node, locationData) ->
+  #   return false unless node? and node.locationData?
+  #   nodeLocationData = node.locationData
+  #   (
+  #     nodeLocationData.first_line < locationData.first_line      or
+  #     nodeLocationData.first_line is locationData.first_line     and
+  #     nodeLocationData.first_column <= locationData.first_column
+  #   ) and
+  #   (
+  #     locationData.last_line < nodeLocationData.last_line      or
+  #     locationData.last_line is nodeLocationData.last_line     and
+  #     locationData.last_column <= nodeLocationData.last_column
+  #   )
+
+  @declaredSymbols: (scope) ->
+    name for { type, name } in scope.variables when @isScopedSymbol type, name
+
+  @isScopedSymbol: (type, name) ->
+    (type is 'var' or type is 'param') and
+    isString(name)                     and
+    name.charAt(0) isnt '_'
+
+  @isPrimitive: (node) ->
+    node.isString?()       or
+    node.isSimpleNumber?() or
+    node.isHexNumber?()    or
+    node.isRegex?()
+
+  @isKeyOfObjectAccess: (parent, child) ->
+    parent.soak is false          and
+    child.asKey                   and
+    child.unfoldedSoak isnt false
+
+  @isKeyOfObjectLiteral: (parent, child) ->
+    parent.context is 'object' and
+    child is parent.variable   and
+    parent instanceof Assign   and
+    child instanceof Value
+
   @isEqualLocationData: (a, b) ->
     return false unless a? and b?
-    a.first_line   is b.first_line   and \
-    a.first_column is b.first_column and \
-    a.last_line    is b.last_line    and \
+    a.first_line   is b.first_line   and
+    a.first_column is b.first_column and
+    a.last_line    is b.last_line    and
     a.last_column  is b.last_column
 
   @isSameLiteral: (a, b) ->
@@ -191,23 +212,38 @@ class Ripper
     b instanceof Literal                and
     a.value is b.value
 
+  @generateNodes: (parent) ->
+    return unless parent.children?
+    children = []
+    for attr in parent.children when parent[attr]
+      children.push parent[attr]
+    children = flatten children
+    for child in children
+      @generateNodes child
+    parent._children = children
+    parent
 
-  nodes: null
+    # unless parent._children?
+    #   children = for attr in parent.children when parent[attr]
+    #     parent[attr]
+    #   children = flatten children
+    #   parent._children = children
+    # parent
+
 
   destruct: ->
     delete @nodes
 
   parse: (code) ->
     try
-      @nodes =
-        symbol    : nodes code
-        references: nodes code
+      rawNodes = nodes code
     catch err
-      delete @nodes
+      err #TODO output at the next step
+      return
+    @nodes = Ripper.generateNodes rawNodes
 
   find: (range) ->
     return [] unless @nodes?
-
     targetLocationData = Ripper.rangeToLocationData range
     foundNodes = Ripper.find @nodes, targetLocationData
     for { locationData }, i in foundNodes
