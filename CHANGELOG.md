@@ -1,3 +1,7 @@
+# v0.3.1 on 2014/05/08
+
+* Fixed an issue causing not working highlight in Atom v0.94.0.
+
 # v0.3.0 on 2014/05/04
 
 * Refactored code.

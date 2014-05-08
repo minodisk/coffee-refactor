@@ -73,9 +73,9 @@ class Refactoring extends EventEmitter
 
   getReferenceRanges: ->
     cursor = @editor.cursors[0]
-    return unless cursor?
+    return [] unless cursor?
     range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
-    return if range.isEmpty()
+    return [] if range.isEmpty()
     @ripper.find range
 
   ###
