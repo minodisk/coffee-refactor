@@ -8,6 +8,5 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
 '.editor:not(.mini)':
-  'ctrl-alt-r': 'coffee-refactor:toggle-highlight'
   'ctrl-r': 'coffee-refactor:rename'
   'enter': 'coffee-refactor:done'

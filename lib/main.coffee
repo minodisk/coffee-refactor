@@ -8,13 +8,8 @@ new class Main
     highlightReference: true
 
   activate: (state) ->
-    # @isHighlight = false
-
     @refactoringViews = []
     atom.workspaceView.eachEditorView @onEditorViewCreated
-    # atom.workspaceView.command 'coffee-refactor:toggle-highlight', (e) =>
-    #   @isHighlight = !@isHighlight
-    #   @callViews e, 'setEnabled', @isHighlight
     atom.workspaceView.command 'coffee-refactor:rename', (e) =>
       @callActiveViews e, 'rename'
     atom.workspaceView.command 'coffee-refactor:done', (e) =>
@@ -52,7 +47,6 @@ new class Main
     editor = editorView.getEditor()
     editor.on 'destroyed', onEditorDestroyed
 
-    # refactoringView.setEnabled @isHighlight
     @refactoringViews.push refactoringView
 
   onEditorViewDestroyed: (refactoringView) ->

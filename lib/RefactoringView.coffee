@@ -5,6 +5,7 @@ ErrorView = require './background/ErrorView'
 GutterView = require './gutter/GutterView'
 LocationDataUtil = require './LocationDataUtil'
 { config } = atom
+
 module.exports =
 class RefactoringingView extends View
 
@@ -44,7 +45,6 @@ class RefactoringingView extends View
 
     @editorView.off 'cursor:moved', @onCursorMoved
 
-    delete @isHighlight
     delete @refactoring
     delete @editorView
 

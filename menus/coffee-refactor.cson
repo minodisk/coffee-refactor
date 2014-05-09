@@ -10,9 +10,6 @@
     'submenu': [
         'label': 'Rename References'
         'command': 'coffee-refactor:rename'
-      ,
-        'label': 'Toggle Highlight References'
-        'command': 'coffee-refactor:toggle-highlight'
     ]
   ]
 ]
