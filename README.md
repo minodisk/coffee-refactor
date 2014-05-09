@@ -46,13 +46,8 @@ You can toggle enabled in settings view.
 
 ## Custom Setting
 
-### Keymap
-
-Override [keymap](kaymaps/coffee-refactor.cson) with `Atom > Open Your Keymap`.
-
-### Style
-
-Override [stylesheet](stylesheets/coffee-refactor.less) with `Atom > Open Your Stylesheet`.
+* Override [keymap](kaymaps/coffee-refactor.cson) with `Atom > Open Your Keymap`.
+* Override [stylesheet](stylesheets/coffee-refactor.less) with `Atom > Open Your Stylesheet`.
 
 ## See
 
