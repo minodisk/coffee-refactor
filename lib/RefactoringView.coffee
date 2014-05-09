@@ -70,10 +70,11 @@ class RefactoringingView extends View
 
   onParseError: ({ location, message }) =>
     return unless location?
+    range = LocationDataUtil.locationDataToRange location
     err =
-      range  : LocationDataUtil.locationDataToRange location
+      range  : range
       message: message
-    @errorView.update [ err ]
+    @errorView.update [ range ]
     @gutterView.update [ err ]
 
   onParseSuccess: =>
@@ -95,4 +96,4 @@ class RefactoringingView extends View
       @timeoutId = setTimeout @updateReferences, 0
 
   updateReferences: =>
-    @referenceView.highlight @refactoring.getReferenceRanges()
+    @referenceView.update @refactoring.getReferenceRanges()

@@ -1,25 +1,27 @@
-{ config } = atom
 { View } = require 'atom'
 MarkerView = require './MarkerView'
+{ config } = atom
 
 module.exports =
-class ErrorView extends View
+class HighlightView extends View
+
+  @className: ''
 
   @content: ->
-    @div class: 'error'
+    @div class: @className
+
+
+  configProperty: ''
 
   constructor: (@editorView, @refactoring) ->
     super()
-    config.observe 'coffee-refactor.highlightError', =>
-      @setEnabled config.get 'coffee-refactor.highlightError'
+    config.observe @configProperty, =>
+      @setEnabled config.get @configProperty
 
-  update: (@errors) ->
+  update: (ranges) ->
     @empty()
-    @render()
-
-  render: =>
-    return unless @errors?.length
-    for { range, message } in @errors
+    return unless ranges?.length
+    for range in ranges
       @append new MarkerView @editorView, @refactoring, range
 
   setEnabled: (isEnabled) ->

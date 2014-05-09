@@ -1,23 +1,10 @@
-{ View } = require 'atom'
-MarkerView = require './MarkerView'
+HighlightView = require './HighlightView'
 
 module.exports =
-class ReferenceView extends View
+class ReferenceView extends HighlightView
 
-  @content: ->
-    @div class: 'reference'
+  @className: 'reference'
+  configProperty: 'coffee-refactor.highlightReference'
 
-  constructor: (@editorView, @refactoring) ->
-    super()
-    @isEnabled = false
-
-  setEnabled: (@isEnabled) ->
-
-  highlight: (ranges) =>
-    return unless @isEnabled
-    @empty()
-    @highlightAt ranges
-
-  highlightAt: (ranges) ->
-    for range in ranges
-      @append new MarkerView @editorView, @refactoring, range
+  constructor: ->
+    super
