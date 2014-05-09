@@ -3,11 +3,6 @@
   "main": "./lib/main",
   "version": "0.3.1",
   "description": "CoffeeScript refactoring",
-  "activationEvents": [
-    "coffee-refactor:toggle-highlight",
-    "coffee-refactor:rename",
-    "coffee-refactor:done"
-  ],
   "repository": "https://github.com/minodisk/coffee-refactor",
   "license": "MIT",
   "auther": {

@@ -1,18 +1,15 @@
 RefactoringView = require './RefactoringView'
 
-
 module.exports =
 new class Main
 
-  activate: (state) ->
-    @isHighlight = false
+  configDefaults:
+    highlightError    : true
+    highlightReference: true
 
+  activate: (state) ->
     @refactoringViews = []
     atom.workspaceView.eachEditorView @onEditorViewCreated
-
-    atom.workspaceView.command 'coffee-refactor:toggle-highlight', (e) =>
-      @isHighlight = !@isHighlight
-      @callViews e, 'setHighlight', @isHighlight
     atom.workspaceView.command 'coffee-refactor:rename', (e) =>
       @callActiveViews e, 'rename'
     atom.workspaceView.command 'coffee-refactor:done', (e) =>
@@ -26,9 +23,9 @@ new class Main
     # console.log 'serialize'
 
 
-  callViews: (e, methodName, args...) ->
-    for view, i in @refactoringViews
-      view[methodName].apply view, args
+  # callViews: (e, methodName, args...) ->
+  #   for view, i in @refactoringViews
+  #     view[methodName].apply view, args
 
   callActiveViews: (e, methodName, args...) ->
     activePaneItem = atom.workspaceView.getActivePaneItem()
@@ -50,7 +47,6 @@ new class Main
     editor = editorView.getEditor()
     editor.on 'destroyed', onEditorDestroyed
 
-    refactoringView.setHighlight @isHighlight
     @refactoringViews.push refactoringView
 
   onEditorViewDestroyed: (refactoringView) ->
