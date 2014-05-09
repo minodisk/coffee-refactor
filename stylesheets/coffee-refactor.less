@@ -1,28 +1,7 @@
 @import "octicon-utf-codes.less";
 @import "ui-variables.less";
+
 .editor {
-  .gutter {
-    .line-number {
-      &.coffee-refactor-warning {
-        .icon-right {
-          visibility: visible;
-          &:before {
-            content: @alert;
-            color: @text-color-warning;
-          }
-        }
-      }
-      &.coffee-refactor-error {
-        .icon-right {
-          visibility: visible;
-          &:before {
-            content: @alert;
-            color: @text-color-error;
-          }
-        }
-      }
-    }
-  }
   .coffee-refactor {
     .reference {
       .marker {
@@ -45,11 +24,37 @@
       }
     }
     .error {
+      &.is-disabled {
+        display: none;
+      }
       .marker {
         .region {
           position: absolute;
           box-sizing: border-box;
           border-bottom: 1px dotted rgba(255, 0, 0, 1);
+        }
+      }
+    }
+  }
+
+  .gutter {
+    .line-number {
+      &.coffee-refactor-warning {
+        .icon-right {
+          visibility: visible;
+          &:before {
+            content: @info;
+            color: @text-color-warning;
+          }
+        }
+      }
+      &.coffee-refactor-error {
+        .icon-right {
+          visibility: visible;
+          &:before {
+            content: @alert;
+            color: @text-color-error;
+          }
         }
       }
     }

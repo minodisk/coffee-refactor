@@ -2,8 +2,9 @@
 Refactoring = require './Refactoring'
 ReferenceView = require './background/ReferenceView'
 ErrorView = require './background/ErrorView'
+GutterView = require './gutter/GutterView'
 LocationDataUtil = require './LocationDataUtil'
-
+{ config } = atom
 module.exports =
 class RefactoringingView extends View
 
@@ -29,6 +30,12 @@ class RefactoringingView extends View
     @append @referenceView
     @errorView = new ErrorView @editorView, @refactoring
     @append @errorView
+
+    # Setup gutter view
+    @gutterView = new GutterView @editorView.gutter
+
+    config.observe 'coffee-refactor.highlightReference', ->
+      config.get 'coffee-refactor.highlightReference'
 
   destruct: =>
     @remove()
@@ -61,12 +68,17 @@ class RefactoringingView extends View
     if isEnabled
       @updateReferences()
 
-  onParseError: (err) =>
-    if err.location?
-      @errorView.highlight [ LocationDataUtil.locationDataToRange(err.location) ], err.message
+  onParseError: ({ location, message }) =>
+    return unless location?
+    err =
+      range  : LocationDataUtil.locationDataToRange location
+      message: message
+    @errorView.update [ err ]
+    @gutterView.update [ err ]
 
   onParseSuccess: =>
-    @errorView.empty()
+    @errorView.update()
+    @gutterView.update()
 
   onParseStart: =>
     @editorView.off 'cursor:moved', @onCursorMoved
