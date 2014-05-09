@@ -10,7 +10,8 @@ Highlight all references of a symbol under the cursor.
 
 ![capture_highlight](https://cloud.githubusercontent.com/assets/514164/2870666/5a3aafbe-d2d6-11e3-959f-14957255a980.gif)
 
-You can toggle enabled.
+You can toggle enabled from settings view.
+
 1. Open setting with `Atom > Preferences`.
 2. Input 'coffee refactor' to `Filter package` and select 'Coffee Refactor' package.
 3. Toggle checkbox named `Highlight Reference`.
@@ -37,7 +38,8 @@ Rename all references of a symbol under the cursor.
 
 ## Highlight Compile Error (EXPERIMENTAL)
 
-You can toggle enabled.
+You can toggle enabled from settings view.
+
 1. Open setting with `Atom > Preferences`.
 2. Input 'coffee refactor' to `Filter package` and select 'Coffee Refactor' package.
 3. Toggle checkbox named `Highlight Error`.
