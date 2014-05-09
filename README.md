@@ -8,7 +8,7 @@ Refactor CoffeeScript for [Atom](https://atom.io/).
 
 Highlight all references of a symbol under the cursor.
 
-![capture_highlight](https://cloud.githubusercontent.com/assets/514164/2870666/5a3aafbe-d2d6-11e3-959f-14957255a980.gif)
+![capture_reference](https://cloud.githubusercontent.com/assets/514164/2929355/b4fe6d30-d788-11e3-88c3-e65c0046d3fc.gif)
 
 You can toggle enabled in settings view.
 
@@ -20,7 +20,7 @@ You can toggle enabled in settings view.
 
 Rename all references of a symbol under the cursor.
 
-![capture_rename](https://cloud.githubusercontent.com/assets/514164/2870667/63182d8c-d2d6-11e3-854b-8c196becfd60.gif)
+![capture_rename](https://cloud.githubusercontent.com/assets/514164/2929354/b4e848d4-d788-11e3-99c2-620f406d5e6f.gif)
 
 1. Set cursor to symbol.
 2. Start renaming with `ctrl-r`.
@@ -37,6 +37,8 @@ Rename all references of a symbol under the cursor.
 * for-of key and value
 
 ## Highlight Compile Error (EXPERIMENTAL)
+
+![capture_error](https://cloud.githubusercontent.com/assets/514164/2929353/b4cbe374-d788-11e3-8fc0-b28ef203bab3.gif)
 
 You can toggle enabled in settings view.
 

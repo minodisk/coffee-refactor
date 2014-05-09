@@ -1,6 +1,6 @@
-tmp = [ 0, 1 ]
-fib = (i) ->
-  return tmp[i] if tmp[i]?
-  tmp[i] = fib(i - 1) + fib(i - 2)
-for i in [0..10]
-  console.log i, fib i
+cache = [ 0, 1 ]
+fibonacci = (n) ->
+  return cache[n] if cache[n]?
+  cache[n] = fibonacci(n - 1) + fibonacci(n - 2)
+for index in [0..10]
+  console.log index, fibonacci index

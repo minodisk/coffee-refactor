@@ -1,6 +1,6 @@
 # v0.3.2 on 2014/05/09
 
-* Add checkbox for toggling highlight enabled: discard keybinding `ctrl-alt-r`.
+* Use setting view to toggle highlighting enabled.
 * Add an implementation of highlighting compile error experimentally.
 
 # v0.3.1 on 2014/05/08
