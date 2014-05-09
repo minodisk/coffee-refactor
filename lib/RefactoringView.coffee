@@ -1,7 +1,7 @@
 { View } = require 'atom'
 Refactoring = require './Refactoring'
-ReferenceView = require './ReferenceView'
-ErrorView = require './ErrorView'
+ReferenceView = require './background/ReferenceView'
+ErrorView = require './background/ErrorView'
 LocationDataUtil = require './LocationDataUtil'
 
 module.exports =

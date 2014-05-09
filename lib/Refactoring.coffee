@@ -16,7 +16,6 @@ class Refactoring extends EventEmitter
     @ripper = new Ripper
 
     @editor.on 'grammar-changed', @checkGrammar
-
     @checkGrammar()
 
   destruct: =>

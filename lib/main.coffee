@@ -4,6 +4,10 @@ RefactoringView = require './RefactoringView'
 module.exports =
 new class Main
 
+  configDefaults:
+    highlightReference: true
+    highlightError    : true
+
   activate: (state) ->
     @isHighlight = false
 
