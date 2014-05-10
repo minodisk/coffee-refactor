@@ -1,3 +1,7 @@
+# v0.3.3 on 2014/05/10
+
+* Fixed an issue wrong error range.
+
 # v0.3.2 on 2014/05/09
 
 * Use setting view to toggle highlighting enabled.
