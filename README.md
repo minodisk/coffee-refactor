@@ -38,7 +38,7 @@ Rename all references of a symbol under the cursor.
 
 ## Highlight Compile Error (EXPERIMENTAL)
 
-![capture_error](https://cloud.githubusercontent.com/assets/514164/2929353/b4cbe374-d788-11e3-8fc0-b28ef203bab3.gif)
+![capture_error](https://cloud.githubusercontent.com/assets/514164/2936037/568a47d8-d841-11e3-84d4-76ba1a8f69b6.gif)
 
 You can toggle enabled in settings view.
 
