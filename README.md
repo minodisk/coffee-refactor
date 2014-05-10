@@ -23,9 +23,9 @@ Rename all references of a symbol under the cursor.
 ![capture_rename](https://cloud.githubusercontent.com/assets/514164/2929354/b4e848d4-d788-11e3-99c2-620f406d5e6f.gif)
 
 1. Set cursor to symbol.
-2. Start renaming with `ctrl-r`.
+2. Start renaming using `ctrl-r`.
 3. Type new name.
-4. Finish renaming with `enter`.
+4. Finish renaming using `enter`.
 
 ### Supported Symbols
 
