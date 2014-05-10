@@ -61,7 +61,7 @@
 
 # v0.1.7-v0.1.8 on 2014/04/15
 
-* Support highlighting.
+* Support highlighting references.
 
 # v0.1.6 on 2014/04/12
 
