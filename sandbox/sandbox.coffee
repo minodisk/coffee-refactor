@@ -18,9 +18,9 @@ multi
 line
 string
 """
-/wtf\sjs/
+/aaa\sjs/
 ///
-wtf
+aaa
 \s
 js
 ///
