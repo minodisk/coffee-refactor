@@ -3,7 +3,7 @@ Refactoring = require './Refactoring'
 ReferenceView = require './background/ReferenceView'
 ErrorView = require './background/ErrorView'
 GutterView = require './gutter/GutterView'
-LocationDataUtil = require './LocationDataUtil'
+{ locationDataToRange } = require './utils/LocationDataUtil'
 { config } = atom
 
 module.exports =
@@ -70,7 +70,7 @@ class RefactoringingView extends View
 
   onParseError: ({ location, message }) =>
     return unless location?
-    range = LocationDataUtil.locationDataToRange location
+    range = locationDataToRange location
     err =
       range  : range
       message: message
