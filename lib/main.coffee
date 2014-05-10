@@ -22,11 +22,6 @@ new class Main
   serialize: ->
     # console.log 'serialize'
 
-
-  # callViews: (e, methodName, args...) ->
-  #   for view, i in @refactoringViews
-  #     view[methodName].apply view, args
-
   callActiveViews: (e, methodName, args...) ->
     activePaneItem = atom.workspaceView.getActivePaneItem()
     isCalled = false
@@ -36,7 +31,6 @@ new class Main
 
     unless isCalled
       e.abortKeyBinding()
-
 
   onEditorViewCreated: (editorView) =>
     refactoringView = new RefactoringView editorView
