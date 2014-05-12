@@ -11,7 +11,7 @@ class Watcher
   constructor: (@editorView) ->
     @editor = @editorView.editor
 
-    console.log 'construct:', @editor.getTitle()
+    # console.log 'construct:', @editor.getTitle()
 
     atom.workspaceView.command 'coffee-refactor:rename', @onRename
     atom.workspaceView.command 'coffee-refactor:done', @onDone
@@ -20,7 +20,7 @@ class Watcher
     @checkGrammar()
 
   destruct: =>
-    console.log 'destruct:', @editor.getTitle()
+    # console.log 'destruct:', @editor.getTitle()
 
     @inactivate()
 
@@ -41,7 +41,7 @@ class Watcher
   ###
 
   checkGrammar: =>
-    console.log 'checkGrammar:', @editor.getTitle()
+    # console.log 'checkGrammar:', @editor.getTitle()
 
     @inactivate()
     @isActive = @editor.getGrammar().name is 'CoffeeScript'
@@ -208,6 +208,8 @@ class Watcher
     delete @renameInfo
 
   onDone: (e) =>
+    console.log 'onDone', @editor.getTitle(), @isActive, @isThisEditorActive(), @renameInfo
+
     unless @isActive and @isThisEditorActive()
       e.abortKeyBinding()
       return
