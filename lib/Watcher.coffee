@@ -11,6 +11,41 @@ class Watcher
   constructor: (@editorView) ->
     @editor = @editorView.editor
 
+    console.log 'construct:', @editor.getTitle()
+
+    atom.workspaceView.command 'coffee-refactor:rename', @onRename
+    atom.workspaceView.command 'coffee-refactor:done', @onDone
+    @editor.on 'grammar-changed', @checkGrammar
+    @checkGrammar()
+
+  destruct: =>
+    console.log 'destruct:', @editor.getTitle()
+
+    @inactivate()
+
+    atom.workspaceView.off 'coffee-refactor:rename', @onRename
+    atom.workspaceView.off 'coffee-refactor:done', @onDone
+    @editor.off 'grammar-changed', @checkGrammar
+
+    delete @editorView
+    delete @editor
+
+
+  ###
+  Grammar checker
+  1. Detect grammar changed.
+  2. Destroy instances and listeners.
+  3. Exit when grammar isn't CoffeeScript.
+  4. Create instances and listeners.
+  ###
+
+  checkGrammar: =>
+    @inactivate()
+    @isActive = @editor.getGrammar().name is 'CoffeeScript'
+    return unless @isActive
+    @activate()
+
+  activate: ->
     # Setup model
     @ripper = new Ripper
 
@@ -22,43 +57,38 @@ class Watcher
     @gutterView = new GutterView @editorView.gutter
     @statusView = new StatusView
 
-    # Listen
-    @startListeningCursorMoved()
-    @editor.on 'grammar-changed', @checkGrammar
+    # Start listening
+    @editorView.on 'cursor:moved', @onCursorMoved
     @editor.on 'destroyed', @destruct
-    atom.workspaceView.command 'coffee-refactor:rename', @onRename
-    atom.workspaceView.command 'coffee-refactor:done', @onDone
+    @editor.buffer.on 'changed', @onBufferChanged
 
-    # Execution
-    @checkGrammar()
+    # Execute
+    @parse()
 
-  destruct: =>
+  inactivate: ->
+    # Stop listening
     @editorView.off 'cursor:moved', @onCursorMoved
-    @editor.off 'grammar-changed', @checkGrammar
+    @editor.off 'destroyed', @destruct
     @editor.buffer.off 'changed', @onBufferChanged
 
-    @ripper.destruct()
-    @referenceView.destruct()
-    @errorView.destruct()
-    @gutterView.destruct()
-    @statusView.destruct()
+    # Destruct instances
+    @ripper?.destruct()
+    @referenceView?.destruct()
+    @errorView?.destruct()
+    @gutterView?.destruct()
+    @statusView?.destruct()
 
-    delete @editorView
-    delete @editor
+    # Remove references
     delete @ripper
-
-
-  checkGrammar: =>
-    @isCoffee = @editor.getGrammar().name is 'CoffeeScript'
-    @editor.buffer.off 'changed', @onBufferChanged
-    if @isCoffee
-      @editor.buffer.on 'changed', @onBufferChanged
-      @parse()
+    delete @referenceView
+    delete @errorView
+    delete @gutterView
+    delete @statusView
 
 
   ###
   Reference finder process
-  1. Detect buffer change.
+  1. Detect buffer changed.
   2. Stop listening cursor move event.
   3. Parse.
   4. Show errors and exit process when compile error is thrown.
@@ -71,9 +101,9 @@ class Watcher
     @timeoutId = setTimeout @parse, 0
     unless @isParsing
       @isParsing = true
-      @stopListeningCursorMoved()
       @referenceView.empty()
       @errorView.empty()
+      @editorView.off 'cursor:moved', @onCursorMoved
 
   parse: =>
     text = @editor.buffer.getText()
@@ -103,7 +133,8 @@ class Watcher
 
   onParseEnd: =>
     @updateReferences()
-    @startListeningCursorMoved()
+    @editorView.off 'cursor:moved', @cancel
+    @editorView.on 'cursor:moved', @cancel
 
   updateReferences: =>
     ranges = []
@@ -125,13 +156,6 @@ class Watcher
   2. Update references.
   ###
 
-  stopListeningCursorMoved: ->
-    @editorView.off 'cursor:moved', @onCursorMoved
-
-  startListeningCursorMoved: ->
-    @stopListeningCursorMoved()
-    @editorView.on 'cursor:moved', @onCursorMoved
-
   onCursorMoved: =>
     clearTimeout @timeoutId
     @timeoutId = setTimeout @updateReferences, 0
@@ -145,6 +169,14 @@ class Watcher
   ###
 
   onRename: (e) =>
+    console.log 'onRename'
+
+    # unless atom.workspaceView.getActivePaneItem() is @editor
+    unless @isActive
+      e.abortKeyBinding()
+      return
+
+    console.log @editor
     cursor = @editor.cursors[0]
     range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
     refRanges = @ripper.find range
@@ -175,6 +207,11 @@ class Watcher
     delete @renameInfo
 
   onDone: (e) =>
+    # unless atom.workspaceView.getActivePaneItem() is @editor
+    unless @isActive
+      e.abortKeyBinding()
+      return
+
     unless @renameInfo?
       e.abortKeyBinding()
       return
@@ -186,6 +223,10 @@ class Watcher
     @editorView.off 'cursor:moved', @cancel
     delete @renameInfo
 
+
+  ###
+  Utility
+  ###
 
   # Range to pixel based start and end range for each row.
   rangeToRows: ({ start, end }) ->
