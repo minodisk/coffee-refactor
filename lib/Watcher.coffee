@@ -16,6 +16,7 @@ class Watcher
     atom.workspaceView.command 'coffee-refactor:rename', @onRename
     atom.workspaceView.command 'coffee-refactor:done', @onDone
     @editor.on 'grammar-changed', @checkGrammar
+
     @checkGrammar()
 
   destruct: =>
@@ -40,6 +41,8 @@ class Watcher
   ###
 
   checkGrammar: =>
+    console.log 'checkGrammar:', @editor.getTitle()
+
     @inactivate()
     @isActive = @editor.getGrammar().name is 'CoffeeScript'
     return unless @isActive
@@ -169,20 +172,18 @@ class Watcher
   ###
 
   onRename: (e) =>
-    console.log 'onRename'
-
-    # unless atom.workspaceView.getActivePaneItem() is @editor
-    unless @isActive
+    unless @isActive and @isThisEditorActive()
       e.abortKeyBinding()
       return
 
-    console.log @editor
     cursor = @editor.cursors[0]
     range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
     refRanges = @ripper.find range
     if refRanges.length is 0
       e.abortKeyBinding()
       return
+
+    console.log 'onRename', @editor.getTitle()
 
     # Save cursor info.
     # Select all references.
@@ -207,8 +208,7 @@ class Watcher
     delete @renameInfo
 
   onDone: (e) =>
-    # unless atom.workspaceView.getActivePaneItem() is @editor
-    unless @isActive
+    unless @isActive and @isThisEditorActive()
       e.abortKeyBinding()
       return
 
@@ -227,6 +227,9 @@ class Watcher
   ###
   Utility
   ###
+
+  isThisEditorActive: ->
+    atom.workspaceView.getActivePaneItem() is @editor
 
   # Range to pixel based start and end range for each row.
   rangeToRows: ({ start, end }) ->
