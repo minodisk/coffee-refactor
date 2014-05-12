@@ -4,7 +4,6 @@ ReferenceView = require './background/ReferenceView'
 ErrorView = require './background/ErrorView'
 GutterView = require './gutter/GutterView'
 { locationDataToRange } = require './utils/LocationDataUtil'
-{ config } = atom
 
 module.exports =
 class RefactoringingView extends View
@@ -17,6 +16,7 @@ class RefactoringingView extends View
 
     # Setup model
     @refactoring = new Refactoring @editorView.getEditor()
+    @refactoring.on 'destroyed', @destruct
     @refactoring.on 'parse:error', @onParseError
     @refactoring.on 'parse:success', @onParseSuccess
     @refactoring.on 'parse:start', @onParseStart
@@ -35,8 +35,9 @@ class RefactoringingView extends View
     # Setup gutter view
     @gutterView = new GutterView @editorView.gutter
 
-    config.observe 'coffee-refactor.highlightReference', ->
-      config.get 'coffee-refactor.highlightReference'
+    # Listen commands
+    atom.workspaceView.command 'coffee-refactor:rename', @onRename
+    atom.workspaceView.command 'coffee-refactor:done', @onDone
 
   destruct: =>
     @remove()
@@ -52,14 +53,20 @@ class RefactoringingView extends View
   isSameEditor: (editor) ->
     @refactoring.isSameEditor editor
 
-  rename: ->
-    @refactoring.rename()
 
-  cancel: ->
+  onRename: (e) =>
+    unless @refactoring.rename()
+      e.abortKeyBinding()
+
+  onDone: (e) =>
+    unless @refactoring.done()
+      e.abortKeyBinding()
+
+  onCursorMoved: =>
     @refactoring.cancel()
-
-  done: ->
-    @refactoring.done()
+    unless @refactoring.isParsing
+      clearTimeout @timeoutId
+      @timeoutId = setTimeout @updateReferences, 0
 
 
   setEnabled: (isEnabled) ->
@@ -89,11 +96,6 @@ class RefactoringingView extends View
     @editorView.off 'cursor:moved', @onCursorMoved
     @editorView.on 'cursor:moved', @onCursorMoved
     @updateReferences()
-
-  onCursorMoved: =>
-    unless @refactoring.isParsing
-      clearTimeout @timeoutId
-      @timeoutId = setTimeout @updateReferences, 0
 
   updateReferences: =>
     @referenceView.update @refactoring.getReferenceRanges()

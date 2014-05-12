@@ -1,3 +1,7 @@
+# v0.3.4 on 2014/05/
+
+* Improve behavior about aborting renaming.
+
 # v0.3.3 on 2014/05/10
 
 * Fixed an issue wrong error range.

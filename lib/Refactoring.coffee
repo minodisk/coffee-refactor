@@ -54,20 +54,34 @@ class Refactoring extends EventEmitter
     @editor.buffer.rangeForRow.apply @editor.buffer, arguments
 
   rename: ->
-    @editor.selectWord()
-    selection = @editor.getLastSelection()
-    ranges = @ripper.find selection.getBufferRange()
-    return false if ranges.length is 0
+    cursor = @editor.cursors[0]
+    range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
+    refRanges = @ripper.find range
+    return false if refRanges.length is 0
 
-    @selection = selection
-    for range in ranges
-      @editor.addSelectionForBufferRange range
+    # Save cursor info
+    @renameInfo =
+      cursor: cursor
+      range : range
+
+    # Select all references
+    for refRange in refRanges
+      @editor.addSelectionForBufferRange refRange
     true
 
   done: ->
-    return false unless @selection?
-    @editor.setCursorBufferPosition @selection.getBufferRange().start
-    delete @selection
+    return false unless @renameInfo?
+
+    @editor.setCursorBufferPosition @renameInfo.cursor.getBufferPosition()
+    delete @renameInfo
+    true
+
+  cancel: ->
+    return false if not @renameInfo? or
+                        @renameInfo.range.start.isEqual @renameInfo.cursor.getCurrentWordBufferRange(includeNonWordCharacters: false).start
+
+    @editor.setCursorBufferPosition @renameInfo.cursor.getBufferPosition()
+    delete @renameInfo
     true
 
   getReferenceRanges: ->
