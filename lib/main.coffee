@@ -1,4 +1,4 @@
-RefactoringView = require './RefactoringView'
+Watcher = require './Watcher'
 
 module.exports =
 new class Main
@@ -9,7 +9,7 @@ new class Main
 
 
   ###
-  package life cycle
+  Life cycle
   ###
 
   activate: (state) ->
@@ -23,5 +23,9 @@ new class Main
   serialize: ->
 
 
+  ###
+  Events
+  ###
+
   onEditorViewCreated: (editorView) =>
-    new RefactoringView editorView
+    new Watcher editorView

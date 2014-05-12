@@ -18,6 +18,9 @@ class HighlightView extends View
     config.observe @configProperty, =>
       @setEnabled config.get @configProperty
 
+  destruct: ->
+    #TODO implement
+
   update: (ranges) ->
     @empty()
     return unless ranges?.length

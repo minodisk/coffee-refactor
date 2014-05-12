@@ -13,3 +13,6 @@ class StatusView extends View
 
     @find('.linter-name')
     @find('.linter-name')
+
+  destruct: ->
+    #TODO implement
