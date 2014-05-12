@@ -15,9 +15,9 @@ class Watcher
     @ripper = new Ripper
 
     # Setup views
-    @referenceView = new ReferenceView @editorView, @
+    @referenceView = new ReferenceView
     @editorView.underlayer.append @referenceView
-    @errorView = new ErrorView @editorView, @
+    @errorView = new ErrorView
     @editorView.underlayer.append @errorView
     @gutterView = new GutterView @editorView.gutter
     @statusView = new StatusView
@@ -94,7 +94,7 @@ class Watcher
     err =
       range  : range
       message: message
-    @errorView.update [ range ]
+    @errorView.update [ @rangeToRows range ]
     @gutterView.update [ err ]
 
   hideError: =>
@@ -114,7 +114,9 @@ class Watcher
       unless range.isEmpty()
         ranges = @ripper.find range
 
-    @referenceView.update ranges
+    rowsList = for range in ranges
+      @rangeToRows range
+    @referenceView.update rowsList
 
 
   ###
@@ -185,9 +187,15 @@ class Watcher
     delete @renameInfo
 
 
-
-
-
-
-  rangeForRow: ->
-    @editor.buffer.rangeForRow.apply @editor.buffer, arguments
+  # Range to pixel based start and end range for each row.
+  rangeToRows: ({ start, end }) ->
+    for row in [start.row..end.row] by 1
+      rowRange = @editor.buffer.rangeForRow row
+      point =
+        left : if row is start.row then start else rowRange.start
+        right: if row is end.row then end else rowRange.end
+      pixel =
+        tl: @editorView.pixelPositionForBufferPosition point.left
+        br: @editorView.pixelPositionForBufferPosition point.right
+      pixel.br.top += @editorView.lineHeight
+      pixel
