@@ -22,7 +22,6 @@ new class Main
     atom.workspaceView.off 'coffee-refactor:rename', @onRename
     atom.workspaceView.off 'coffee-refactor:done', @onDone
     for watcher in @watchers
-      watcher.off 'destroyed', @onDestroyed
       watcher.destruct()
     delete @watchers
 
@@ -35,22 +34,23 @@ new class Main
 
   onCreated: (editorView) =>
     watcher = new Watcher editorView
-    watcher.off 'destroyed', @onDestroyed
+    watcher.on 'destroyed', @onDestroyed
     @watchers.push watcher
 
   onDestroyed: (watcher) =>
-    watcher.off 'destroyed', @onDestroyed
+    watcher.destruct()
     @watchers.splice @watchers.indexOf(watcher), 1
 
   onRename: (e) =>
     isExecuted = false
     for watcher in @watchers when watcher.isActive()
-      isExecute or= watcher.onRename()
+      isExecuted or= watcher.rename()
     return if isExecuted
     e.abortKeyBinding()
 
   onDone: (e) =>
+    isExecuted = false
     for watcher in @watchers when watcher.isActive()
-      isExecute or= watcher.onDone()
+      isExecuted or= watcher.done()
     return if isExecuted
     e.abortKeyBinding()

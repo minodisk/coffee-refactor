@@ -1,3 +1,4 @@
+{ EventEmitter } = require 'events'
 Ripper = require './Ripper'
 ReferenceView = require './background/ReferenceView'
 ErrorView = require './background/ErrorView'
@@ -6,26 +7,24 @@ StatusView = require './status/StatusView'
 { locationDataToRange } = require './utils/LocationDataUtil'
 
 module.exports =
-class Watcher
+class Watcher extends EventEmitter
 
   constructor: (@editorView) ->
+    super()
     @editor = @editorView.editor
-
-    # console.log 'construct:', @editor.getTitle()
-
     @editor.on 'grammar-changed', @checkGrammar
-
     @checkGrammar()
 
   destruct: =>
-    # console.log 'destruct:', @editor.getTitle()
-
+    @removeAllListeners()
     @inactivate()
-
     @editor.off 'grammar-changed', @checkGrammar
 
     delete @editorView
     delete @editor
+
+  onDestroyed: =>
+    @emit 'destroyed', @
 
 
   ###
@@ -40,11 +39,11 @@ class Watcher
     # console.log 'checkGrammar:', @editor.getTitle()
 
     @inactivate()
-    @isActive = @editor.getGrammar().name is 'CoffeeScript'
-    return unless @isActive
+    return unless @editor.getGrammar().name is 'CoffeeScript'
     @activate()
 
   activate: ->
+    @isActivated = true
     # Setup model
     @ripper = new Ripper
 
@@ -58,7 +57,7 @@ class Watcher
 
     # Start listening
     @editorView.on 'cursor:moved', @onCursorMoved
-    @editor.on 'destroyed', @destruct
+    @editor.on 'destroyed', @onDestroyed
     @editor.buffer.on 'changed', @onBufferChanged
 
     # Execute
@@ -67,7 +66,7 @@ class Watcher
   inactivate: ->
     # Stop listening
     @editorView.off 'cursor:moved', @onCursorMoved
-    @editor.off 'destroyed', @destruct
+    @editor.off 'destroyed', @onDestroyed
     @editor.buffer.off 'changed', @onBufferChanged
 
     # Destruct instances
@@ -78,6 +77,7 @@ class Watcher
     @statusView?.destruct()
 
     # Remove references
+    delete @isActivated
     delete @ripper
     delete @referenceView
     delete @errorView
@@ -132,8 +132,8 @@ class Watcher
 
   onParseEnd: =>
     @updateReferences()
-    @editorView.off 'cursor:moved', @cancel
-    @editorView.on 'cursor:moved', @cancel
+    @editorView.off 'cursor:moved', @onCursorMoved
+    @editorView.on 'cursor:moved', @onCursorMoved
 
   updateReferences: =>
     ranges = []
@@ -167,19 +167,15 @@ class Watcher
   3. Detect done command.
   ###
 
-  onRename: (e) =>
-    unless @isActive and @isThisEditorActive()
-      e.abortKeyBinding()
-      return
+  rename: ->
+    return false unless @isActive()
 
     cursor = @editor.cursors[0]
     range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
     refRanges = @ripper.find range
-    if refRanges.length is 0
-      e.abortKeyBinding()
-      return
+    return false if refRanges.length is 0
 
-    console.log 'onRename', @editor.getTitle()
+    # console.log 'rename', @editor.getTitle()
 
     # Save cursor info.
     # Select all references.
@@ -191,28 +187,13 @@ class Watcher
       @editor.addSelectionForBufferRange refRange
     @editorView.off 'cursor:moved', @cancel
     @editorView.on 'cursor:moved', @cancel
+    true
 
   cancel: =>
     return if not @renameInfo? or
                   @renameInfo.range.start.isEqual @renameInfo.cursor.getCurrentWordBufferRange(includeNonWordCharacters: false).start
 
-    # Set cursor position to current position.
-    # Stop listening cursor moved event.
-    # Destroy cursor info.
-    @editor.setCursorBufferPosition @renameInfo.cursor.getBufferPosition()
-    @editorView.off 'cursor:moved', @cancel
-    delete @renameInfo
-
-  onDone: (e) =>
-    console.log 'onDone', @editor.getTitle(), @isActive, @isThisEditorActive(), @renameInfo
-
-    unless @isActive and @isThisEditorActive()
-      e.abortKeyBinding()
-      return
-
-    unless @renameInfo?
-      e.abortKeyBinding()
-      return
+    # console.log 'cancel'
 
     # Set cursor position to current position.
     # Stop listening cursor moved event.
@@ -220,14 +201,28 @@ class Watcher
     @editor.setCursorBufferPosition @renameInfo.cursor.getBufferPosition()
     @editorView.off 'cursor:moved', @cancel
     delete @renameInfo
+
+  done: ->
+    # console.log 'done', @editor.getTitle(), @isActive(), @renameInfo
+
+    return false unless @isActive()
+    return false unless @renameInfo?
+
+    # Set cursor position to current position.
+    # Stop listening cursor moved event.
+    # Destroy cursor info.
+    @editor.setCursorBufferPosition @renameInfo.cursor.getBufferPosition()
+    @editorView.off 'cursor:moved', @cancel
+    delete @renameInfo
+    true
 
 
   ###
   Utility
   ###
 
-  isThisEditorActive: ->
-    atom.workspaceView.getActivePaneItem() is @editor
+  isActive: ->
+    @isActivated and atom.workspaceView.getActivePaneItem() is @editor
 
   # Range to pixel based start and end range for each row.
   rangeToRows: ({ start, end }) ->
