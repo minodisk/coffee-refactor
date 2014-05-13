@@ -13,12 +13,18 @@ new class Main
   ###
 
   activate: (state) ->
-    @refactoringViews = []
-    atom.workspaceView.eachEditorView @onEditorViewCreated
+    @watchers = []
+    atom.workspaceView.eachEditorView @onCreated
+    atom.workspaceView.command 'coffee-refactor:rename', @onRename
+    atom.workspaceView.command 'coffee-refactor:done', @onDone
 
   deactivate: ->
-    for view in @refactoringViews
-      view.destruct()
+    atom.workspaceView.off 'coffee-refactor:rename', @onRename
+    atom.workspaceView.off 'coffee-refactor:done', @onDone
+    for watcher in @watchers
+      watcher.off 'destroyed', @onDestroyed
+      watcher.destruct()
+    delete @watchers
 
   serialize: ->
 
@@ -27,5 +33,24 @@ new class Main
   Events
   ###
 
-  onEditorViewCreated: (editorView) =>
-    new Watcher editorView
+  onCreated: (editorView) =>
+    watcher = new Watcher editorView
+    watcher.off 'destroyed', @onDestroyed
+    @watchers.push watcher
+
+  onDestroyed: (watcher) =>
+    watcher.off 'destroyed', @onDestroyed
+    @watchers.splice @watchers.indexOf(watcher), 1
+
+  onRename: (e) =>
+    isExecuted = false
+    for watcher in @watchers when watcher.isActive()
+      isExecute or= watcher.onRename()
+    return if isExecuted
+    e.abortKeyBinding()
+
+  onDone: (e) =>
+    for watcher in @watchers when watcher.isActive()
+      isExecute or= watcher.onDone()
+    return if isExecuted
+    e.abortKeyBinding()

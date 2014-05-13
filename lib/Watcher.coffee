@@ -13,8 +13,6 @@ class Watcher
 
     # console.log 'construct:', @editor.getTitle()
 
-    atom.workspaceView.command 'coffee-refactor:rename', @onRename
-    atom.workspaceView.command 'coffee-refactor:done', @onDone
     @editor.on 'grammar-changed', @checkGrammar
 
     @checkGrammar()
@@ -24,8 +22,6 @@ class Watcher
 
     @inactivate()
 
-    atom.workspaceView.off 'coffee-refactor:rename', @onRename
-    atom.workspaceView.off 'coffee-refactor:done', @onDone
     @editor.off 'grammar-changed', @checkGrammar
 
     delete @editorView
