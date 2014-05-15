@@ -27,7 +27,7 @@ Rename all references of a symbol under the cursor.
 3. Type new name.
 4. Finish renaming using `enter`.
 
-**You can abort renaming, when move cursor out of the symbol.*
+*You can abort renaming, when move cursor out of the symbol.*
 
 ### Supported Symbols
 
