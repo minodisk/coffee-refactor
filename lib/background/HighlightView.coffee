@@ -13,16 +13,19 @@ class HighlightView extends View
 
   configProperty: ''
 
-  constructor: (@editorView, @refactoring) ->
+  constructor: ->
     super()
     config.observe @configProperty, =>
       @setEnabled config.get @configProperty
 
-  update: (ranges) ->
+  destruct: ->
+    #TODO implement
+
+  update: (rowsList) ->
     @empty()
-    return unless ranges?.length
-    for range in ranges
-      @append new MarkerView @editorView, @refactoring, range
+    return unless rowsList?.length
+    for rows in rowsList
+      @append new MarkerView rows
 
   setEnabled: (isEnabled) ->
     if isEnabled

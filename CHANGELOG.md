@@ -1,3 +1,7 @@
+# v0.3.4 on 2014/05/16
+
+* Improve behavior about aborting renaming.
+
 # v0.3.3 on 2014/05/10
 
 * Fixed an issue wrong error range.
@@ -61,7 +65,7 @@
 
 # v0.1.7-v0.1.8 on 2014/04/15
 
-* Support highlighting.
+* Support highlighting references.
 
 # v0.1.6 on 2014/04/12
 

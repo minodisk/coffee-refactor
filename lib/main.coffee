@@ -1,4 +1,4 @@
-RefactoringView = require './RefactoringView'
+Watcher = require './Watcher'
 
 module.exports =
 new class Main
@@ -7,44 +7,50 @@ new class Main
     highlightError    : true
     highlightReference: true
 
+
+  ###
+  Life cycle
+  ###
+
   activate: (state) ->
-    @refactoringViews = []
-    atom.workspaceView.eachEditorView @onEditorViewCreated
-    atom.workspaceView.command 'coffee-refactor:rename', (e) =>
-      @callActiveViews e, 'rename'
-    atom.workspaceView.command 'coffee-refactor:done', (e) =>
-      @callActiveViews e, 'done'
+    @watchers = []
+    atom.workspaceView.eachEditorView @onCreated
+    atom.workspaceView.command 'coffee-refactor:rename', @onRename
+    atom.workspaceView.command 'coffee-refactor:done', @onDone
 
   deactivate: ->
-    for view in @refactoringViews
-      view.destruct()
+    atom.workspaceView.off 'coffee-refactor:rename', @onRename
+    atom.workspaceView.off 'coffee-refactor:done', @onDone
+    for watcher in @watchers
+      watcher.destruct()
+    delete @watchers
 
   serialize: ->
-    # console.log 'serialize'
 
-  callActiveViews: (e, methodName, args...) ->
-    activePaneItem = atom.workspaceView.getActivePaneItem()
-    isCalled = false
-    for view in @refactoringViews
-      if view.isSameEditor activePaneItem
-        isCalled or= view[methodName].apply view, args
 
-    unless isCalled
-      e.abortKeyBinding()
+  ###
+  Events
+  ###
 
-  onEditorViewCreated: (editorView) =>
-    refactoringView = new RefactoringView editorView
-    onEditorDestroyed = =>
-      editor.off 'destroyed', onEditorDestroyed
-      @onEditorViewDestroyed refactoringView
+  onCreated: (editorView) =>
+    watcher = new Watcher editorView
+    watcher.on 'destroyed', @onDestroyed
+    @watchers.push watcher
 
-    editor = editorView.getEditor()
-    editor.on 'destroyed', onEditorDestroyed
+  onDestroyed: (watcher) =>
+    watcher.destruct()
+    @watchers.splice @watchers.indexOf(watcher), 1
 
-    @refactoringViews.push refactoringView
+  onRename: (e) =>
+    isExecuted = false
+    for watcher in @watchers when watcher.isActive()
+      isExecuted or= watcher.rename()
+    return if isExecuted
+    e.abortKeyBinding()
 
-  onEditorViewDestroyed: (refactoringView) ->
-    refactoringView.destruct()
-    index = @refactoringViews.indexOf refactoringView
-    return if index is -1
-    @refactoringViews.splice index, 1
+  onDone: (e) =>
+    isExecuted = false
+    for watcher in @watchers when watcher.isActive()
+      isExecuted or= watcher.done()
+    return if isExecuted
+    e.abortKeyBinding()

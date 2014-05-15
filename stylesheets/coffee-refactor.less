@@ -2,8 +2,32 @@
 @import "ui-variables.less";
 
 .editor {
-  .coffee-refactor {
-    .reference {
+  .gutter {
+    .line-number {
+      &.coffee-refactor-warning {
+        .icon-right {
+          visibility: visible;
+          &:before {
+            content: @info;
+            color: @text-color-warning;
+          }
+        }
+      }
+      &.coffee-refactor-error {
+        .icon-right {
+          visibility: visible;
+          &:before {
+            content: @alert;
+            color: @text-color-error;
+          }
+        }
+      }
+    }
+  }
+
+  .underlayer {
+
+    .coffee-refactor-reference {
       &.is-disabled {
         display: none;
       }
@@ -26,7 +50,8 @@
         }
       }
     }
-    .error {
+
+    .coffee-refactor-error {
       &.is-disabled {
         display: none;
       }
@@ -38,29 +63,7 @@
         }
       }
     }
-  }
 
-  .gutter {
-    .line-number {
-      &.coffee-refactor-warning {
-        .icon-right {
-          visibility: visible;
-          &:before {
-            content: @info;
-            color: @text-color-warning;
-          }
-        }
-      }
-      &.coffee-refactor-error {
-        .icon-right {
-          visibility: visible;
-          &:before {
-            content: @alert;
-            color: @text-color-error;
-          }
-        }
-      }
-    }
   }
 }
 

@@ -20,7 +20,7 @@ expectEqualRefs = (ripper, ranges...) ->
     .toEqual ranges[i]
 
 
-describe 'Parser', ->
+describe 'Ripper', ->
 
   ripper = new Ripper
 

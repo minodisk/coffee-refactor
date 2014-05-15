@@ -11,7 +11,7 @@ class RegionView extends View
   @content: ->
     @div class: 'region'
 
-  constructor: (tl, br, isFirstRow, isLastRow) ->
+  constructor: ({ tl, br }, isFirstRow, isLastRow) ->
     super()
 
     where = RegionView.MIDDLE_ROW
@@ -28,9 +28,9 @@ class RegionView extends View
         @addClass 'last'
 
     @css
-      left: tl.left
-      top: tl.top
-      width: br.left - tl.left
+      left  : tl.left
+      top   : tl.top
+      width : br.left - tl.left
       height: br.top - tl.top
 
   remove: ->

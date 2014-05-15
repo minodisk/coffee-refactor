@@ -5,6 +5,10 @@ class GutterView
 
   constructor: (@gutter) ->
 
+  destruct: ->
+    #TODO implement
+
+
   empty: ->
     @gutter.removeClassFromAllLines 'coffee-refactor-error'
     @gutter
