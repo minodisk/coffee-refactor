@@ -37,11 +37,11 @@ class Watcher extends EventEmitter
 
   checkGrammar: =>
     @deactivate()
-    return unless @editor.getGrammar().name is 'CoffeeScript'
+    scopeName = @editor.getGrammar().scopeName
+    return unless scopeName is 'source.coffee' or scopeName is 'source.litcoffee' 
     @activate()
 
   activate: ->
-    @isActivated = true
     # Setup model
     @ripper = new Ripper
 
