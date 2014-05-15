@@ -1,34 +1,37 @@
+path = require 'path'
+fs = require 'fs'
+{ inspect } = require 'util'
 { WorkspaceView } = require 'atom'
-
-# Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
-#
-# To run a specific `it` or `describe` block add an `f` to the front (e.g. `fit`
-# or `fdescribe`). Remove the `f` to unfocus the block.
+ErrorView = require '../lib/background/ErrorView.coffee'
+ReferenceView = require '../lib/background/ReferenceView.coffee'
 
 describe "CoffeeRefactor", ->
-  activationPromise = null
+  [ editorView, editor, activationPromise, watcher ] = []
 
   beforeEach ->
-    # Create a fake workspace and open a sample file
+    # Ready workspaceView
     atom.workspaceView = new WorkspaceView
-    atom.workspaceView.openSync 'sample.coffee'
+    atom.project.setPath path.join __dirname, 'fixtures'
+    atom.workspaceView.openSync 'fibonacci.coffee'
+    atom.workspaceView.attachToDom()
+    editorView = atom.workspaceView.getActiveView()
+    editor = editorView.getEditor()
 
+    # Load grammers about CoffeeScript
+    languageCoffeeScriptPath = atom.packages.resolvePackagePath 'language-coffee-script'
+    grammarDir = path.resolve languageCoffeeScriptPath, 'grammars'
+    for filename in fs.readdirSync grammarDir
+      atom.syntax.loadGrammarSync path.resolve grammarDir, filename
+
+    # Activate coffee-refactor package
     activationPromise = atom.packages.activatePackage 'coffee-refactor'
+    .then ({ mainModule }) ->
+      watcher = mainModule.watchers[0]
 
-
-  describe "when the test:toggle event is triggered", ->
-    it "attaches and then detaches the view", ->
-      expect(atom.workspaceView.find('.coffee-refactor-reference')).not.toExist()
-
-      # This is an activation event, triggering it will cause the package to be
-      # activated.
-      atom.workspaceView.trigger 'coffee-refactor:rename'
-
+  describe "when the coffee-refactor is activated", ->
+    it "attaches the views", ->
       waitsForPromise ->
         activationPromise
-
       runs ->
-        console.log atom.workspaceView.find('.coffee-refactor-reference').length
-        expect(atom.workspaceView.find('.coffee-refactor-reference')).toExist()
-        # atom.workspaceView.trigger 'test:toggle'
-        # expect(atom.workspaceView.find('.coffee-refactor')).not.toExist()
+        expect(atom.workspaceView.find(".#{ErrorView.className}")).toExist()
+        expect(atom.workspaceView.find(".#{ReferenceView.className}")).toExist()
