@@ -1,4 +1,4 @@
-# v0.3.4 on 2014/05/
+# v0.3.4 on 2014/05/16
 
 * Improve behavior about aborting renaming.
 
