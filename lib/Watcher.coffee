@@ -17,7 +17,7 @@ class Watcher extends EventEmitter
 
   destruct: =>
     @removeAllListeners()
-    @inactivate()
+    @deactivate()
     @editor.off 'grammar-changed', @checkGrammar
 
     delete @editorView
@@ -36,9 +36,7 @@ class Watcher extends EventEmitter
   ###
 
   checkGrammar: =>
-    # console.log 'checkGrammar:', @editor.getTitle()
-
-    @inactivate()
+    @deactivate()
     return unless @editor.getGrammar().name is 'CoffeeScript'
     @activate()
 
@@ -63,7 +61,7 @@ class Watcher extends EventEmitter
     # Execute
     @parse()
 
-  inactivate: ->
+  deactivate: ->
     # Stop listening
     @editorView.off 'cursor:moved', @onCursorMoved
     @editor.off 'destroyed', @onDestroyed
@@ -175,8 +173,6 @@ class Watcher extends EventEmitter
     refRanges = @ripper.find range
     return false if refRanges.length is 0
 
-    # console.log 'rename', @editor.getTitle()
-
     # Save cursor info.
     # Select all references.
     # Listen to cursor moved event.
@@ -193,8 +189,6 @@ class Watcher extends EventEmitter
     return if not @renameInfo? or
                   @renameInfo.range.start.isEqual @renameInfo.cursor.getCurrentWordBufferRange(includeNonWordCharacters: false).start
 
-    # console.log 'cancel'
-
     # Set cursor position to current position.
     # Stop listening cursor moved event.
     # Destroy cursor info.
@@ -203,8 +197,6 @@ class Watcher extends EventEmitter
     delete @renameInfo
 
   done: ->
-    # console.log 'done', @editor.getTitle(), @isActive(), @renameInfo
-
     return false unless @isActive()
     return false unless @renameInfo?
 
