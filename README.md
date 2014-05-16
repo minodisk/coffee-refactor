@@ -6,11 +6,11 @@ Refactor CoffeeScript for [Atom](https://atom.io/).
 
 ### Highlight references
 
-Highlight all references of a symbol under the cursor.
+Highlight all references of the symbol under the cursor.
 
 ![capture_reference](https://cloud.githubusercontent.com/assets/514164/2929355/b4fe6d30-d788-11e3-88c3-e65c0046d3fc.gif)
 
-You can toggle enabled in settings view.
+You can toggle whether to enable or not in the setting view.
 
 1. Open setting with `Atom > Preferences`.
 2. Input 'coffee refactor' to `Filter package` and select 'Coffee Refactor' package.
@@ -18,7 +18,7 @@ You can toggle enabled in settings view.
 
 ### Rename references
 
-Rename all references of a symbol under the cursor.
+Rename all references of the symbol under the cursor.
 
 ![capture_rename](https://cloud.githubusercontent.com/assets/514164/2929354/b4e848d4-d788-11e3-99c2-620f406d5e6f.gif)
 
@@ -27,7 +27,7 @@ Rename all references of a symbol under the cursor.
 3. Type new name.
 4. Finish renaming using `enter`.
 
-**You can abort renaming, when move cursor out of the symbol.*
+**You can abort renaming, by removing the cursor out of the symbol.*
 
 ### Supported Symbols
 
@@ -42,7 +42,7 @@ Rename all references of a symbol under the cursor.
 
 ![capture_error](https://cloud.githubusercontent.com/assets/514164/2936037/568a47d8-d841-11e3-84d4-76ba1a8f69b6.gif)
 
-You can toggle enabled in settings view.
+You can toggle whether to enable or not in the setting view.
 
 1. Open setting with `Atom > Preferences`.
 2. Input 'coffee refactor' to `Filter package` and select 'Coffee Refactor' package.
