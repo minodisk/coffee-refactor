@@ -60,7 +60,7 @@ describe "main", ->
       runs ->
         expect(referenceView.find('.marker').length).toEqual 4
 
-    it "not starts selecting references", ->
+    it "has single cursor", ->
       waitsForPromise ->
         activationPromise
       runs ->
@@ -68,12 +68,21 @@ describe "main", ->
 
     describe "when 'coffee-refactor:rename' event is triggered", ->
 
-      it "starts selecting references", ->
+      it "has multi-cursors", ->
         atom.workspaceView.trigger 'coffee-refactor:rename'
         waitsForPromise ->
           activationPromise
         runs ->
           expect(editor.getCursors().length).toEqual 4
+
+    describe "when 'coffee-refactor:done' event is triggered", ->
+
+      it "has single cursor", ->
+        atom.workspaceView.trigger 'coffee-refactor:done'
+        waitsForPromise ->
+          activationPromise
+        runs ->
+          expect(editor.getCursors().length).toEqual 1
 
   describe "when '.litcoffee' file is opened", ->
 
