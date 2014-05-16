@@ -59,7 +59,7 @@ class Watcher extends EventEmitter
     @editor.buffer.on 'changed', @onBufferChanged
 
     # Execute
-    @onBufferChanged()
+    @parse()
 
   deactivate: ->
     # Stop listening
@@ -84,25 +84,18 @@ class Watcher extends EventEmitter
 
   ###
   Reference finder process
-  1. Detect buffer changed.
-  2. Stop listening cursor move event.
-  3. Parse.
-  4. Show errors and exit process when compile error is thrown.
-  5. Show references.
-  6. Start listening cursor move event.
+  1. Stop listening cursor move event and reset views.
+  2. Parse.
+  3. Show errors and exit process when compile error is thrown.
+  4. Show references.
+  5. Start listening cursor move event.
   ###
 
-  onBufferChanged: =>
-    # clearTimeout @timeoutId
-    # @timeoutId = setTimeout @parse, 0
+  parse: ->
+    @editorView.off 'cursor:moved', @onCursorMoved
     @hideError()
     @referenceView.update()
-    @editorView.off 'cursor:moved', @onCursorMoved
-    @parse()
-    # unless @isParsing
-    #   @isParsing = true
 
-  parse: =>
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
@@ -129,8 +122,6 @@ class Watcher extends EventEmitter
     @gutterView.update()
 
   onParseEnd: =>
-    # return unless @isParsing
-    # @isParsing = false
     @updateReferences()
     @editorView.off 'cursor:moved', @onCursorMoved
     @editorView.on 'cursor:moved', @onCursorMoved
@@ -147,17 +138,6 @@ class Watcher extends EventEmitter
     rowsList = for range in ranges
       @rangeToRows range
     @referenceView.update rowsList
-
-
-  ###
-  Cursor moved process
-  1. Detect cursor moved.
-  2. Update references.
-  ###
-
-  onCursorMoved: =>
-    clearTimeout @timeoutId
-    @timeoutId = setTimeout @updateReferences, 0
 
 
   ###
@@ -209,6 +189,18 @@ class Watcher extends EventEmitter
     @editorView.off 'cursor:moved', @cancel
     delete @renameInfo
     true
+
+
+  ###
+  User events
+  ###
+
+  onBufferChanged: =>
+    @parse()
+
+  onCursorMoved: =>
+    clearTimeout @timeoutId
+    @timeoutId = setTimeout @updateReferences, 0
 
 
   ###
