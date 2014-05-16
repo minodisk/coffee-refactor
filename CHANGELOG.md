@@ -1,3 +1,7 @@
+# v0.4.0 on 2014/05/17
+
+* Separate core module related to view-controller and view to atom-refactor.
+
 # v0.3.5 on 2014/05/16
 
 * Fixed an issue that remaning was not working.
