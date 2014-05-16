@@ -4,7 +4,7 @@
 { Range } = require 'atom'
 { inspect } = require 'util'
 { isString, isArray, uniq, some } = _ = require 'lodash'
-{ locationDataToRange, rangeToLocationData, isEqualsLocationData } = require './utils/LocationDataUtil'
+{ utils: { LocationDataUtil: { locationDataToRange, rangeToLocationData, isEqualsLocationData }}} = require 'atom-refactor'
 
 
 LEVEL_TOP = 1
