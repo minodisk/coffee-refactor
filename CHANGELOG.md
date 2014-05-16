@@ -1,4 +1,8 @@
-# v0.3.4 on 2014/05/
+# v0.3.5 on 2014/05/16
+
+* Fixed an issue that remaning was not working.
+
+# v0.3.4 on 2014/05/16
 
 * Improve behavior about aborting renaming.
 

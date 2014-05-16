@@ -17,7 +17,7 @@ class Watcher extends EventEmitter
 
   destruct: =>
     @removeAllListeners()
-    @inactivate()
+    @deactivate()
     @editor.off 'grammar-changed', @checkGrammar
 
     delete @editorView
@@ -36,14 +36,12 @@ class Watcher extends EventEmitter
   ###
 
   checkGrammar: =>
-    # console.log 'checkGrammar:', @editor.getTitle()
-
-    @inactivate()
-    return unless @editor.getGrammar().name is 'CoffeeScript'
+    @deactivate()
+    scopeName = @editor.getGrammar().scopeName
+    return unless scopeName is 'source.coffee' or scopeName is 'source.litcoffee'
     @activate()
 
   activate: ->
-    @isActivated = true
     # Setup model
     @ripper = new Ripper
 
@@ -63,7 +61,7 @@ class Watcher extends EventEmitter
     # Execute
     @parse()
 
-  inactivate: ->
+  deactivate: ->
     # Stop listening
     @editorView.off 'cursor:moved', @onCursorMoved
     @editor.off 'destroyed', @onDestroyed
@@ -77,7 +75,6 @@ class Watcher extends EventEmitter
     @statusView?.destruct()
 
     # Remove references
-    delete @isActivated
     delete @ripper
     delete @referenceView
     delete @errorView
@@ -87,24 +84,18 @@ class Watcher extends EventEmitter
 
   ###
   Reference finder process
-  1. Detect buffer changed.
-  2. Stop listening cursor move event.
-  3. Parse.
-  4. Show errors and exit process when compile error is thrown.
-  5. Show references.
-  6. Start listening cursor move event.
+  1. Stop listening cursor move event and reset views.
+  2. Parse.
+  3. Show errors and exit process when compile error is thrown.
+  4. Show references.
+  5. Start listening cursor move event.
   ###
 
-  onBufferChanged: =>
-    clearTimeout @timeoutId
-    @timeoutId = setTimeout @parse, 0
-    unless @isParsing
-      @isParsing = true
-      @referenceView.empty()
-      @errorView.empty()
-      @editorView.off 'cursor:moved', @onCursorMoved
+  parse: ->
+    @editorView.off 'cursor:moved', @onCursorMoved
+    @hideError()
+    @referenceView.update()
 
-  parse: =>
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
@@ -113,8 +104,8 @@ class Watcher extends EventEmitter
           @showError err
           return
         @hideError()
-    if @isParsing
-      @isParsing = false
+        @onParseEnd()
+    else
       @onParseEnd()
 
   showError: ({ location, message }) =>
@@ -150,17 +141,6 @@ class Watcher extends EventEmitter
 
 
   ###
-  Cursor moved process
-  1. Detect cursor moved.
-  2. Update references.
-  ###
-
-  onCursorMoved: =>
-    clearTimeout @timeoutId
-    @timeoutId = setTimeout @updateReferences, 0
-
-
-  ###
   Rename process
   1. Detect rename command.
   2. Cancel and exit process when cursor is moved out from the symbol.
@@ -174,8 +154,6 @@ class Watcher extends EventEmitter
     range = cursor.getCurrentWordBufferRange includeNonWordCharacters: false
     refRanges = @ripper.find range
     return false if refRanges.length is 0
-
-    # console.log 'rename', @editor.getTitle()
 
     # Save cursor info.
     # Select all references.
@@ -193,8 +171,6 @@ class Watcher extends EventEmitter
     return if not @renameInfo? or
                   @renameInfo.range.start.isEqual @renameInfo.cursor.getCurrentWordBufferRange(includeNonWordCharacters: false).start
 
-    # console.log 'cancel'
-
     # Set cursor position to current position.
     # Stop listening cursor moved event.
     # Destroy cursor info.
@@ -203,8 +179,6 @@ class Watcher extends EventEmitter
     delete @renameInfo
 
   done: ->
-    # console.log 'done', @editor.getTitle(), @isActive(), @renameInfo
-
     return false unless @isActive()
     return false unless @renameInfo?
 
@@ -218,19 +192,31 @@ class Watcher extends EventEmitter
 
 
   ###
+  User events
+  ###
+
+  onBufferChanged: =>
+    @parse()
+
+  onCursorMoved: =>
+    clearTimeout @timeoutId
+    @timeoutId = setTimeout @updateReferences, 0
+
+
+  ###
   Utility
   ###
 
   isActive: ->
-    @isActivated and atom.workspaceView.getActivePaneItem() is @editor
+    @ripper? and atom.workspaceView.getActivePaneItem() is @editor
 
   # Range to pixel based start and end range for each row.
   rangeToRows: ({ start, end }) ->
-    for row in [start.row..end.row] by 1
-      rowRange = @editor.buffer.rangeForRow row
+    for raw in [start.row..end.row] by 1
+      rowRange = @editor.buffer.rangeForRow raw
       point =
-        left : if row is start.row then start else rowRange.start
-        right: if row is end.row then end else rowRange.end
+        left : if raw is start.row then start else rowRange.start
+        right: if raw is end.row then end else rowRange.end
       pixel =
         tl: @editorView.pixelPositionForBufferPosition point.left
         br: @editorView.pixelPositionForBufferPosition point.right

@@ -25,9 +25,9 @@ Rename all references of the symbol under the cursor.
 1. Set cursor to symbol.
 2. Start renaming using `ctrl-r`.
 3. Type new name.
-4. Finish renaming using `enter`.
+4. Finish renaming using `enter` or moving cursor out of the focused symbol.
 
-**You can abort renaming, by removing the cursor out of the symbol.*
+**You can abort renaming, when move cursor out of the symbol.*
 
 ### Supported Symbols
 

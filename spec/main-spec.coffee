@@ -1,34 +1,108 @@
+path = require 'path'
+fs = require 'fs'
+{ inspect } = require 'util'
 { WorkspaceView } = require 'atom'
-
-# Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
-#
-# To run a specific `it` or `describe` block add an `f` to the front (e.g. `fit`
-# or `fdescribe`). Remove the `f` to unfocus the block.
-
-describe "CoffeeRefactor", ->
-  activationPromise = null
-
-  beforeEach ->
-    # Create a fake workspace and open a sample file
-    atom.workspaceView = new WorkspaceView
-    atom.workspaceView.openSync 'sample.coffee'
-
-    activationPromise = atom.packages.activatePackage 'coffee-refactor'
+ErrorView = require '../lib/background/ErrorView.coffee'
+ReferenceView = require '../lib/background/ReferenceView.coffee'
 
 
-  describe "when the test:toggle event is triggered", ->
-    it "attaches and then detaches the view", ->
-      expect(atom.workspaceView.find('.coffee-refactor-reference')).not.toExist()
+openFile = (filename) ->
+  atom.workspaceView = new WorkspaceView
+  atom.project.setPath path.join __dirname, 'fixtures'
+  atom.workspaceView.openSync filename
+  atom.workspaceView.attachToDom()
+  editorView = atom.workspaceView.getActiveView()
+  editor = editorView.getEditor()
+  { editorView, editor }
 
-      # This is an activation event, triggering it will cause the package to be
-      # activated.
-      atom.workspaceView.trigger 'coffee-refactor:rename'
+loadLanguage = ->
+  languageCoffeeScriptPath = atom.packages.resolvePackagePath 'language-coffee-script'
+  grammarDir = path.resolve languageCoffeeScriptPath, 'grammars'
+  for filename in fs.readdirSync grammarDir
+    atom.syntax.loadGrammarSync path.resolve grammarDir, filename
 
+activatePackage = (callback) ->
+  activationPromise = atom.packages.activatePackage 'coffee-refactor'
+  .then ({ mainModule }) ->
+    callback mainModule.watchers[0]
+
+
+describe "main", ->
+
+  describe "when '.coffee' file is opened", ->
+
+    [ editorView, editor, activationPromise, watcher, errorView, referenceView ] = []
+
+    beforeEach ->
+      { editorView, editor } = openFile 'fibonacci.coffee'
+      loadLanguage()
+      activationPromise = activatePackage (w) ->
+        watcher = w
+
+    it "attaches the views", ->
       waitsForPromise ->
         activationPromise
-
       runs ->
-        console.log atom.workspaceView.find('.coffee-refactor-reference').length
-        expect(atom.workspaceView.find('.coffee-refactor-reference')).toExist()
-        # atom.workspaceView.trigger 'test:toggle'
-        # expect(atom.workspaceView.find('.coffee-refactor')).not.toExist()
+        errorView = atom.workspaceView.find ".#{ErrorView.className}"
+        referenceView = atom.workspaceView.find ".#{ReferenceView.className}"
+        expect(errorView).toExist()
+        expect(referenceView).toExist()
+
+    it "activates watcher", ->
+      waitsForPromise ->
+        activationPromise
+      runs ->
+        expect(watcher.ripper).toBeDefined()
+
+    it "starts highlighting", ->
+      waitsForPromise ->
+        activationPromise
+      runs ->
+        expect(referenceView.find('.marker').length).toEqual 4
+
+    it "has single cursor", ->
+      waitsForPromise ->
+        activationPromise
+      runs ->
+        expect(editor.getCursors().length).toEqual 1
+
+    describe "when 'coffee-refactor:rename' event is triggered", ->
+
+      it "has multi-cursors", ->
+        atom.workspaceView.trigger 'coffee-refactor:rename'
+        waitsForPromise ->
+          activationPromise
+        runs ->
+          expect(editor.getCursors().length).toEqual 4
+
+    describe "when 'coffee-refactor:done' event is triggered", ->
+
+      it "has single cursor", ->
+        atom.workspaceView.trigger 'coffee-refactor:done'
+        waitsForPromise ->
+          activationPromise
+        runs ->
+          expect(editor.getCursors().length).toEqual 1
+
+  describe "when '.litcoffee' file is opened", ->
+
+    [ editorView, editor, activationPromise, watcher ] = []
+
+    beforeEach ->
+      { editorView, editor } = openFile 'fibonacci.litcoffee'
+      loadLanguage()
+      activationPromise = activatePackage (w) ->
+        watcher = w
+
+    it "attaches the views", ->
+      waitsForPromise ->
+        activationPromise
+      runs ->
+        expect(atom.workspaceView.find(".#{ErrorView.className}")).toExist()
+        expect(atom.workspaceView.find(".#{ReferenceView.className}")).toExist()
+
+    it "activates watcher", ->
+      waitsForPromise ->
+        activationPromise
+      runs ->
+        expect(watcher.ripper).toBeDefined()

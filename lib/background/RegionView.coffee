@@ -11,6 +11,7 @@ class RegionView extends View
   @content: ->
     @div class: 'region'
 
+
   constructor: ({ tl, br }, isFirstRow, isLastRow) ->
     super()
 
