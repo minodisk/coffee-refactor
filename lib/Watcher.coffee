@@ -38,7 +38,7 @@ class Watcher extends EventEmitter
   checkGrammar: =>
     @deactivate()
     scopeName = @editor.getGrammar().scopeName
-    return unless scopeName is 'source.coffee' or scopeName is 'source.litcoffee' 
+    return unless scopeName is 'source.coffee' or scopeName is 'source.litcoffee'
     @activate()
 
   activate: ->
@@ -59,7 +59,7 @@ class Watcher extends EventEmitter
     @editor.buffer.on 'changed', @onBufferChanged
 
     # Execute
-    @parse()
+    @onBufferChanged()
 
   deactivate: ->
     # Stop listening
@@ -75,7 +75,6 @@ class Watcher extends EventEmitter
     @statusView?.destruct()
 
     # Remove references
-    delete @isActivated
     delete @ripper
     delete @referenceView
     delete @errorView
@@ -94,13 +93,14 @@ class Watcher extends EventEmitter
   ###
 
   onBufferChanged: =>
-    clearTimeout @timeoutId
-    @timeoutId = setTimeout @parse, 0
-    unless @isParsing
-      @isParsing = true
-      @referenceView.empty()
-      @errorView.empty()
-      @editorView.off 'cursor:moved', @onCursorMoved
+    # clearTimeout @timeoutId
+    # @timeoutId = setTimeout @parse, 0
+    @hideError()
+    @referenceView.update()
+    @editorView.off 'cursor:moved', @onCursorMoved
+    @parse()
+    # unless @isParsing
+    #   @isParsing = true
 
   parse: =>
     text = @editor.buffer.getText()
@@ -111,8 +111,8 @@ class Watcher extends EventEmitter
           @showError err
           return
         @hideError()
-    if @isParsing
-      @isParsing = false
+        @onParseEnd()
+    else
       @onParseEnd()
 
   showError: ({ location, message }) =>
@@ -129,6 +129,8 @@ class Watcher extends EventEmitter
     @gutterView.update()
 
   onParseEnd: =>
+    # return unless @isParsing
+    # @isParsing = false
     @updateReferences()
     @editorView.off 'cursor:moved', @onCursorMoved
     @editorView.on 'cursor:moved', @onCursorMoved
@@ -214,15 +216,15 @@ class Watcher extends EventEmitter
   ###
 
   isActive: ->
-    @isActivated and atom.workspaceView.getActivePaneItem() is @editor
+    @ripper? and atom.workspaceView.getActivePaneItem() is @editor
 
   # Range to pixel based start and end range for each row.
   rangeToRows: ({ start, end }) ->
-    for row in [start.row..end.row] by 1
-      rowRange = @editor.buffer.rangeForRow row
+    for raw in [start.row..end.row] by 1
+      rowRange = @editor.buffer.rangeForRow raw
       point =
-        left : if row is start.row then start else rowRange.start
-        right: if row is end.row then end else rowRange.end
+        left : if raw is start.row then start else rowRange.start
+        right: if raw is end.row then end else rowRange.end
       pixel =
         tl: @editorView.pixelPositionForBufferPosition point.left
         br: @editorView.pixelPositionForBufferPosition point.right
