@@ -10,7 +10,7 @@ Highlight all references of the symbol under the cursor.
 
 ![capture_reference](https://cloud.githubusercontent.com/assets/514164/2929355/b4fe6d30-d788-11e3-88c3-e65c0046d3fc.gif)
 
-You can toggle whether to enable or not in the setting view.
+You can toggle whether to enable the function or not in the setting view.
 
 1. Open setting with `Atom > Preferences`.
 2. Input 'coffee refactor' to `Filter package` and select 'Coffee Refactor' package.
@@ -25,7 +25,7 @@ Rename all references of the symbol under the cursor.
 1. Set cursor to symbol.
 2. Start renaming using `ctrl-r`.
 3. Type new name.
-4. Finish renaming using `enter` or removing cursor from the focused symbol.
+4. Finish renaming by using `enter` or removing cursor from the focused symbol.
 
 ### Supported Symbols
 
@@ -40,7 +40,7 @@ Rename all references of the symbol under the cursor.
 
 ![capture_error](https://cloud.githubusercontent.com/assets/514164/2936037/568a47d8-d841-11e3-84d4-76ba1a8f69b6.gif)
 
-You can toggle whether to enable or not in the setting view.
+You can toggle whether to enable the function or not in the setting view.
 
 1. Open setting with `Atom > Preferences`.
 2. Input 'coffee refactor' to `Filter package` and select 'Coffee Refactor' package.
