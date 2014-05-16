@@ -43,14 +43,14 @@ new class Main
 
   onRename: (e) =>
     isExecuted = false
-    for watcher in @watchers when watcher.isActive()
+    for watcher in @watchers
       isExecuted or= watcher.rename()
     return if isExecuted
     e.abortKeyBinding()
 
   onDone: (e) =>
     isExecuted = false
-    for watcher in @watchers when watcher.isActive()
+    for watcher in @watchers
       isExecuted or= watcher.done()
     return if isExecuted
     e.abortKeyBinding()

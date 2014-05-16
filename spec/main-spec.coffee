@@ -31,7 +31,7 @@ describe "main", ->
 
   describe "when '.coffee' file is opened", ->
 
-    [ editorView, editor, activationPromise, watcher ] = []
+    [ editorView, editor, activationPromise, watcher, errorView, referenceView ] = []
 
     beforeEach ->
       { editorView, editor } = openFile 'fibonacci.coffee'
@@ -43,14 +43,46 @@ describe "main", ->
       waitsForPromise ->
         activationPromise
       runs ->
-        expect(atom.workspaceView.find(".#{ErrorView.className}")).toExist()
-        expect(atom.workspaceView.find(".#{ReferenceView.className}")).toExist()
+        errorView = atom.workspaceView.find ".#{ErrorView.className}"
+        referenceView = atom.workspaceView.find ".#{ReferenceView.className}"
+        expect(errorView).toExist()
+        expect(referenceView).toExist()
 
     it "activates watcher", ->
       waitsForPromise ->
         activationPromise
       runs ->
         expect(watcher.ripper).toBeDefined()
+
+    it "starts highlighting", ->
+      waitsForPromise ->
+        activationPromise
+      runs ->
+        expect(referenceView.find('.marker').length).toEqual 4
+
+    it "has single cursor", ->
+      waitsForPromise ->
+        activationPromise
+      runs ->
+        expect(editor.getCursors().length).toEqual 1
+
+    describe "when 'coffee-refactor:rename' event is triggered", ->
+
+      it "has multi-cursors", ->
+        atom.workspaceView.trigger 'coffee-refactor:rename'
+        waitsForPromise ->
+          activationPromise
+        runs ->
+          expect(editor.getCursors().length).toEqual 4
+
+    describe "when 'coffee-refactor:done' event is triggered", ->
+
+      it "has single cursor", ->
+        atom.workspaceView.trigger 'coffee-refactor:done'
+        waitsForPromise ->
+          activationPromise
+        runs ->
+          expect(editor.getCursors().length).toEqual 1
 
   describe "when '.litcoffee' file is opened", ->
 

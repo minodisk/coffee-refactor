@@ -38,7 +38,7 @@ class Watcher extends EventEmitter
   checkGrammar: =>
     @deactivate()
     scopeName = @editor.getGrammar().scopeName
-    return unless scopeName is 'source.coffee' or scopeName is 'source.litcoffee' 
+    return unless scopeName is 'source.coffee' or scopeName is 'source.litcoffee'
     @activate()
 
   activate: ->
@@ -75,7 +75,6 @@ class Watcher extends EventEmitter
     @statusView?.destruct()
 
     # Remove references
-    delete @isActivated
     delete @ripper
     delete @referenceView
     delete @errorView
@@ -85,24 +84,18 @@ class Watcher extends EventEmitter
 
   ###
   Reference finder process
-  1. Detect buffer changed.
-  2. Stop listening cursor move event.
-  3. Parse.
-  4. Show errors and exit process when compile error is thrown.
-  5. Show references.
-  6. Start listening cursor move event.
+  1. Stop listening cursor move event and reset views.
+  2. Parse.
+  3. Show errors and exit process when compile error is thrown.
+  4. Show references.
+  5. Start listening cursor move event.
   ###
 
-  onBufferChanged: =>
-    clearTimeout @timeoutId
-    @timeoutId = setTimeout @parse, 0
-    unless @isParsing
-      @isParsing = true
-      @referenceView.empty()
-      @errorView.empty()
-      @editorView.off 'cursor:moved', @onCursorMoved
+  parse: ->
+    @editorView.off 'cursor:moved', @onCursorMoved
+    @hideError()
+    @referenceView.update()
 
-  parse: =>
     text = @editor.buffer.getText()
     if text isnt @cachedText
       @cachedText = text
@@ -111,8 +104,8 @@ class Watcher extends EventEmitter
           @showError err
           return
         @hideError()
-    if @isParsing
-      @isParsing = false
+        @onParseEnd()
+    else
       @onParseEnd()
 
   showError: ({ location, message }) =>
@@ -145,17 +138,6 @@ class Watcher extends EventEmitter
     rowsList = for range in ranges
       @rangeToRows range
     @referenceView.update rowsList
-
-
-  ###
-  Cursor moved process
-  1. Detect cursor moved.
-  2. Update references.
-  ###
-
-  onCursorMoved: =>
-    clearTimeout @timeoutId
-    @timeoutId = setTimeout @updateReferences, 0
 
 
   ###
@@ -210,19 +192,31 @@ class Watcher extends EventEmitter
 
 
   ###
+  User events
+  ###
+
+  onBufferChanged: =>
+    @parse()
+
+  onCursorMoved: =>
+    clearTimeout @timeoutId
+    @timeoutId = setTimeout @updateReferences, 0
+
+
+  ###
   Utility
   ###
 
   isActive: ->
-    @isActivated and atom.workspaceView.getActivePaneItem() is @editor
+    @ripper? and atom.workspaceView.getActivePaneItem() is @editor
 
   # Range to pixel based start and end range for each row.
   rangeToRows: ({ start, end }) ->
-    for row in [start.row..end.row] by 1
-      rowRange = @editor.buffer.rangeForRow row
+    for raw in [start.row..end.row] by 1
+      rowRange = @editor.buffer.rangeForRow raw
       point =
-        left : if row is start.row then start else rowRange.start
-        right: if row is end.row then end else rowRange.end
+        left : if raw is start.row then start else rowRange.start
+        right: if raw is end.row then end else rowRange.end
       pixel =
         tl: @editorView.pixelPositionForBufferPosition point.left
         br: @editorView.pixelPositionForBufferPosition point.right
