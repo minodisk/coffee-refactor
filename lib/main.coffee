@@ -1,4 +1,9 @@
-{ Main } = require 'atom-refactor'
-Ripper = require './Ripper'
+module.exports =
+new class CoffeeRefactor extends require('atom-refactor').Main
 
-module.exports = new Main Ripper
+  Watcher: require './Watcher'
+  renameCommand: 'coffee-refactor:rename'
+  refactorCommand: 'coffee-refactor:refactor'
+
+  constructor: ->
+    super
