@@ -1,3 +1,8 @@
+# v0.4.1 on 2014/05/20
+
+* Update atom-refactor to v0.1.2.
+* Implement compatible interface to [js-refactor](https://atom.io/packages/js-refactor).
+
 # v0.4.0 on 2014/05/17
 
 * Separate core module related to view-controller and view to atom-refactor.

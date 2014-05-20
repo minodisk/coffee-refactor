@@ -1,6 +1,6 @@
-# Coffee Refactor package [![Build Status](https://travis-ci.org/minodisk/coffee-refactor.svg?branch=master)](https://travis-ci.org/minodisk/coffee-refactor)
+# coffee-refactor [![Build Status](https://travis-ci.org/minodisk/coffee-refactor.svg?branch=master)](https://travis-ci.org/minodisk/coffee-refactor)
 
-Refactor CoffeeScript for [Atom](https://atom.io/).
+CoffeeScript refactoring package for [Atom](https://atom.io/).
 
 ## Reference Finder
 
@@ -54,4 +54,4 @@ You can toggle whether to enable the function or not in the setting view.
 ## See
 
 * [Changelog](CHANGELOG.md)
-* [MITLicense](LICENSE.md)
+* [MITLicense](LICENSE)

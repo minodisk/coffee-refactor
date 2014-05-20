@@ -2,8 +2,6 @@ path = require 'path'
 fs = require 'fs'
 { inspect } = require 'util'
 { WorkspaceView } = require 'atom'
-# ErrorView = require '../lib/background/ErrorView.coffee'
-# ReferenceView = require '../lib/background/ReferenceView.coffee'
 
 
 openFile = (filename) ->
@@ -43,8 +41,8 @@ describe "main", ->
       waitsForPromise ->
         activationPromise
       runs ->
-        errorView = atom.workspaceView.find ".coffee-refactor-error"
-        referenceView = atom.workspaceView.find ".coffee-refactor-reference"
+        errorView = atom.workspaceView.find ".refactor-error"
+        referenceView = atom.workspaceView.find ".refactor-reference"
         expect(errorView).toExist()
         expect(referenceView).toExist()
 
@@ -98,8 +96,8 @@ describe "main", ->
       waitsForPromise ->
         activationPromise
       runs ->
-        expect(atom.workspaceView.find(".coffee-refactor-error")).toExist()
-        expect(atom.workspaceView.find(".coffee-refactor-reference")).toExist()
+        expect(atom.workspaceView.find(".refactor-error")).toExist()
+        expect(atom.workspaceView.find(".refactor-reference")).toExist()
 
     it "activates watcher", ->
       waitsForPromise ->
