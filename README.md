@@ -51,6 +51,10 @@ You can toggle whether to enable the function or not in the setting view.
 * Override [keymap](kaymaps/coffee-refactor.cson) with `Atom > Open Your Keymap`.
 * Override [stylesheet](stylesheets/coffee-refactor.less) with `Atom > Open Your Stylesheet`.
 
+## Related Package
+
+* [js-refactor](https://atom.io/packages/js-refactor)
+
 ## See
 
 * [Changelog](CHANGELOG.md)
