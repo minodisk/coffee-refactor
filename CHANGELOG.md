@@ -1,3 +1,8 @@
+# v0.4.2 on 2014/05/
+
+* Support `for-in` statement with destructuring assignment.
+* Support `for-of` statement with destructuring assignment.
+
 # v0.4.1 on 2014/05/20
 
 * Update atom-refactor to v0.1.2.

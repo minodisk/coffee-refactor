@@ -2,9 +2,10 @@
 { Value, Code, Literal, For, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../node_modules/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
-{ inspect } = require 'util'
 { isString, isArray, uniq, some } = _ = require 'lodash'
 { utils: { LocationDataUtil: { locationDataToRange, rangeToLocationData, isEqualsLocationData }}} = require 'atom-refactor'
+
+{ inspect } = require 'util'
 
 
 LEVEL_TOP = 1
@@ -47,16 +48,23 @@ class Ripper
       #     break if property is child
       #   return false
 
-      if child instanceof For
-        if child.name? and
-           isEqualsLocationData child.name.locationData, targetLocationData
-          target = child.name
-          return false
-        else if child.index? and
-                isEqualsLocationData child.index.locationData, targetLocationData
-          target = child.index
-          return false
-      else if child instanceof Literal
+      # if child instanceof For
+      #   if child.name?
+          # target = @findSymbol child.name, targetLocationData
+          # console.log target
+          # return false if target?
+
+        # if child.name? and
+        #    isEqualsLocationData child.name.locationData, targetLocationData
+        #   target = child.name
+        #   return false
+        # else if child.index? and
+        #         isEqualsLocationData child.index.locationData, targetLocationData
+        #   target = child.index
+        #   return false
+      # else
+
+      if child instanceof Literal
         if isEqualsLocationData child.locationData, targetLocationData
           target = child
           return false
@@ -177,6 +185,13 @@ class Ripper
   @generateNodes: (parent) ->
     return unless parent.children?
     children = []
+
+    # Add `for` statement
+    if parent.index?
+      children.push parent.index
+    if parent.name?
+      children.push parent.name
+
     for attr in parent.children when parent[attr]
       children.push parent[attr]
     children = flatten children
