@@ -79,8 +79,14 @@ a = b = 100
 #TODO
 for { a } in arr
   a = 100
+for a, { b } of obj
+  a = 100
+  b = 100
 for [ a ] in arr
   a = 100
+for a, [ b ] of obj
+  a = 100
+  b = 100
 
 
 obj =
@@ -113,4 +119,6 @@ func0 = -> abcde = 100
 func1 = -> abcde = 100
 
 func = ({ a }) ->
+  a 1
+func = ([ a ]) ->
   a 1

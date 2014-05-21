@@ -172,6 +172,30 @@ describe 'Ripper', ->
       expectEqualRefs ripper, new Range([1, 14], [1, 15]),
         new Range([0, 10], [0, 11])
 
+    it 'should support `for-in` statement with destructuring assignment', ->
+      ripper.parse """
+      for { a } in arr
+        a = 100
+      for [ a ] in arr
+        a = 100
+      """
+      expectEqualRefs ripper, new Range([0, 6], [0, 7]),
+        new Range([1, 2], [1, 3]),
+        new Range([2, 6], [2, 7]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
+        new Range([0, 6], [0, 7]),
+        new Range([2, 6], [2, 7]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs ripper, new Range([2, 6], [2, 7]),
+        new Range([0, 6], [0, 7]),
+        new Range([1, 2], [1, 3]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs ripper, new Range([3, 2], [3, 3]),
+        new Range([0, 6], [0, 7]),
+        new Range([1, 2], [1, 3]),
+        new Range([2, 6], [2, 7])
+
     it 'should support `for-of` statement', ->
       ripper.parse """
       for key, val of obj
@@ -185,6 +209,30 @@ describe 'Ripper', ->
         new Range([0, 4], [0, 7])
       expectEqualRefs ripper, new Range([1, 19], [1, 22]),
         new Range([0, 9], [0, 12])
+
+    it 'should support `for-of` statement with destructuring assignment', ->
+      ripper.parse """
+      for i, { a } of obj
+        a = 100
+      for i, [ a ] of obj
+        a = 100
+      """
+      expectEqualRefs ripper, new Range([0, 9], [0, 10]),
+        new Range([1, 2], [1, 3]),
+        new Range([2, 9], [2, 10]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
+        new Range([0, 9], [0, 10]),
+        new Range([2, 9], [2, 10]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs ripper, new Range([2, 9], [2, 10]),
+        new Range([0, 9], [0, 10]),
+        new Range([1, 2], [1, 3]),
+        new Range([3, 2], [3, 3])
+      expectEqualRefs ripper, new Range([3, 2], [3, 3]),
+        new Range([0, 9], [0, 10]),
+        new Range([1, 2], [1, 3]),
+        new Range([2, 9], [2, 10])
 
     it 'should support destructuring assignment statement of `Array`', ->
       ripper.parse """

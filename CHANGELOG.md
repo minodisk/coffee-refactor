@@ -1,11 +1,16 @@
+# v0.4.2 on 2014/05/
+
+* Supported `for-in` statement with destructuring assignment.
+* Supported `for-of` statement with destructuring assignment.
+
 # v0.4.1 on 2014/05/20
 
-* Update atom-refactor to v0.1.2.
-* Implement compatible interface to [js-refactor](https://atom.io/packages/js-refactor).
+* Updated atom-refactor to v0.1.2.
+* Implemented compatible interface to [js-refactor](https://atom.io/packages/js-refactor).
 
 # v0.4.0 on 2014/05/17
 
-* Separate core module related to view-controller and view to atom-refactor.
+* Separated core module related to view-controller and view to atom-refactor.
 
 # v0.3.5 on 2014/05/16
 
@@ -13,7 +18,7 @@
 
 # v0.3.4 on 2014/05/16
 
-* Improve behavior about aborting renaming.
+* Improved behavior about aborting renaming.
 
 # v0.3.3 on 2014/05/10
 
@@ -21,8 +26,8 @@
 
 # v0.3.2 on 2014/05/09
 
-* Use setting view to toggle highlighting enabled.
-* Add an implementation of highlighting compile error experimentally.
+* Started using setting view to toggle highlighting enabled.
+* Added an implementation of highlighting compile error experimentally.
 
 # v0.3.1 on 2014/05/08
 
@@ -31,8 +36,8 @@
 # v0.3.0 on 2014/05/04
 
 * Refactored code.
-* Detect text modification faster.
-* Tune the performance of highlighting.
+* Improved detecting text modification faster.
+* Improved the performance of highlighting.
 
 # v0.2.4 on 2014/05/02
 
@@ -42,7 +47,7 @@
 # v0.2.3 on 2014/05/01
 
 * Fixed an issue causing not working in destructuring assignment statement of `Object`.
-* Test on Travis CI.
+* Started testing on Travis CI.
 
 # v0.2.2 on 2014/05/01
 
@@ -55,8 +60,8 @@
 # v0.2.0 on 2014/04/25
 
 * Fixed an issue causing stopping highlighting when typing wrong code.
-* Skip key of object literal.
-* Skip key access.
+* Skipped key of object literal.
+* Skipped key access.
 
 # v0.1.12 on 2014/04/20
 
@@ -65,43 +70,43 @@
 # v0.1.11 on 2014/04/16
 
 * Fixed an issue causing the highlighting to be wrong when focusing at primitive symbols.
-* Add class using when highlighting multi-lines.
+* Added class using when highlighting multi-lines.
 
 # v0.1.10 on 2014/04/16
 
-* Support `for-in` and `for-of` statement
+* Supported `for-in` and `for-of` statement
 
 # v0.1.9 on 2014/04/15
 
 * Fixed error thrown when toggle highlight after closing editor.
-* Replace capture in README.
+* Replaced capture in README.
 
 # v0.1.7-v0.1.8 on 2014/04/15
 
-* Support highlighting references.
+* Supported highlighting references.
 
 # v0.1.6 on 2014/04/12
 
-* Add capture to README.
-* Add descriptions about operation and support to README.
+* Added capture to README.
+* Added descriptions about operation and support to README.
 
 # v0.1.5 on 2014/04/11
 
-* Support renaming over lexical scope.
+* Supported renaming over lexical scope.
 
 # v0.1.3-v0.1.4 on 2014/04/10
 
-* Implement finding references with `Literal` class.
+* Implemented finding references with `Literal` class.
 
 # v0.1.2 on 2014/04/10
 
-* Support renaming parameter.
-* Support renaming class name.
+* Supported renaming parameter.
+* Supported renaming class name.
 
 # v0.1.1 on 2014/04/09
 
-* Add tests.
-* Support renaming variable.
+* Added some specs.
+* Supported renaming variable.
 
 # v0.1.0 on 2014/04/09
 
