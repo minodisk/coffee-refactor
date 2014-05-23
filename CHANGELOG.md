@@ -1,3 +1,7 @@
+# v0.4.2 on 2014/05/
+
+* Supported string interpolation.
+
 # v0.4.2 on 2014/05/21
 
 * Supported `for-in` statement with destructuring assignment.

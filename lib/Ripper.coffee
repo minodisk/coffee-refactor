@@ -1,5 +1,5 @@
 { nodes } = require 'coffee-script'
-{ Value, Code, Literal, For, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ Value, Code, Literal, For, Assign, Access, Parens } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../node_modules/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { isString, isArray, uniq, some } = _ = require 'lodash'
@@ -108,6 +108,8 @@ class Ripper
       # Skip key of object literal
       return true if @isKeyOfObjectLiteral parent, child
 
+      # if child instanceof Parens
+      #   console.log inspect child
       if @isSameLiteral child, target
         data.push child
         return true
@@ -212,8 +214,27 @@ class Ripper
     delete @nodes
 
   parse: (code, callback) ->
+    CS = require '../node_modules/coffee-script-redux/lib/nodes'
+
+    coffee = code
+
+    { Preprocessor } = require '../node_modules/coffee-script-redux/lib/preprocessor'
+    Parser = require '../node_modules/coffee-script-redux/lib/parser'
+    { Optimiser } = require '../node_modules/coffee-script-redux/lib/optimiser'
+    { Compiler } = require '../node_modules/coffee-script-redux/lib/compiler'
+    CoffeeScript = require '../node_modules/coffee-script-redux/lib/module'
+
+    preprocessed = Preprocessor.process coffee, literate: false
+    parsed = Parser.parse preprocessed, raw: true, inputSource: null
+    if false
+      parsed = Optimiser.optimise parsed
+    console.log inspect parsed
+    jsAST = Compiler.compile parsed, bare: false
+    console.log jsAST
+    console.log CoffeeScript.jsWithSourceMap jsAST
+
     try
-      rawNodes = nodes code
+      rawNodes = nodes code #, rewrite: off
     catch err
       callback? err
       return

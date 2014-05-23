@@ -127,10 +127,21 @@ func = ([ a ]) ->
 # TODO
 
 a
-"#{a}"
-"""
+"abcdefg#{a}"
+"abcdefg
+#{a}
+"
+"
+abcdefg#{a}
+"
+"""abcdefg#{a}"""
+"""abcdefg
 #{a}
 """
+"""
+abcdefg#{a}
+"""
+
 '#{a}'
 '''
 #{a}
