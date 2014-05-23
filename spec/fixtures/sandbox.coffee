@@ -76,7 +76,7 @@ b.name = 'override!!'
 [ a, b ] = arr
 a = b = 100
 
-#TODO
+
 for { a } in arr
   a = 100
 for a, { b } of obj
@@ -122,3 +122,16 @@ func = ({ a }) ->
   a 1
 func = ([ a ]) ->
   a 1
+
+
+# TODO
+
+a
+"#{a}"
+"""
+#{a}
+"""
+'#{a}'
+'''
+#{a}
+'''
