@@ -137,6 +137,9 @@ abcdefg#{a}
 """abcdefg#{a}"""
 """abcdefg
 #{a}
+#{a}
+#{a}
+#{a}
 """
 """
 abcdefg#{a}

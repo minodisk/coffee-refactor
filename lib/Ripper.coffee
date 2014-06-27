@@ -1,4 +1,4 @@
-{ nodes } = require 'coffee-script'
+{ nodes } = require '../node_modules/coffee-script/lib/coffee-script/coffee-script'
 { Value, Code, Literal, For, Assign, Access, Parens } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../node_modules/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
@@ -17,10 +17,6 @@ class Ripper
   @find: (root, targetLocationData) ->
     target = @findSymbol root, targetLocationData
     return [] unless target?
-    # if isArray target
-    #   console.log inspect target[0]
-    #   console.log inspect @findReference(root, target[0])
-    # else
     @findReference(root, target).data
 
   @findSymbol: (parent, targetLocationData) ->
@@ -82,8 +78,6 @@ class Ripper
       # Skip key of object literal
       return true if @isKeyOfObjectLiteral parent, child
 
-      # if child instanceof Parens
-      #   console.log inspect child
       if @isSameLiteral child, target
         data.push child
         return true
@@ -189,7 +183,7 @@ class Ripper
 
   parse: (code, callback) ->
     try
-      rawNodes = nodes code #, rewrite: off
+      rawNodes = nodes code
     catch err
       callback? err
       return
