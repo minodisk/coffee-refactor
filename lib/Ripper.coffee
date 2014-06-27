@@ -5,8 +5,6 @@
 { isString, isArray, uniq, some } = _ = require 'lodash'
 { utils: { LocationDataUtil: { locationDataToRange, rangeToLocationData, isEqualsLocationData }}} = require 'atom-refactor'
 
-{ inspect } = require 'util'
-
 
 LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
@@ -214,25 +212,6 @@ class Ripper
     delete @nodes
 
   parse: (code, callback) ->
-    CS = require '../node_modules/coffee-script-redux/lib/nodes'
-
-    coffee = code
-
-    { Preprocessor } = require '../node_modules/coffee-script-redux/lib/preprocessor'
-    Parser = require '../node_modules/coffee-script-redux/lib/parser'
-    { Optimiser } = require '../node_modules/coffee-script-redux/lib/optimiser'
-    { Compiler } = require '../node_modules/coffee-script-redux/lib/compiler'
-    CoffeeScript = require '../node_modules/coffee-script-redux/lib/module'
-
-    preprocessed = Preprocessor.process coffee, literate: false
-    parsed = Parser.parse preprocessed, raw: true, inputSource: null
-    if false
-      parsed = Optimiser.optimise parsed
-    console.log inspect parsed
-    jsAST = Compiler.compile parsed, bare: false
-    console.log jsAST
-    console.log CoffeeScript.jsWithSourceMap jsAST
-
     try
       rawNodes = nodes code #, rewrite: off
     catch err
