@@ -434,3 +434,11 @@ describe 'Ripper', ->
     #     new Range([1, 6], [1, 7])
     #   expectEqualRefs ripper, new Range([1, 4], [1, 5]),
     #     new Range([0, 4], [0, 5])
+
+    it 'should support $', ->
+      ripper.parse '''
+      $a = $ '<p>foo</p>'
+      $a.text()
+      '''
+      expectEqualRefs ripper, new Range([0, 0], [0, 2]),
+        new Range([1, 0], [1, 2])

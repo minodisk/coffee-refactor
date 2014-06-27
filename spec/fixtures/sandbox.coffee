@@ -146,3 +146,6 @@ abcdefg#{a}
 '''
 #{a}
 '''
+
+$a = $ '<p>foo</p>'
+$a.text()
