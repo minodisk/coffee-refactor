@@ -1,11 +1,9 @@
-{ nodes } = require 'coffee-script'
-{ Value, Code, Literal, For, Assign, Access } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
+{ nodes } = require '../node_modules/coffee-script/lib/coffee-script/coffee-script'
+{ Value, Code, Literal, For, Assign, Access, Parens } = require '../node_modules/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../node_modules/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { isString, isArray, uniq, some } = _ = require 'lodash'
 { utils: { LocationDataUtil: { locationDataToRange, rangeToLocationData, isEqualsLocationData }}} = require 'atom-refactor'
-
-{ inspect } = require 'util'
 
 
 LEVEL_TOP = 1
@@ -19,10 +17,6 @@ class Ripper
   @find: (root, targetLocationData) ->
     target = @findSymbol root, targetLocationData
     return [] unless target?
-    # if isArray target
-    #   console.log inspect target[0]
-    #   console.log inspect @findReference(root, target[0])
-    # else
     @findReference(root, target).data
 
   @findSymbol: (parent, targetLocationData) ->
@@ -39,30 +33,6 @@ class Ripper
       return true if @isKeyOfObjectAccess parent, child
       # Skip key in object literal
       return true if @isKeyOfObjectLiteral parent, child
-
-      # if child instanceof Access and
-      #    isEqualsLocationData child.name.locationData, targetLocationData
-      #   target = [ parent.base ]
-      #   for property in parent.properties
-      #     target.push property
-      #     break if property is child
-      #   return false
-
-      # if child instanceof For
-      #   if child.name?
-          # target = @findSymbol child.name, targetLocationData
-          # console.log target
-          # return false if target?
-
-        # if child.name? and
-        #    isEqualsLocationData child.name.locationData, targetLocationData
-        #   target = child.name
-        #   return false
-        # else if child.index? and
-        #         isEqualsLocationData child.index.locationData, targetLocationData
-        #   target = child.index
-        #   return false
-      # else
 
       if child instanceof Literal
         if isEqualsLocationData child.locationData, targetLocationData

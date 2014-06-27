@@ -18,6 +18,7 @@ module.exports = (grunt) ->
           'spec/**/*'
           'stylesheets/**/*'
           'node_modules/atom-refactor/**/*'
+          'vender/coffeescript/lib/**/*'
         ]
         livereload:
           enabled: false
@@ -31,6 +32,18 @@ module.exports = (grunt) ->
     grunt.util.spawn
       cmd: 'apm'
       args: [ 'test' ]
+    , (err, result, code) ->
+      if err?
+        grunt.util.error err
+      if result?
+        grunt.log.writeln result
+      done()
+
+  grunt.registerTask 'cake:generate', ->
+    done = @async()
+    grunt.util.spawn
+      cmd: 'cake'
+      args: [ 'generate' ]
     , (err, result, code) ->
       if err?
         grunt.util.error err

@@ -407,6 +407,44 @@ describe 'Ripper', ->
       expectEqualRefs ripper, new Range([4, 4], [4, 5]),
         new Range([3, 3], [3, 4])
 
+    it 'should support string interpolation', ->
+      ripper.parse '''
+      a
+      "#{a}"
+      "x#{a}"
+      """
+      #{a}
+      """
+      """x
+      #{a}
+      """
+      '''
+      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+        new Range([1, 3], [1, 4]),
+        new Range([2, 4], [2, 5]),
+        new Range([4, 2], [4, 3]),
+        new Range([7, 2], [7, 3])
+      expectEqualRefs ripper, new Range([1, 3], [1, 4]),
+        new Range([0, 0], [0, 1]),
+        new Range([2, 4], [2, 5]),
+        new Range([4, 2], [4, 3]),
+        new Range([7, 2], [7, 3])
+      expectEqualRefs ripper, new Range([2, 4], [2, 5]),
+        new Range([0, 0], [0, 1]),
+        new Range([1, 3], [1, 4]),
+        new Range([4, 2], [4, 3]),
+        new Range([7, 2], [7, 3])
+      expectEqualRefs ripper, new Range([4, 2], [4, 3]),
+        new Range([0, 0], [0, 1]),
+        new Range([1, 3], [1, 4]),
+        new Range([2, 4], [2, 5]),
+        new Range([7, 2], [7, 3])
+      expectEqualRefs ripper, new Range([7, 2], [7, 3]),
+        new Range([0, 0], [0, 1]),
+        new Range([1, 3], [1, 4]),
+        new Range([2, 4], [2, 5]),
+        new Range([4, 2], [4, 3])
+
     # it 'should recognize context', ->
     #   ripper.parse """
     #   obj.a.b = 1
@@ -416,3 +454,13 @@ describe 'Ripper', ->
     #     new Range([1, 6], [1, 7])
     #   expectEqualRefs ripper, new Range([1, 4], [1, 5]),
     #     new Range([0, 4], [0, 5])
+
+    it 'should support $', ->
+      ripper.parse '''
+      $a = $ '<p>foo</p>'
+      $a.text()
+      '''
+      expectEqualRefs ripper, new Range([0, 0], [0, 2]),
+        new Range([1, 0], [1, 2])
+      expectEqualRefs ripper, new Range([1, 0], [1, 2]),
+        new Range([0, 0], [0, 2])
