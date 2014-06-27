@@ -1,6 +1,6 @@
-# v0.4.2 on 2014/05/
+# v0.4.3 on 2014/06/27
 
-* Supported string interpolation.
+* Fixed an issue wrong position in string interpolation.
 
 # v0.4.2 on 2014/05/21
 
