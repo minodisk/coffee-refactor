@@ -1,7 +1,7 @@
 {
   "name": "coffee-refactor",
   "main": "./lib/main",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "CoffeeScript refactoring package for Atom",
   "repository": "https://github.com/minodisk/coffee-refactor",
   "license": "MIT",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "atom-refactor": "0.1.2",
-    "coffee-script": "git://github.com/minodisk/coffeescript.git",
+    "coffee-script": "minodisk/coffeescript",
     "lodash": "~2.4.1"
   },
   "devDependencies": {
