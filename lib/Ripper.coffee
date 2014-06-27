@@ -38,30 +38,6 @@ class Ripper
       # Skip key in object literal
       return true if @isKeyOfObjectLiteral parent, child
 
-      # if child instanceof Access and
-      #    isEqualsLocationData child.name.locationData, targetLocationData
-      #   target = [ parent.base ]
-      #   for property in parent.properties
-      #     target.push property
-      #     break if property is child
-      #   return false
-
-      # if child instanceof For
-      #   if child.name?
-          # target = @findSymbol child.name, targetLocationData
-          # console.log target
-          # return false if target?
-
-        # if child.name? and
-        #    isEqualsLocationData child.name.locationData, targetLocationData
-        #   target = child.name
-        #   return false
-        # else if child.index? and
-        #         isEqualsLocationData child.index.locationData, targetLocationData
-        #   target = child.index
-        #   return false
-      # else
-
       if child instanceof Literal
         if isEqualsLocationData child.locationData, targetLocationData
           target = child
