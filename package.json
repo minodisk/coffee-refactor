@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "atom-refactor": "0.1.2",
-    "coffee-script": "minodisk/coffeescript",
+    "coffee-script": "https://github.com/minodisk/coffeescript.git",
     "lodash": "~2.4.1"
   },
   "devDependencies": {
