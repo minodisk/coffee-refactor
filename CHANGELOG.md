@@ -1,6 +1,6 @@
 # v0.4.4-v0.4.6 on 2014/06/28
 
-* Fixed an issue stoping installation.
+* Fixed an issue aborting installation.
 
 # v0.4.3 on 2014/06/27
 
