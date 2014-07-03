@@ -1,10 +1,14 @@
+# v0.4.7 on 2014/07/03
+
+* Fixed an issue wrong position in "string" interpolation.
+
 # v0.4.4-v0.4.6 on 2014/06/28
 
 * Fixed an issue aborting installation.
 
 # v0.4.3 on 2014/06/27
 
-* Fixed an issue wrong position in string interpolation.
+* Fixed an issue wrong position in """string""" interpolation.
 
 # v0.4.2 on 2014/05/21
 

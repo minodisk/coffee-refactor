@@ -132,6 +132,9 @@ a
 #{a}
 "
 "
+#{a}
+"
+"
 abcdefg#{a}
 "
 """abcdefg#{a}"""
