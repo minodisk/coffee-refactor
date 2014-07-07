@@ -1,3 +1,7 @@
+# v0.4.8 on 2014/07/08
+
+* Updated atom-refactor to v0.1.3.
+
 # v0.4.7 on 2014/07/03
 
 * Fixed an issue wrong position in "string" interpolation.
