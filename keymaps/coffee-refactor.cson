@@ -1,3 +1,3 @@
 '.editor:not(.mini)':
-  'ctrl-r': 'coffee-refactor:rename'
+  'ctrl-alt-r': 'coffee-refactor:rename'
   'enter': 'coffee-refactor:done'
