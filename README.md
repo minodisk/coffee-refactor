@@ -58,4 +58,3 @@ You can toggle whether to enable the function or not in the setting view.
 ## See
 
 * [Changelog](CHANGELOG.md)
-* [MITLicense](LICENSE)
