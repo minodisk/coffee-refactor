@@ -79,7 +79,6 @@ class Ripper
       return true if @isKeyOfObjectLiteral parent, child
 
       if @isSameLiteral child, target
-        console.log require('util').inspect child
         data.push child
         return true
 

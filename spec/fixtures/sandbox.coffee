@@ -123,9 +123,6 @@ func = ({ a }) ->
 func = ([ a ]) ->
   a 1
 
-
-# TODO
-
 a
 "abcdefg#{a}"
 "abcdefg
@@ -152,6 +149,9 @@ abcdefg#{a}
 '''
 #{a}
 '''
+
+
+# TODO
 
 $a = $ '<p>foo</p>'
 $a.text()
