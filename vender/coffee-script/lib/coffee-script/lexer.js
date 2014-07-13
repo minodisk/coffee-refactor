@@ -273,7 +273,7 @@
     };
 
     Lexer.prototype.heregexToken = function() {
-      var body, flags, flagsOffset, heregex, match, plusToken, prev, re, tag, token, tokens, value, _i, _len, _ref2, _ref3, _ref4;
+      var body, flags, flagsOffset, heregex, match, plusToken, prev, re, strOffset, tag, token, tokens, value, _i, _len, _ref2, _ref3, _ref4;
       if (!(match = HEREGEX.exec(this.chunk))) {
         return 0;
       }
@@ -289,8 +289,10 @@
       this.token('IDENTIFIER', 'RegExp', 0, 0);
       this.token('CALL_START', '(', 0, 0);
       tokens = [];
+      strOffset = body.charAt(0) === '\n' ? 4 : 3;
       _ref2 = this.interpolateString(body, {
-        regex: true
+        regex: true,
+        strOffset: 3
       });
       for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
         token = _ref2[_i];
