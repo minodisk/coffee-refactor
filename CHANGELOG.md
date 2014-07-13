@@ -1,3 +1,7 @@
+# v0.4.10 on 2014/07/13
+
+* Fixed an issue wrong position in heregex interpolation.
+
 # v0.4.9 on 2014/07/09
 
 * Remap shortcut key to `ctrl-alt-r`
