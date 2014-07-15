@@ -1,4 +1,4 @@
-ripper = require '../lib/main'
+{ Ripper } = require '../lib/coffee-refactor'
 { Range } = require 'atom'
 # { inspect } = require 'util'
 
@@ -24,7 +24,9 @@ describe 'Ripper', ->
 
   describe 'parse', ->
 
-   it 'should run without error when parse invalid code', ->
+    ripper = new Ripper
+
+    it 'should run without error when parse invalid code', ->
       expect ->
         ripper.parse """
         a /// b
@@ -36,6 +38,8 @@ describe 'Ripper', ->
       expectNoRefs ripper, new Range([0, 0], [0, 1])
 
   describe 'find', ->
+
+    ripper = new Ripper
 
     it 'should find no reference of whitespace or operator', ->
       ripper.parse """

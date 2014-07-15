@@ -10,10 +10,7 @@ LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
 Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 
-
-module.exports =
-new class RefactorCoffee
-
+class Ripper
   @find: (root, targetLocationData) ->
     target = @findSymbol root, targetLocationData
     return [] unless target?
@@ -178,12 +175,12 @@ new class RefactorCoffee
     # parent
 
 
-  scopeNames: [
+  @scopeNames: [
     'source.coffee'
     'source.litcoffee'
   ]
 
-  activate: ->
+  constructor: (@editor) ->
 
   destruct: ->
     delete @nodes
@@ -196,12 +193,18 @@ new class RefactorCoffee
     catch err
       callback? err
       return
-    @nodes = RefactorCoffee.generateNodes rawNodes
+    @nodes = Ripper.generateNodes rawNodes
     callback?()
 
   find: (range) ->
     return [] unless @nodes?
     targetLocationData = rangeToLocationData range
-    foundNodes = RefactorCoffee.find @nodes, targetLocationData
+    foundNodes = Ripper.find @nodes, targetLocationData
     for { locationData }, i in foundNodes
       locationDataToRange locationData
+
+module.exports =
+  activate: ->
+  deactivate: ->
+  serialize: ->
+  Ripper: Ripper
