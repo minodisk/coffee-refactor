@@ -1,22 +1,29 @@
 {
   "name": "coffee-refactor",
+<<<<<<< HEAD
   "main": "./lib/main",
   "version": "0.4.10",
   "description": "CoffeeScript refactoring package: Rename with `ctrl-alt-r`",
   "repository": "https://github.com/minodisk/coffee-refactor",
+=======
+  "main": "./lib/coffee-refactor",
+  "version": "0.4.9",
+  "description": "CoffeeScript refactoring support",
+  "repository": "https://github.com/atom-refactor/coffee-refactor",
+>>>>>>> develop
   "license": "MIT",
   "auther": {
     "name": "Daisuke Mino",
     "url": "http://dsk.mn"
   },
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">0.50.0",
+    "refactor": "*"
   },
   "scripts": {
     "test": "apm test"
   },
   "dependencies": {
-    "atom-refactor": "0.1.3",
     "lodash": "~2.4.1"
   },
   "devDependencies": {

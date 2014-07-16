@@ -3,17 +3,15 @@
 { flatten } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { isString, isArray, uniq, some } = _ = require 'lodash'
-{ utils: { LocationDataUtil: { locationDataToRange, rangeToLocationData, isEqualsLocationData }}} = require 'atom-refactor'
+{ locationDataToRange, rangeToLocationData, isEqualsLocationData } = require './LocationDataUtil'
 
 
 LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
 Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 
-
 module.exports =
 class Ripper
-
   @find: (root, targetLocationData) ->
     target = @findSymbol root, targetLocationData
     return [] unless target?
@@ -178,8 +176,17 @@ class Ripper
     # parent
 
 
+  @scopeNames: [
+    'source.coffee'
+    'source.litcoffee'
+  ]
+
+  constructor: (@editor) ->
+
   destruct: ->
     delete @nodes
+
+  serialize: ->
 
   parse: (code, callback) ->
     try
