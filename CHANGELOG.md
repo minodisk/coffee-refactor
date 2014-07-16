@@ -1,3 +1,11 @@
+# v0.5.0 on 2014/07/16
+
+* Reform refactor ecosystem. Run as a language plugin of [refactor](https://atom.io/packages/refactor).
+
+# v0.4.11 on 2014/07/16
+
+* Fixed an issue that the reference markers remains when editor is deactivated.
+
 # v0.4.10 on 2014/07/13
 
 * Fixed an issue wrong position in heregex interpolation.

@@ -3,7 +3,7 @@
   "main": "./lib/coffee-refactor",
   "version": "0.4.11",
   "description": "CoffeeScript refactoring support",
-  "repository": "https://github.com/atom-refactor/coffee-refactor",
+  "repository": "https://github.com/minodisk/coffee-refactor",
   "license": "MIT",
   "auther": {
     "name": "Daisuke Mino",
