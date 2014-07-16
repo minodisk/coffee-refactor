@@ -1,6 +1,5 @@
 { Ripper } = require '../lib/coffee-refactor'
 { Range } = require 'atom'
-# { inspect } = require 'util'
 
 expectNoRefs = (ripper, range) ->
   resultRanges = ripper.find range
