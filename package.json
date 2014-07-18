@@ -1,16 +1,9 @@
 {
   "name": "coffee-refactor",
-<<<<<<< HEAD
   "main": "./lib/coffee-refactor",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "description": "CoffeeScript refactoring support",
   "repository": "https://github.com/atom-refactor/coffee-refactor",
-=======
-  "main": "./lib/main",
-  "version": "0.4.10",
-  "description": "CoffeeScript refactoring package: Rename with `ctrl-alt-r`",
-  "repository": "https://github.com/minodisk/coffee-refactor",
->>>>>>> master
   "license": "MIT",
   "auther": {
     "name": "Daisuke Mino",
