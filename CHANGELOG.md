@@ -1,3 +1,7 @@
+# v0.5.1 on 2014/07/19
+
+* Support symbol starting with `$` or `_`.
+
 # v0.5.0 on 2014/07/16
 
 * Reform refactor ecosystem. Run as a language plugin of [refactor](https://atom.io/packages/refactor).
