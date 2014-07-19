@@ -3,7 +3,7 @@
 { flatten } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { isString, isArray, uniq, some } = _ = require 'lodash'
-{ locationDataToRange, rangeToLocationData, isEqualsLocationData } = require './LocationDataUtil'
+{ locationDataToRange, isEqualsLocationData, pointToLineColumn, isContains } = require './LocationDataUtil'
 
 
 LEVEL_TOP = 1
@@ -17,7 +17,7 @@ class Ripper
     return [] unless target?
     @findReference(root, target).data
 
-  @findSymbol: (parent, targetLocationData) ->
+  @findSymbol: (parent, targetPoint) ->
     target = null
 
     _.each parent._children, (child) =>
@@ -33,11 +33,11 @@ class Ripper
       return true if @isKeyOfObjectLiteral parent, child
 
       if child instanceof Literal
-        if isEqualsLocationData child.locationData, targetLocationData
+        if isContains child.locationData, targetPoint
           target = child
           return false
 
-      target = @findSymbol child, targetLocationData
+      target = @findSymbol child, targetPoint
       return false if target?
 
     target
@@ -197,9 +197,8 @@ class Ripper
     @nodes = Ripper.generateNodes rawNodes
     callback?()
 
-  find: (range) ->
+  find: (point) ->
     return [] unless @nodes?
-    targetLocationData = rangeToLocationData range
-    foundNodes = Ripper.find @nodes, targetLocationData
+    foundNodes = Ripper.find @nodes, pointToLineColumn point
     for { locationData }, i in foundNodes
       locationDataToRange locationData

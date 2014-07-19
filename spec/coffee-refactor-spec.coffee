@@ -7,7 +7,7 @@ expectNoRefs = (ripper, range) ->
   .toHaveLength 0
 
 expectEqualRefs = (ripper, ranges...) ->
-  resultRanges = ripper.find ranges[0]
+  resultRanges = ripper.find ranges[0].start
   ranges.sort (a, b) ->
     return delta if (delta = a.start.row - b.start.row) isnt 0
     a.start.column - b.start.column
@@ -522,6 +522,27 @@ describe 'Ripper', ->
         new Range([2, 6], [2, 7]),
         new Range([4, 2], [4, 3])
 
+    it 'should support symbol starting with $', ->
+      ripper.parse '''
+      $a = $ '<p>foo</p>'
+      $a.text()
+      '''
+      expectEqualRefs ripper, new Range([0, 0], [0, 2]),
+        new Range([1, 0], [1, 2])
+      expectEqualRefs ripper, new Range([1, 0], [1, 2]),
+        new Range([0, 0], [0, 2])
+
+    it 'should support symbol starting with _', ->
+      ripper.parse '''
+      _a = 1
+      _a += 2
+      '''
+      expectEqualRefs ripper, new Range([0, 0], [0, 2]),
+        new Range([1, 0], [1, 2])
+      expectEqualRefs ripper, new Range([1, 0], [1, 2]),
+        new Range([0, 0], [0, 2])
+
+    # FEATURE
     # it 'should recognize context', ->
     #   ripper.parse """
     #   obj.a.b = 1
@@ -531,13 +552,3 @@ describe 'Ripper', ->
     #     new Range([1, 6], [1, 7])
     #   expectEqualRefs ripper, new Range([1, 4], [1, 5]),
     #     new Range([0, 4], [0, 5])
-
-    # it 'should support $', ->
-    #   ripper.parse '''
-    #   $a = $ '<p>foo</p>'
-    #   $a.text()
-    #   '''
-    #   expectEqualRefs ripper, new Range([0, 0], [0, 2]),
-    #     new Range([1, 0], [1, 2])
-    #   expectEqualRefs ripper, new Range([1, 0], [1, 2]),
-    #     new Range([0, 0], [0, 2])

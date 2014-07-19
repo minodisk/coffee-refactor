@@ -19,3 +19,18 @@ class LocationDataUtil
     a.first_column is b.first_column and
     a.last_line    is b.last_line    and
     a.last_column  is b.last_column
+
+  @pointToLineColumn: ({ row, column }) ->
+    { line: row, column }
+
+  @isContains: ({ first_line, first_column, last_line, last_column }, { line, column }) ->
+    if first_line == line == last_line
+      first_column <= column <= last_column
+    else if first_line == line < last_line
+      first_column <= column
+    else if first_line < line == last_line
+      column <= last_column
+    else if first_line < line < last_line
+      true
+    else
+      false
