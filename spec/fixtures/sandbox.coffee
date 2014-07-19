@@ -150,11 +150,13 @@ abcdefg#{a}
 #{a}
 '''
 
-
-# TODO
-
 $a = $ '<p>foo</p>'
-$a.text()
+$a.html()
+"""#{$a.text()}"""
+
+_a = 'abc'
+_a = 'def'
+_a = 'ghi'
 
 a
 ///#{a}///
