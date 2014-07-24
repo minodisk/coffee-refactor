@@ -23,9 +23,9 @@ class Ripper
 
   @isIdentifier: (tokens, targetLocationData) ->
     for token in tokens
-      if isContains token[2], targetLocationData
-        return token[0] is 'IDENTIFIER'
-    return false
+      if token[0] is 'IDENTIFIER' and isContains token[2], targetLocationData
+        return true
+    false
 
   @findSymbol: (parent, targetPoint) ->
     target = null
