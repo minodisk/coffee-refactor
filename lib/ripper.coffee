@@ -1,10 +1,12 @@
 { nodes } = require '../vender/coffee-script/lib/coffee-script/coffee-script'
+{ Lexer } = require '../vender/coffee-script/lib/coffee-script/lexer'
+{ parse } = require '../vender/coffee-script/lib/coffee-script/parser'
+{ updateSyntaxError } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Value, Code, Literal, For, Assign, Access, Parens } = require '../vender/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { isString, isArray, uniq, some } = _ = require 'lodash'
 { locationDataToRange, isEqualsLocationData, pointToLineColumn, isContains } = require './LocationDataUtil'
-
 
 LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
@@ -168,33 +170,29 @@ class Ripper
     parent._children = children
     parent
 
-    # unless parent._children?
-    #   children = for attr in parent.children when parent[attr]
-    #     parent[attr]
-    #   children = flatten children
-    #   parent._children = children
-    # parent
-
-
   @scopeNames: [
     'source.coffee'
     'source.litcoffee'
   ]
 
   constructor: (@editor) ->
+    @lexer = new Lexer
 
   destruct: ->
+    delete @lexer
+    delete @tokens
     delete @nodes
 
   serialize: ->
 
   parse: (code, callback) ->
     try
-      rawNodes = nodes code
+      @tokens = @lexer.tokenize code, {}
+      @nodes = Ripper.generateNodes parse @tokens
     catch err
+      updateSyntaxError err, code
       callback? err
       return
-    @nodes = Ripper.generateNodes rawNodes
     callback?()
 
   find: (point) ->

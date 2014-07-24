@@ -542,6 +542,15 @@ describe 'Ripper', ->
       expectEqualRefs ripper, new Range([1, 0], [1, 2]),
         new Range([0, 0], [0, 2])
 
+    it 'should explode interspersed JS', ->
+      ripper.parse '''
+      a = 10
+      `
+      a = 20;
+      `
+      '''
+      expectNoRefs ripper, new Range([2, 0], [2, 1])
+
     # FEATURE
     # it 'should recognize context', ->
     #   ripper.parse """
