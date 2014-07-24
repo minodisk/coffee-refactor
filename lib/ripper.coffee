@@ -14,10 +14,18 @@ Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 
 module.exports =
 class Ripper
-  @find: (root, targetLocationData) ->
+  @find: (tokens, root, targetLocationData) ->
+    return [] unless @isIdentifier tokens, targetLocationData
+
     target = @findSymbol root, targetLocationData
     return [] unless target?
     @findReference(root, target).data
+
+  @isIdentifier: (tokens, targetLocationData) ->
+    for token in tokens
+      if isContains token[2], targetLocationData
+        return token[0] is 'IDENTIFIER'
+    return false
 
   @findSymbol: (parent, targetPoint) ->
     target = null
@@ -197,6 +205,6 @@ class Ripper
 
   find: (point) ->
     return [] unless @nodes?
-    foundNodes = Ripper.find @nodes, pointToLineColumn point
+    foundNodes = Ripper.find @tokens, @nodes, pointToLineColumn point
     for { locationData }, i in foundNodes
       locationDataToRange locationData
