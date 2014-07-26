@@ -6,7 +6,7 @@
 { flatten } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { isString, isArray, uniq, some } = _ = require 'lodash'
-{ locationDataToRange, isEqualsLocationData, pointToLineColumn, isContains } = require './LocationDataUtil'
+{ locationDataToRange, isEqualsLocationData, isContains } = require './LocationDataUtil'
 
 LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
@@ -14,23 +14,22 @@ Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
 
 module.exports =
 class Ripper
-  @find: (tokens, root, targetLocationData) ->
-    return [] unless @isIdentifier tokens, targetLocationData
-
-    target = @findSymbol root, targetLocationData
+  @find: (tokens, nodes, point) ->
+    return [] unless @isIdentifier tokens, point
+    target = @findSymbol nodes, point
     return [] unless target?
-    @findReference(root, target).data
+    @findReference(nodes, target).data
 
-  @isIdentifier: (tokens, targetLocationData) ->
+  @isIdentifier: (tokens, point) ->
     for token in tokens
-      if token[0] is 'IDENTIFIER' and isContains token[2], targetLocationData
+      if token[0] is 'IDENTIFIER' and isContains token[2], point
         return true
     false
 
-  @findSymbol: (parent, targetPoint) ->
+  @findSymbol: (nodes, point) ->
     target = null
 
-    _.each parent._children, (child) =>
+    _.each nodes._children, (child) =>
       # Break this loop if target is found
       return false if target?
       # Skip no locationData
@@ -38,16 +37,16 @@ class Ripper
       # Skip primitive node
       return true if @isPrimitive child
       # Skip object key access
-      return true if @isKeyOfObjectAccess parent, child
+      return true if @isKeyOfObjectAccess nodes, child
       # Skip key in object literal
-      return true if @isKeyOfObjectLiteral parent, child
+      return true if @isKeyOfObjectLiteral nodes, child
 
       if child instanceof Literal
-        if isContains child.locationData, targetPoint
+        if isContains child.locationData, point
           target = child
           return false
 
-      target = @findSymbol child, targetPoint
+      target = @findSymbol child, point
       return false if target?
 
     target
@@ -205,6 +204,6 @@ class Ripper
 
   find: (point) ->
     return [] unless @nodes?
-    foundNodes = Ripper.find @tokens, @nodes, pointToLineColumn point
+    foundNodes = Ripper.find @tokens, @nodes, point
     for { locationData }, i in foundNodes
       locationDataToRange locationData
