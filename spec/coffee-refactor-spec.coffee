@@ -7,11 +7,21 @@ expectNoRefs = (ripper, range) ->
   .toHaveLength 0
 
 expectEqualRefs = (ripper, ranges...) ->
-  resultRanges = ripper.find ranges[0].start
+  for range, i in ranges
+    newRanges = ranges.slice()
+    newRanges.splice i, 1
+    newRanges.unshift range
+    assertRange ripper, newRanges
+
+assertRange = (ripper, ranges) ->
+  assertPoint ripper, ranges[0].start, ranges
+  assertPoint ripper, ranges[0].end, ranges
+
+assertPoint = (ripper, point, ranges) ->
+  resultRanges = ripper.find point
   ranges.sort (a, b) ->
     return delta if (delta = a.start.row - b.start.row) isnt 0
     a.start.column - b.start.column
-
   expect resultRanges
   .toHaveLength ranges.length
   for resultRange, i in resultRanges
@@ -25,7 +35,7 @@ describe 'Ripper', ->
 
     ripper = new Ripper
 
-    it 'should run without error when parse invalid code', ->
+    it 'should not throw error if code is invalid', ->
       expect ->
         ripper.parse """
         a /// b
@@ -96,15 +106,10 @@ describe 'Ripper', ->
       expectNoRefs ripper, new Range([2, 2], [2, 3])
       expectNoRefs ripper, new Range([3, 4], [3, 5])
       expectNoRefs ripper, new Range([4, 6], [4, 7])
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([3, 7], [3, 8]),
         new Range([3, 11], [3, 12])
-      expectEqualRefs ripper, new Range([3, 7], [3, 8]),
-        new Range([0, 0], [0, 1]),
-        new Range([3, 11], [3, 12])
-      expectEqualRefs ripper, new Range([3, 11], [3, 12]),
-        new Range([0, 0], [0, 1]),
-        new Range([3, 7], [3, 8])
 
     it 'should support `Array` literal', ->
       ripper.parse """
@@ -115,10 +120,12 @@ describe 'Ripper', ->
         a - b
       ]
       """
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([3, 2], [3, 3]),
         new Range([4, 2], [4, 3])
-      expectEqualRefs ripper, new Range([3, 6], [3, 7]),
+      expectEqualRefs ripper,
+        new Range([3, 6], [3, 7]),
         new Range([1, 0], [1, 1]),
         new Range([4, 6], [4, 7])
 
@@ -128,11 +135,9 @@ describe 'Ripper', ->
       class B extends A
       class C extends A
       """
-      expectEqualRefs ripper, new Range([0, 6], [0, 7]),
-        new Range([1, 16], [1, 17]),
-        new Range([2, 16], [2, 17])
-      expectEqualRefs ripper, new Range([1, 16], [1, 17]),
+      expectEqualRefs ripper,
         new Range([0, 6], [0, 7]),
+        new Range([1, 16], [1, 17]),
         new Range([2, 16], [2, 17])
 
     it 'should support `if` statement', ->
@@ -140,38 +145,32 @@ describe 'Ripper', ->
       if a
         a = a / a
       """
-      expectEqualRefs ripper, new Range([0, 3], [0, 4]),
+      expectEqualRefs ripper,
+        new Range([0, 3], [0, 4]),
         new Range([1, 2], [1, 3]),
         new Range([1, 6], [1, 7]),
         new Range([1, 10], [1, 11])
-      expectEqualRefs ripper, new Range([1, 10], [1, 11]),
-        new Range([0, 3], [0, 4]),
-        new Range([1, 2], [1, 3]),
-        new Range([1, 6], [1, 7])
 
     it 'should support `for-in` statement without index', ->
       ripper.parse """
       for variable in variables
         console.log variable
       """
-      expectEqualRefs ripper, new Range([0, 4], [0, 12]),
+      expectEqualRefs ripper,
+        new Range([0, 4], [0, 12]),
         new Range([1, 14], [1, 22])
-      expectEqualRefs ripper, new Range([1, 14], [1, 22]),
-        new Range([0, 4], [0, 12])
 
     it 'should support `for-in` statement with index', ->
       ripper.parse """
       for elem, i in arr
         console.log i, elem
       """
-      expectEqualRefs ripper, new Range([0, 4], [0, 8]),
+      expectEqualRefs ripper,
+        new Range([0, 4], [0, 8]),
         new Range([1, 17], [1, 21])
-      expectEqualRefs ripper, new Range([0, 10], [0, 11]),
+      expectEqualRefs ripper,
+        new Range([0, 10], [0, 11]),
         new Range([1, 14], [1, 15])
-      expectEqualRefs ripper, new Range([1, 17], [1, 21]),
-        new Range([0, 4], [0, 8])
-      expectEqualRefs ripper, new Range([1, 14], [1, 15]),
-        new Range([0, 10], [0, 11])
 
     it 'should support `for-in` statement with destructuring assignment', ->
       ripper.parse """
@@ -180,36 +179,23 @@ describe 'Ripper', ->
       for [ a ] in arr
         a = 100
       """
-      expectEqualRefs ripper, new Range([0, 6], [0, 7]),
+      expectEqualRefs ripper,
+        new Range([0, 6], [0, 7]),
         new Range([1, 2], [1, 3]),
         new Range([2, 6], [2, 7]),
         new Range([3, 2], [3, 3])
-      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
-        new Range([0, 6], [0, 7]),
-        new Range([2, 6], [2, 7]),
-        new Range([3, 2], [3, 3])
-      expectEqualRefs ripper, new Range([2, 6], [2, 7]),
-        new Range([0, 6], [0, 7]),
-        new Range([1, 2], [1, 3]),
-        new Range([3, 2], [3, 3])
-      expectEqualRefs ripper, new Range([3, 2], [3, 3]),
-        new Range([0, 6], [0, 7]),
-        new Range([1, 2], [1, 3]),
-        new Range([2, 6], [2, 7])
 
     it 'should support `for-of` statement', ->
       ripper.parse """
       for key, val of obj
         console.log key, val
       """
-      expectEqualRefs ripper, new Range([0, 4], [0, 7]),
+      expectEqualRefs ripper,
+        new Range([0, 4], [0, 7]),
         new Range([1, 14], [1, 17])
-      expectEqualRefs ripper, new Range([0, 9], [0, 12]),
+      expectEqualRefs ripper,
+        new Range([0, 9], [0, 12]),
         new Range([1, 19], [1, 22])
-      expectEqualRefs ripper, new Range([1, 14], [1, 17]),
-        new Range([0, 4], [0, 7])
-      expectEqualRefs ripper, new Range([1, 19], [1, 22]),
-        new Range([0, 9], [0, 12])
 
     it 'should support `for-of` statement with destructuring assignment', ->
       ripper.parse """
@@ -218,22 +204,11 @@ describe 'Ripper', ->
       for i, [ a ] of obj
         a = 100
       """
-      expectEqualRefs ripper, new Range([0, 9], [0, 10]),
+      expectEqualRefs ripper,
+        new Range([0, 9], [0, 10]),
         new Range([1, 2], [1, 3]),
         new Range([2, 9], [2, 10]),
         new Range([3, 2], [3, 3])
-      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
-        new Range([0, 9], [0, 10]),
-        new Range([2, 9], [2, 10]),
-        new Range([3, 2], [3, 3])
-      expectEqualRefs ripper, new Range([2, 9], [2, 10]),
-        new Range([0, 9], [0, 10]),
-        new Range([1, 2], [1, 3]),
-        new Range([3, 2], [3, 3])
-      expectEqualRefs ripper, new Range([3, 2], [3, 3]),
-        new Range([0, 9], [0, 10]),
-        new Range([1, 2], [1, 3]),
-        new Range([2, 9], [2, 10])
 
     it 'should support destructuring assignment statement of `Array`', ->
       ripper.parse """
@@ -242,25 +217,23 @@ describe 'Ripper', ->
       func = ([ a, [ b, c ] ]) ->
         a = b = c = 2
       """
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([1, 2], [1, 3])
-      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
-        new Range([0, 0], [0, 1])
-      expectEqualRefs ripper, new Range([0, 4], [0, 5]),
+      expectEqualRefs ripper,
+        new Range([0, 4], [0, 5]),
         new Range([1, 7], [1, 8])
-      expectEqualRefs ripper, new Range([1, 7], [1, 8]),
-        new Range([0, 4], [0, 5])
-      expectEqualRefs ripper, new Range([0, 8], [0, 9]),
+      expectEqualRefs ripper,
+        new Range([0, 8], [0, 9]),
         new Range([1, 10], [1, 11])
-      expectEqualRefs ripper, new Range([1, 10], [1, 11]),
-        new Range([0, 8], [0, 9])
-      expectEqualRefs ripper, new Range([2, 10], [2, 11]),
+      expectEqualRefs ripper,
+        new Range([2, 10], [2, 11]),
         new Range([3, 2], [3, 3])
-      expectEqualRefs ripper, new Range([3, 2], [3, 3]),
-        new Range([2, 10], [2, 11])
-      expectEqualRefs ripper, new Range([2, 15], [2, 16]),
+      expectEqualRefs ripper,
+        new Range([2, 15], [2, 16]),
         new Range([3, 6], [3, 7])
-      expectEqualRefs ripper, new Range([2, 18], [2, 19]),
+      expectEqualRefs ripper,
+        new Range([2, 18], [2, 19]),
         new Range([3, 10], [3, 11])
 
     it 'should support destructuring assignment statement of `Object`', ->
@@ -274,46 +247,39 @@ describe 'Ripper', ->
       expectNoRefs ripper, new Range([1, 7], [1, 8])
       expectNoRefs ripper, new Range([2, 10], [2, 11])
       expectNoRefs ripper, new Range([2, 15], [2, 16])
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([3, 2], [3, 3])
-      expectEqualRefs ripper, new Range([3, 2], [3, 3]),
-        new Range([0, 0], [0, 1])
-      expectEqualRefs ripper, new Range([0, 4], [0, 5]),
+      expectEqualRefs ripper,
+        new Range([0, 4], [0, 5]),
         new Range([3, 6], [3, 7])
-      expectEqualRefs ripper, new Range([3, 6], [3, 7]),
-        new Range([0, 4], [0, 5])
-      expectEqualRefs ripper, new Range([0, 8], [0, 9]),
+      expectEqualRefs ripper,
+        new Range([0, 8], [0, 9]),
         new Range([1, 10], [1, 11])
-      expectEqualRefs ripper, new Range([1, 10], [1, 11]),
-        new Range([0, 8], [0, 9])
-      expectEqualRefs ripper, new Range([0, 12], [0, 13]),
+      expectEqualRefs ripper,
+        new Range([0, 12], [0, 13]),
         new Range([1, 15], [1, 16])
-      expectEqualRefs ripper, new Range([1, 15], [1, 16]),
-        new Range([0, 12], [0, 13])
-      expectEqualRefs ripper, new Range([2, 18], [2, 19]),
+      expectEqualRefs ripper,
+        new Range([2, 18], [2, 19]),
         new Range([3, 10], [3, 11])
-      expectEqualRefs ripper, new Range([3, 10], [3, 11]),
-        new Range([2, 18], [2, 19])
 
     it 'shoud work in construction of `Array`', ->
       ripper.parse """
       a = 1
       [ a ]
       """
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([1, 2], [1, 3])
-      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
-        new Range([0, 0], [0, 1])
 
     it 'shoud work in construction of `Object`', ->
       ripper.parse """
       a = 1
       { a }
       """
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([1, 2], [1, 3])
-      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
-        new Range([0, 0], [0, 1])
 
     it 'should recognize the scope of variable', ->
       ripper.parse """
@@ -324,21 +290,13 @@ describe 'Ripper', ->
       """
       expectEqualRefs ripper, new Range([0, 0], [0, 1]),
         new Range([3, 0], [3, 1])
-      expectEqualRefs ripper, new Range([1, 8], [1, 9]),
+      expectEqualRefs ripper,
+        new Range([1, 8], [1, 9]),
         new Range([2, 2], [2, 3])
-      expectEqualRefs ripper, new Range([2, 2], [2, 3]),
-        new Range([1, 8], [1, 9])
-      expectEqualRefs ripper, new Range([3, 0], [3, 1]),
-        new Range([0, 0], [0, 1])
-      expectEqualRefs ripper, new Range([0, 4], [0, 5]),
+      expectEqualRefs ripper,
+        new Range([0, 4], [0, 5]),
         new Range([2, 6], [2, 7]),
         new Range([3, 5], [3, 6])
-      expectEqualRefs ripper, new Range([2, 6], [2, 7]),
-        new Range([0, 4], [0, 5]),
-        new Range([3, 5], [3, 6])
-      expectEqualRefs ripper, new Range([3, 5], [3, 6]),
-        new Range([0, 4], [0, 5]),
-        new Range([2, 6], [2, 7])
 
     it 'should recognize nested scope with param', ->
       ripper.parse """
@@ -347,19 +305,13 @@ describe 'Ripper', ->
           a * a
       """
       expectEqualRefs ripper, new Range([0, 0], [0, 1])
-      expectEqualRefs ripper, new Range([0, 11], [0, 12]),
-        new Range([1, 2], [1, 3])
-      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
+      expectEqualRefs ripper,
+        new Range([1, 2], [1, 3]),
         new Range([0, 11], [0, 12])
-      expectEqualRefs ripper, new Range([1, 13], [1, 14]),
+      expectEqualRefs ripper,
+        new Range([1, 13], [1, 14]),
         new Range([2, 4], [2, 5]),
         new Range([2, 8], [2, 9])
-      expectEqualRefs ripper, new Range([2, 4], [2, 5]),
-        new Range([1, 13], [1, 14]),
-        new Range([2, 8], [2, 9])
-      expectEqualRefs ripper, new Range([2, 8], [2, 9]),
-        new Range([1, 13], [1, 14]),
-        new Range([2, 4], [2, 5])
 
     it 'should recognize nested scope with variable', ->
       ripper.parse """
@@ -370,15 +322,10 @@ describe 'Ripper', ->
         func2 = ->
           a = 300
       """
-      expectEqualRefs ripper, new Range([1, 2], [1, 3]),
+      expectEqualRefs ripper,
+        new Range([1, 2], [1, 3]),
         new Range([3, 4], [3, 5]),
         new Range([5, 4], [5, 5])
-      expectEqualRefs ripper, new Range([3, 4], [3, 5]),
-        new Range([1, 2], [1, 3]),
-        new Range([5, 4], [5, 5])
-      expectEqualRefs ripper, new Range([5, 4], [5, 5]),
-        new Range([1, 2], [1, 3]),
-        new Range([3, 4], [3, 5])
 
     it 'should recognize declared variable in independent scopes', ->
       ripper.parse """
@@ -399,16 +346,14 @@ describe 'Ripper', ->
           a 2
       ]
       """
-      expectEqualRefs ripper, new Range([1, 3], [1, 4]),
+      expectEqualRefs ripper,
+        new Range([1, 3], [1, 4]),
         new Range([2, 4], [2, 5])
-      expectEqualRefs ripper, new Range([2, 4], [2, 5]),
-        new Range([1, 3], [1, 4])
-      expectEqualRefs ripper, new Range([3, 3], [3, 4]),
+      expectEqualRefs ripper,
+        new Range([3, 3], [3, 4]),
         new Range([4, 4], [4, 5])
-      expectEqualRefs ripper, new Range([4, 4], [4, 5]),
-        new Range([3, 3], [3, 4])
 
-    it 'should support "string" interpolation', ->
+    it 'should support double quoted string interpolation', ->
       ripper.parse '''
       a
       "#{a}"
@@ -420,33 +365,14 @@ describe 'Ripper', ->
       #{a}
       "
       '''
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([1, 3], [1, 4]),
         new Range([2, 4], [2, 5]),
         new Range([4, 2], [4, 3]),
         new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([1, 3], [1, 4]),
-        new Range([0, 0], [0, 1]),
-        new Range([2, 4], [2, 5]),
-        new Range([4, 2], [4, 3]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([2, 4], [2, 5]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 3], [1, 4]),
-        new Range([4, 2], [4, 3]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([4, 2], [4, 3]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 3], [1, 4]),
-        new Range([2, 4], [2, 5]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([7, 2], [7, 3]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 3], [1, 4]),
-        new Range([2, 4], [2, 5]),
-        new Range([4, 2], [4, 3])
 
-    it 'should support """string""" interpolation', ->
+    it 'should support triple quoted string interpolation', ->
       ripper.parse '''
       a
       """#{a}"""
@@ -458,33 +384,14 @@ describe 'Ripper', ->
       #{a}
       """
       '''
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([1, 5], [1, 6]),
         new Range([2, 6], [2, 7]),
         new Range([4, 2], [4, 3]),
         new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([1, 5], [1, 6]),
-        new Range([0, 0], [0, 1]),
-        new Range([2, 6], [2, 7]),
-        new Range([4, 2], [4, 3]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([2, 6], [2, 7]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 5], [1, 6]),
-        new Range([4, 2], [4, 3]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([4, 2], [4, 3]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 5], [1, 6]),
-        new Range([2, 6], [2, 7]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([7, 2], [7, 3]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 5], [1, 6]),
-        new Range([2, 6], [2, 7]),
-        new Range([4, 2], [4, 3])
 
-    it 'should support regex interpolation', ->
+    it 'should support heregex interpolation', ->
       ripper.parse '''
       a
       ///#{a}///
@@ -496,51 +403,30 @@ describe 'Ripper', ->
       #{a}
       ///
       '''
-      expectEqualRefs ripper, new Range([0, 0], [0, 1]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 1]),
         new Range([1, 5], [1, 6]),
         new Range([2, 6], [2, 7]),
         new Range([4, 2], [4, 3]),
         new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([1, 5], [1, 6]),
-        new Range([0, 0], [0, 1]),
-        new Range([2, 6], [2, 7]),
-        new Range([4, 2], [4, 3]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([2, 6], [2, 7]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 5], [1, 6]),
-        new Range([4, 2], [4, 3]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([4, 2], [4, 3]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 5], [1, 6]),
-        new Range([2, 6], [2, 7]),
-        new Range([7, 2], [7, 3])
-      expectEqualRefs ripper, new Range([7, 2], [7, 3]),
-        new Range([0, 0], [0, 1]),
-        new Range([1, 5], [1, 6]),
-        new Range([2, 6], [2, 7]),
-        new Range([4, 2], [4, 3])
 
     it 'should support symbol starting with $', ->
       ripper.parse '''
       $a = $ '<p>foo</p>'
       $a.text()
       '''
-      expectEqualRefs ripper, new Range([0, 0], [0, 2]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 2]),
         new Range([1, 0], [1, 2])
-      expectEqualRefs ripper, new Range([1, 0], [1, 2]),
-        new Range([0, 0], [0, 2])
 
     it 'should support symbol starting with _', ->
       ripper.parse '''
       _a = 1
       _a += 2
       '''
-      expectEqualRefs ripper, new Range([0, 0], [0, 2]),
+      expectEqualRefs ripper,
+        new Range([0, 0], [0, 2]),
         new Range([1, 0], [1, 2])
-      expectEqualRefs ripper, new Range([1, 0], [1, 2]),
-        new Range([0, 0], [0, 2])
 
     it 'should explode interspersed JS', ->
       ripper.parse '''
