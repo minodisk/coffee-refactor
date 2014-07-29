@@ -166,7 +166,7 @@
     };
 
     Lexer.prototype.stringToken = function() {
-      var inner, innerLen, numBreak, octalEsc, pos, quote, string, trimmed;
+      var inner, innerLen, numBreak, octalEsc, pos, quote, string, trimmed, _ref2;
       switch (quote = this.chunk.charAt(0)) {
         case "'":
           string = (SIMPLESTR.exec(this.chunk) || [])[0];
@@ -184,6 +184,12 @@
         innerLen = inner.length;
         while (inner.charAt(pos++) === '\n' && pos < innerLen) {
           numBreak++;
+        }
+        if (numBreak !== 0) {
+          pos--;
+          while (((_ref2 = inner.charAt(pos++)) === '\n' || _ref2 === ' ') && pos < innerLen) {
+            numBreak++;
+          }
         }
         this.interpolateString(trimmed, {
           strOffset: 1 + numBreak,
@@ -273,7 +279,7 @@
     };
 
     Lexer.prototype.heregexToken = function() {
-      var body, flags, flagsOffset, heregex, match, plusToken, prev, re, strOffset, tag, token, tokens, value, _i, _len, _ref2, _ref3, _ref4;
+      var body, flags, flagsOffset, heregex, match, plusToken, prev, re, tag, token, tokens, value, _i, _len, _ref2, _ref3, _ref4;
       if (!(match = HEREGEX.exec(this.chunk))) {
         return 0;
       }
@@ -289,7 +295,6 @@
       this.token('IDENTIFIER', 'RegExp', 0, 0);
       this.token('CALL_START', '(', 0, 0);
       tokens = [];
-      strOffset = body.charAt(0) === '\n' ? 4 : 3;
       _ref2 = this.interpolateString(body, {
         regex: true,
         strOffset: 3
@@ -610,6 +615,9 @@
       var column, errorToken, expr, heredoc, i, inner, interpolated, len, letter, lexedLength, line, locationToken, nested, offsetInChunk, pi, plusToken, popped, regex, rparen, strOffset, tag, token, tokens, value, _i, _len, _ref2, _ref3, _ref4;
       if (options == null) {
         options = {};
+      }
+      if (global.debug) {
+        console.log(str.replace(/[ ]/g, '.').replace(/\r?\n/g, '-'), this.indent, this.indents, options.strOffset, options.offsetInChunk);
       }
       heredoc = options.heredoc, regex = options.regex, offsetInChunk = options.offsetInChunk, strOffset = options.strOffset, lexedLength = options.lexedLength;
       offsetInChunk || (offsetInChunk = 0);
