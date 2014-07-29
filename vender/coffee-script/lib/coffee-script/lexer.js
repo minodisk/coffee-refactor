@@ -166,7 +166,7 @@
     };
 
     Lexer.prototype.stringToken = function() {
-      var inner, innerLen, numBreak, octalEsc, pos, quote, string, trimmed, _ref2;
+      var inner, match, octalEsc, quote, strOffset, string, trimmed;
       switch (quote = this.chunk.charAt(0)) {
         case "'":
           string = (SIMPLESTR.exec(this.chunk) || [])[0];
@@ -180,19 +180,9 @@
       inner = string.slice(1, -1);
       trimmed = this.removeNewlines(inner);
       if (quote === '"' && 0 < string.indexOf('#{', 1)) {
-        numBreak = pos = 0;
-        innerLen = inner.length;
-        while (inner.charAt(pos++) === '\n' && pos < innerLen) {
-          numBreak++;
-        }
-        if (numBreak !== 0) {
-          pos--;
-          while (((_ref2 = inner.charAt(pos++)) === '\n' || _ref2 === ' ') && pos < innerLen) {
-            numBreak++;
-          }
-        }
+        strOffset = (match = inner.match(/^\n+[\n ]*|^[ ]+\n+[\n ]+/)) != null ? match[0].length : 0;
         this.interpolateString(trimmed, {
-          strOffset: 1 + numBreak,
+          strOffset: 1 + strOffset,
           lexedLength: string.length
         });
       } else {
@@ -216,10 +206,10 @@
         indent: null
       });
       if (quote === '"' && 0 <= doc.indexOf('#{')) {
-        strOffset = match[2].charAt(0) === '\n' ? 4 : 3;
+        strOffset = (match = match[2].match(/^\n+([ ]*)/)) != null ? 1 + match[1].length : 0;
         this.interpolateString(doc, {
           heredoc: true,
-          strOffset: strOffset,
+          strOffset: 3 + strOffset,
           lexedLength: heredoc.length
         });
       } else {
@@ -615,9 +605,6 @@
       var column, errorToken, expr, heredoc, i, inner, interpolated, len, letter, lexedLength, line, locationToken, nested, offsetInChunk, pi, plusToken, popped, regex, rparen, strOffset, tag, token, tokens, value, _i, _len, _ref2, _ref3, _ref4;
       if (options == null) {
         options = {};
-      }
-      if (global.debug) {
-        console.log(str.replace(/[ ]/g, '.').replace(/\r?\n/g, '-'), this.indent, this.indents, options.strOffset, options.offsetInChunk);
       }
       heredoc = options.heredoc, regex = options.regex, offsetInChunk = options.offsetInChunk, strOffset = options.strOffset, lexedLength = options.lexedLength;
       offsetInChunk || (offsetInChunk = 0);
