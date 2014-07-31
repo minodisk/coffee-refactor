@@ -6,7 +6,7 @@
 { flatten } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Range } = require 'atom'
 { isString, isArray, uniq, some } = _ = require 'lodash'
-{ locationDataToRange, isEqualsLocationData, isContains } = require './LocationDataUtil'
+{ locationDataToRange, isEqualsLocationData, isContains } = require './location_data_util'
 
 LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
