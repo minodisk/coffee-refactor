@@ -1,7 +1,7 @@
 {
   "name": "coffee-refactor",
   "main": "./lib/coffee_refactor",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Refactoring support in CoffeeScript",
   "repository": "https://github.com/minodisk/coffee-refactor",
   "license": "MIT",
