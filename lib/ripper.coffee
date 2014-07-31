@@ -182,7 +182,7 @@ class Ripper
     'source.litcoffee'
   ]
 
-  constructor: (@editor) ->
+  constructor: ->
     @lexer = new Lexer
 
   destruct: ->
@@ -196,12 +196,19 @@ class Ripper
     try
       @tokens = @lexer.tokenize code, {}
       @nodes = Ripper.generateNodes parse @tokens
+      callback()
     catch err
       updateSyntaxError err, code
-      callback? [ err ] #TODO deprecate
-      return [ err ]
-    callback?() #TODO deprecate
-    return null
+      { location, message } = err
+      if location? and message?
+        callback [
+          range  : locationDataToRange location
+          message: message
+        ]
+      else
+        # Logs uncaught parse error.
+        console.warn err
+        callback()
 
   find: (point) ->
     return [] unless @nodes?
