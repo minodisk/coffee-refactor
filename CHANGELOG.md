@@ -1,6 +1,7 @@
 # v0.5.4-v0.5.5 on 2014/07/31
 
 * Update refactor API.
+* Fixed wrong position issue in double quoted string interpolation.
 
 # v0.5.3 on 2014/07/24
 
