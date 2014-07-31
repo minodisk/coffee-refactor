@@ -1,3 +1,7 @@
+# v0.5.2 on 2014/07/31
+
+* Update refactor API.
+
 # v0.5.1 on 2014/07/19
 
 * Support symbol starting with `$` or `_`.
