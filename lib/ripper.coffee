@@ -198,9 +198,9 @@ class Ripper
       @nodes = Ripper.generateNodes parse @tokens
     catch err
       updateSyntaxError err, code
-      callback? err
+      callback [ err ]
       return
-    callback?()
+    callback()
 
   find: (point) ->
     return [] unless @nodes?
