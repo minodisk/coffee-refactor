@@ -1,3 +1,7 @@
+# v0.6.0 on 2014/07/31
+
+* Obsolete old API.
+
 # v0.5.4-v0.5.5 on 2014/07/31
 
 * Update refactor API.
