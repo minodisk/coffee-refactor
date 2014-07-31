@@ -35,12 +35,12 @@ class Ripper
       # callback? err
 
   find: ({ row, column }) ->
-    console.log row, column
+    # console.log row, column
     pos = 0
     while --row >= 0
       pos += @lines[row]
     pos += column
-    console.log pos
+    # console.log pos
 
     identification = @context.identify pos
     return [] unless identification
@@ -48,7 +48,7 @@ class Ripper
     { declaration, references } = identification
     # if declaration?
     #   references.unshift declaration
-    console.log  references
+    # console.log  references
     ranges = []
     for reference in references
       ranges.push Ripper.referenceToRange reference
