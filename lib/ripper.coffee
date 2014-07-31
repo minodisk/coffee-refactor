@@ -198,9 +198,10 @@ class Ripper
       @nodes = Ripper.generateNodes parse @tokens
     catch err
       updateSyntaxError err, code
-      callback [ err ]
-      return
-    callback()
+      callback? [ err ] #TODO deprecate
+      return [ err ]
+    callback?() #TODO deprecate
+    return null
 
   find: (point) ->
     return [] unless @nodes?
