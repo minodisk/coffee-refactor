@@ -1,8 +1,8 @@
-# v0.5.3 on 2014/07/31
+# v0.5.4 on 2014/07/31
 
 * Update refactor API.
 
-# v0.5.2 on 2014/07/24
+# v0.5.2-v0.5.3 on 2014/07/24
 
 * Fixes an issue that interspersed JS is highlighted.
 
