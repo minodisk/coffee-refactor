@@ -196,19 +196,19 @@ class Ripper
     try
       @tokens = @lexer.tokenize code, {}
       @nodes = Ripper.generateNodes parse @tokens
-      callback()
+      callback?()
     catch err
       updateSyntaxError err, code
       { location, message } = err
       if location? and message?
-        callback [
+        callback? [
           range  : locationDataToRange location
           message: message
         ]
       else
         # Logs uncaught parse error.
         console.warn err
-        callback()
+        callback?()
 
   find: (point) ->
     return [] unless @nodes?
