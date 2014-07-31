@@ -1,4 +1,4 @@
-{ Ripper } = require '../lib/coffee-refactor'
+{ Ripper } = require '../lib/coffee_refactor'
 { Range } = require 'atom'
 
 expectNoRefs = (ripper, range) ->
