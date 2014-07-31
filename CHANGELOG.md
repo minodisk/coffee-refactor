@@ -2,7 +2,11 @@
 
 * Update refactor API.
 
-# v0.5.2-v0.5.3 on 2014/07/24
+# v0.5.3 on 2014/07/24
+
+* Fixes not highlighting issue when the cursor is left of a word starting with `$`. minodisk/refactor#3
+
+# v0.5.2 on 2014/07/24
 
 * Fixes an issue that interspersed JS is highlighted.
 
