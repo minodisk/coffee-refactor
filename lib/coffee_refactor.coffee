@@ -4,6 +4,10 @@ NotificationView = require './notification_view'
 
 
 module.exports =
+
+  configDefaults:
+    'disable in large files (chars)': 20000
+
   activate: ->
     atom.workspace.emit 'coffee-refactor-became-active'
     return if 'refactor' in packageManager.getAvailablePackageNames() and

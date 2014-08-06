@@ -7,10 +7,18 @@
 { Range } = require 'atom'
 { isString, isArray, uniq, some } = _ = require 'lodash'
 { locationDataToRange, isEqualsLocationData, isContains } = require './location_data_util'
+{ config } = atom
 
 LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
 Value::isHexNumber = -> @bareLiteral(Literal) and HEXNUM.test @base.value
+bench = do ->
+  prev = 0
+  ->
+    current = new Date().getTime()
+    past = current - prev
+    prev = current
+    "#{past}ms"
 
 module.exports =
 class Ripper
@@ -193,9 +201,16 @@ class Ripper
   serialize: ->
 
   parse: (code, callback) ->
+    if code.length > config.getSettings()['coffee-refactor']['disable in large files (chars)']
+      console.warn 'coffe-refactor is disabled in large file: You can cange the threshold in preference pane.'
+      return
+
     try
+      # bench()
       @tokens = @lexer.tokenize code, {}
+      # console.log 'tokenize:', bench()
       @nodes = Ripper.generateNodes parse @tokens
+      # console.log 'nodes:', bench()
       callback?()
     catch err
       updateSyntaxError err, code
@@ -212,6 +227,9 @@ class Ripper
 
   find: (point) ->
     return [] unless @nodes?
+    # bench()
     foundNodes = Ripper.find @tokens, @nodes, point
-    for { locationData }, i in foundNodes
+    results = for { locationData }, i in foundNodes
       locationDataToRange locationData
+    # console.log 'find:', bench()
+    results
