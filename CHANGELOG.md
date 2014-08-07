@@ -1,3 +1,7 @@
+# v0.6.1 on 2014/08/07
+
+* Add an option disables in large file.
+
 # v0.6.0 on 2014/07/31
 
 * Obsolete old API.
