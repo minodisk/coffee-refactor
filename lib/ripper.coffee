@@ -201,7 +201,7 @@ class Ripper
   serialize: ->
 
   parse: (code, callback) ->
-    if code.length > config.getSettings()['coffee-refactor']['disable in large files (chars)']
+    if config.getSettings()['coffee-refactor']? and code.length > config.getSettings()['coffee-refactor']['disable in large files (chars)']
       console.warn 'coffe-refactor is disabled in large file: You can cange the threshold in preference pane.'
       return
 
