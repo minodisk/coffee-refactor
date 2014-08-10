@@ -5,7 +5,7 @@
 { Value, Code, Literal, For, Assign, Access, Parens } = require '../vender/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Range } = require '../vender/text-buffer/src/range'
-{ isString, isArray, uniq, some } = _ = require 'lodash'
+# { isString, uniq, some } = _ = require 'lodash'
 { locationDataToRange, isEqualsLocationData, isContains } = require './location_data_util'
 # { config } = atom
 
@@ -19,6 +19,19 @@ bench = do ->
     past = current - prev
     prev = current
     "#{past}ms"
+isString = (obj) ->
+  obj.toString.call(obj) is "[object String]"
+uniq = (arr) ->
+  newArr = []
+  for elem in arr
+    unless elem in newArr
+      newArr.push elem
+  newArr
+some = (arr, predicate) ->
+  for elem in arr
+    if predicate elem
+      return elem
+  null
 
 module.exports =
 class Ripper
@@ -185,11 +198,6 @@ class Ripper
     parent._children = children
     parent
 
-  @scopeNames: [
-    'source.coffee'
-    'source.litcoffee'
-  ]
-
   constructor: ->
     @lexer = new Lexer
 
@@ -204,26 +212,23 @@ class Ripper
     #   return
 
     try
-      # bench()
       @tokens = @lexer.tokenize code, {}
-      # console.log 'tokenize:', bench()
       @nodes = Ripper.generateNodes parse @tokens
-      # console.log 'nodes:', bench()
-      callback?()
+      return
     catch err
       updateSyntaxError err, code
       { location, message } = err
       if location? and message?
-        callback? [
+        return error:
           range  : locationDataToRange location
           message: message
-        ]
       else
         # Logs uncaught parse error.
         console.warn err
-        callback?()
+        return
 
   find: (point) ->
+    console.log point
     return [] unless @nodes?
     # bench()
     foundNodes = Ripper.find @tokens, @nodes, point
@@ -231,3 +236,9 @@ class Ripper
       locationDataToRange locationData
     # console.log 'find:', bench()
     results
+
+ripper = new Ripper
+self.addEventListener 'message', ({ data: { method, args } }) ->
+  console.log args
+  self.postMessage { method, returns: ripper[method].apply ripper, args }
+, false

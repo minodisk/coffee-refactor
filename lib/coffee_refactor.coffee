@@ -1,7 +1,7 @@
 { readFileSync } = require 'fs'
 { join } = require 'path'
 
-Ripper = require './ripper_worker'
+RipperWorker = require './ripper_worker'
 NotificationView = require './notification_view'
 { packages: packageManager } = atom
 
@@ -18,4 +18,4 @@ module.exports =
     new NotificationView
   deactivate: ->
   serialize: ->
-  Ripper: Ripper
+  Ripper: RipperWorker
