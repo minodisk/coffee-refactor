@@ -1,18 +1,13 @@
-console.log @
-console.log @require
-# console.log window
-# console.log window.require
-
 { nodes } = require '../vender/coffee-script/lib/coffee-script/coffee-script'
 { Lexer } = require '../vender/coffee-script/lib/coffee-script/lexer'
 { parse } = require '../vender/coffee-script/lib/coffee-script/parser'
 { updateSyntaxError } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Value, Code, Literal, For, Assign, Access, Parens } = require '../vender/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../vender/coffee-script/lib/coffee-script/helpers'
-{ Range } = require 'atom'
+{ Range } = require '../vender/text-buffer/src/range'
 { isString, isArray, uniq, some } = _ = require 'lodash'
 { locationDataToRange, isEqualsLocationData, isContains } = require './location_data_util'
-{ config } = atom
+# { config } = atom
 
 LEVEL_TOP = 1
 HEXNUM = /^[+-]?0x[\da-f]+/i
@@ -203,12 +198,10 @@ class Ripper
     delete @tokens
     delete @nodes
 
-  serialize: ->
-
   parse: (code, callback) ->
-    if config.getSettings()['coffee-refactor']? and code.length > config.getSettings()['coffee-refactor']['disable in large files (chars)']
-      console.warn 'coffe-refactor is disabled in large file: You can cange the threshold in preference pane.'
-      return
+    # if config.getSettings()['coffee-refactor']? and code.length > config.getSettings()['coffee-refactor']['disable in large files (chars)']
+    #   console.warn 'coffe-refactor is disabled in large file: You can cange the threshold in preference pane.'
+    #   return
 
     try
       # bench()

@@ -1,4 +1,5 @@
-{ Range } = require 'atom'
+# { Range } = require 'atom'
+{ Range } = require '../vender/text-buffer/src/range'
 
 module.exports =
 class LocationDataUtil
