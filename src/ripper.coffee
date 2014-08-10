@@ -1,3 +1,8 @@
+console.log @
+console.log @require
+# console.log window
+# console.log window.require
+
 { nodes } = require '../vender/coffee-script/lib/coffee-script/coffee-script'
 { Lexer } = require '../vender/coffee-script/lib/coffee-script/lexer'
 { parse } = require '../vender/coffee-script/lib/coffee-script/parser'

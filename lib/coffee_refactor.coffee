@@ -1,3 +1,7 @@
+{ readFileSync } = require 'fs'
+{ join } = require 'path'
+new Worker join __dirname, 'ripper.js'
+
 Ripper = require './ripper'
 NotificationView = require './notification_view'
 { packages: packageManager } = atom
