@@ -15,7 +15,7 @@ class RipperWorker extends EventEmitter2
 
   destruct: ->
 
-  onMessaged: ({ data: { method, returns }}) ->
+  onMessaged: ({ data: { method, returns }}) =>
     switch method
       when 'parse'
         @emit 'parsed', returns
