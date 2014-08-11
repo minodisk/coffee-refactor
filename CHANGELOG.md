@@ -1,3 +1,7 @@
+# v0.6.2 on 2014/08/11
+
+* Fix typo.
+
 # v0.6.1 on 2014/08/07
 
 * Add an option disables in large file.
