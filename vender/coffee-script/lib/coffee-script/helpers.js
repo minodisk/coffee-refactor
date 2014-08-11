@@ -221,7 +221,7 @@
     start = first_column;
     end = first_line === last_line ? last_column + 1 : codeLine.length;
     marker = repeat(' ', start) + repeat('^', end - start);
-    if (typeof process !== "undefined" && process !== null) {
+    if (typeof process !== "undefined" && process !== null && process.stdout != null && process.env != null) {
       colorsEnabled = process.stdout.isTTY && !process.env.NODE_DISABLE_COLORS;
     }
     if ((_ref2 = this.colorful) != null ? _ref2 : colorsEnabled) {
