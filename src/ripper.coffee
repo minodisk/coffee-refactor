@@ -4,7 +4,7 @@
 { updateSyntaxError } = require '../vender/coffee-script/lib/coffee-script/helpers'
 { Value, Code, Literal, For, Assign, Access, Parens } = require '../vender/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../vender/coffee-script/lib/coffee-script/helpers'
-{ Range } = require '../vender/text-buffer/src/range'
+Range = require '../vender/text-buffer/src/range'
 # { isString, uniq, some } = _ = require 'lodash'
 { locationDataToRange, isEqualsLocationData, isContains } = require './location_data_util'
 # { config } = atom
@@ -32,6 +32,11 @@ some = (arr, predicate) ->
     if predicate elem
       return elem
   null
+each = (arr, iterator) ->
+  for elem in arr
+    returns = iterator elem
+    if returns is false
+      break
 
 module.exports =
 class Ripper
@@ -50,7 +55,7 @@ class Ripper
   @findSymbol: (nodes, point) ->
     target = null
 
-    _.each nodes._children, (child) =>
+    each nodes._children, (child) =>
       # Break this loop if target is found
       return false if target?
       # Skip no locationData
@@ -77,7 +82,7 @@ class Ripper
     isFixed = false
     data = []
 
-    _.each parent._children, (child) =>
+    each parent._children, (child) =>
       return false if isFixed
 
       if child instanceof Code
@@ -228,7 +233,6 @@ class Ripper
         return
 
   find: (point) ->
-    console.log point
     return [] unless @nodes?
     # bench()
     foundNodes = Ripper.find @tokens, @nodes, point
@@ -239,6 +243,5 @@ class Ripper
 
 ripper = new Ripper
 self.addEventListener 'message', ({ data: { method, args } }) ->
-  console.log args
   self.postMessage { method, returns: ripper[method].apply ripper, args }
 , false

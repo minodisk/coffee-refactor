@@ -19,6 +19,8 @@ class RipperWorker extends EventEmitter2
     switch method
       when 'parse'
         @emit 'parsed', returns
+      when 'find'
+        @emit 'found', returns
 
   parse: (code, callback) ->
     @worker.postMessage
@@ -26,7 +28,6 @@ class RipperWorker extends EventEmitter2
       args: [ code ]
 
   find: (point) ->
-    console.log 'find', point
     @worker.postMessage
       method: 'find'
       args: [ point ]
