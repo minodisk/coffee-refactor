@@ -4,7 +4,7 @@
 { updateSyntaxError } = require '../vendor/coffee-script/lib/coffee-script/helpers'
 { Value, Code, Literal, For, Assign, Access, Parens } = require '../vendor/coffee-script/lib/coffee-script/nodes'
 { flatten } = require '../vendor/coffee-script/lib/coffee-script/helpers'
-Range = require '../vendor/text-buffer/src/range'
+# Range = require '../vendor/text-buffer/src/range'
 # { isString, uniq, some } = _ = require 'lodash'
 { locationDataToRange, isEqualsLocationData, isContains } = require './location_data_util'
 # { config } = atom
