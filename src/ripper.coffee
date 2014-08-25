@@ -211,7 +211,7 @@ class Ripper
     delete @tokens
     delete @nodes
 
-  parse: (code, callback) ->
+  parse: (code) ->
     # if config.getSettings()['coffee-refactor']? and code.length > config.getSettings()['coffee-refactor']['disable in large files (chars)']
     #   console.warn 'coffe-refactor is disabled in large file: You can cange the threshold in preference pane.'
     #   return
@@ -242,6 +242,6 @@ class Ripper
     results
 
 ripper = new Ripper
-self.addEventListener 'message', ({ data: { method, timestamp, args } }) ->
-  self.postMessage { method, timestamp, returns: ripper[method].apply ripper, args }
+self.addEventListener 'message', ({ data: { timestamp, method, args, callback } }) ->
+  self.postMessage { timestamp, callback, returns: ripper[method].apply ripper, args }
 , false

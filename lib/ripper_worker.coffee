@@ -1,5 +1,7 @@
 { join } = require 'path'
 { EventEmitter2 } = require 'eventemitter2'
+{ max } = Math
+
 
 module.exports =
 class RipperWorker extends EventEmitter2
@@ -10,33 +12,36 @@ class RipperWorker extends EventEmitter2
   ]
 
   constructor: ->
-    @stacks = {}
+    @times = {}
     @worker = new Worker join __dirname, 'ripper.js'
     @worker.addEventListener 'message', @onMessaged
 
   destruct: ->
+    @worker.removeEventListener 'message', @onMessaged
 
-  onMessaged: ({ data: { method, timestamp, returns }}) =>
-    for callback in @stacks[method + timestamp]
-      callback returns
-    delete @stacks[method + timestamp]
+  stamp: (callback) ->
+    newTime = new Date().getTime()
+    oldTime = @times[callback]
+    oldTime ?= newTime
+    @times[callback] = max oldTime, newTime
+    newTime
 
   parse: (code, callback) ->
-    timestamp = new Date().getTime()
+    timestamp = @stamp callback
     @worker.postMessage
       timestamp: timestamp
       method: 'parse'
       args: [ code ]
-    @pushStack 'parse', timestamp, callback
+      callback: callback
 
   find: (point, callback) ->
-    timestamp = new Date().getTime()
+    timestamp = @stamp callback
     @worker.postMessage
       timestamp: timestamp
       method: 'find'
       args: [ point ]
-    @pushStack 'find', timestamp, callback
+      callback: callback
 
-  pushStack: (method, timestamp, callback) ->
-    @stacks[method + timestamp] ?= []
-    @stacks[method + timestamp].push callback
+  onMessaged: ({ data: { method, callback, timestamp, returns }}) =>
+    return unless @times[callback] is timestamp
+    @emit callback, returns
