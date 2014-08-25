@@ -242,6 +242,6 @@ class Ripper
     results
 
 ripper = new Ripper
-self.addEventListener 'message', ({ data: { method, args } }) ->
-  self.postMessage { method, returns: ripper[method].apply ripper, args }
+self.addEventListener 'message', ({ data: { method, timestamp, args } }) ->
+  self.postMessage { method, timestamp, returns: ripper[method].apply ripper, args }
 , false
